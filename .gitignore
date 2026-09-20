@@ -1,0 +1,18 @@
+.env
+.env.*
+!.env.example
+.local/
+.venv/
+__pycache__/
+*.py[cod]
+*.sqlite*
+node_modules/
+dist/
+.DS_Store
+.pytest_cache/
+*.tsbuildinfo
+*.log
+# Account-specific development notes remain local.
+docs/private-development-history.md
+docs/build-review-2026-09-18.md
+docs/tsenta-verification.md
