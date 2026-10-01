@@ -37,6 +37,10 @@ class SettingsInput(BaseModel):
 class KeyInput(BaseModel):
     key: str=Field(min_length=10,max_length=500)
 
+class ResearchInput(BaseModel):
+    company: str | None=Field(default=None,min_length=1,max_length=300)
+    role: str | None=Field(default=None,min_length=1,max_length=300)
+
 class DraftInput(BaseModel):
     note: str=Field(max_length=5000)
     dm: str=Field(max_length=5000)
@@ -95,6 +99,8 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
 
     @asynccontextmanager
     async def lifespan(app):
+        if start_worker and not demo and baseline_valid(store):
+            store.enqueue_sync()
         task=asyncio.create_task(engine.run()) if start_worker else None
         yield
         engine.stop.set()
@@ -149,7 +155,10 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
             outcome_updated_at,details_checked_at,details_error,job_id FROM applications ORDER BY historical,first_seen DESC,source_created_at DESC''')
         valid=baseline_valid(store)
         jobs={j['application_id']:j for j in store.rows('SELECT * FROM jobs')}
+        role_candidates={r['application_id']:r for r in store.rows('SELECT * FROM posting_roles WHERE saved_at IS NULL')}
         for row in applications:
+            candidate=role_candidates.get(row['source_application_id'])
+            row['role_candidate']=candidate if candidate and candidate['posting_url']==row['job_url'] else None
             row['historical']=bool(row['historical'])
             row['selected']=bool(row['selected'])
             row['selected_for_research']=row['selected']
@@ -159,22 +168,34 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
             row['job']=jobs.get(row['source_application_id'])
             row['submission_explanation']='Tsenta’s verified application responses provide createdAt and updatedAt, but no submission timestamp. Neither is used as a submission date.'
             row['description_explanation']=row['details_error'] or ('Tsenta application reads omit the description. Check posting details to try its separate read-only job tool.' if row['job_id'] else 'No job ID was supplied by Tsenta, so its separate posting-details tool cannot be queried.')
-        contacts=store.rows('''SELECT c.*,d.note,d.dm,d.grounding,a.company AS application_company,a.role,
+        contacts=store.rows('''SELECT c.*,d.note,d.dm,d.grounding,a.company AS application_company,a.company_website,a.role,
             a.submitted_at AS application_submitted_at,a.source_status,a.historical,a.hiring_outcome FROM contacts c JOIN applications a ON a.source_application_id=c.application_id
             LEFT JOIN drafts d ON d.contact_id=c.id ORDER BY c.application_id,c.rank''')
         events=store.rows('SELECT * FROM outreach_events ORDER BY id')
+        events_by_contact={}
+        sent_by_contact={}
+        company_contacts={}
+        profile_contacts={}
+        for event in events:
+            events_by_contact.setdefault(event['contact_id'],[]).append(event)
+            if event['kind'] in ('invitation_sent','dm_sent','followup_sent') and not event['undone_at']:
+                sent_by_contact[event['contact_id']]=sent_by_contact.get(event['contact_id'],0)+1
+        for contact in contacts:
+            company=(contact['application_company'] or '').strip().casefold()
+            company_contacts.setdefault(company,set()).add(contact['id'])
+            profile_contacts.setdefault(contact['linkedin_url'],set()).add(contact['id'])
         for contact in contacts:
             contact['dismissed']=bool(contact['dismissed'])
             contact['historical']=bool(contact['historical'])
             contact['evidence']=json.loads(contact['evidence'])
             contact['grounding']=json.loads(contact['grounding'] or '{}')
-            contact['events']=[event for event in events if event['contact_id']==contact['id']]
+            contact['events']=events_by_contact.get(contact['id'],[])
             contact['conversation']=state_for(contact['events'],contact['connection_status'],outcome=contact['hiring_outcome'])
             contact['support']=contact_support(contact)
             contact['relevance_assessment']=assess_relevance(contact)
-            same_company=[c['id'] for c in contacts if (c['application_company'] or '').strip().casefold()==(contact['application_company'] or '').strip().casefold()]
-            same_profile=[c['id'] for c in contacts if c['linkedin_url']==contact['linkedin_url']]
-            contact['prior_outreach_count']=sum(e['kind'] in ('invitation_sent','dm_sent','followup_sent') and not e['undone_at'] for e in events if e['contact_id'] in set(same_company+same_profile))
+            same_company=company_contacts[(contact['application_company'] or '').strip().casefold()]
+            same_profile=profile_contacts[contact['linkedin_url']]
+            contact['prior_outreach_count']=sum(sent_by_contact.get(cid,0) for cid in same_company | same_profile)
         baseline=store.rows('SELECT imported_at,record_count FROM baseline')[0]
         last=store.rows('SELECT * FROM sync_runs ORDER BY id DESC LIMIT 1')
         success=store.rows("SELECT finished_at FROM sync_runs WHERE state='done' ORDER BY id DESC LIMIT 1")
@@ -238,9 +259,43 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
     def sync():return {'run_id':store.enqueue_sync()}
 
     @app.post('/api/applications/{aid}/research')
-    def research(aid:str):
-        store.select_application(aid)
+    def research(aid:str,value:ResearchInput | None=None):
+        store.select_application(aid,company=value.company if value else None,role=value.role if value else None)
         return {'queued':True}
+
+    @app.post('/api/applications/{aid}/research/dismiss')
+    def dismiss_research(aid:str):
+        store.dismiss_preparation(aid)
+        return {'dismissed':True}
+
+    @app.post('/api/applications/{aid}/extract-role')
+    async def extract_role(aid:str):
+        from backend.posting_role import missing_role, inspect_posting
+        rows=store.rows('SELECT role,job_url FROM applications WHERE source_application_id=?',(aid,))
+        if not rows:raise ValueError('Application not found')
+        row=rows[0]
+        if not missing_role(row['role']):raise ValueError('This application already has a role. Nothing was changed.')
+        if not row['job_url']:raise ValueError('No posting link was supplied for this application.')
+        result=await inspect_posting(row['job_url'])
+        with store.db() as db:
+            db.execute('INSERT OR REPLACE INTO posting_roles VALUES(?,?,?,?,?,?,NULL)',
+                (aid,result['role'],result['source_url'],row['job_url'],result['method'],now()))
+        return result
+
+    @app.post('/api/applications/{aid}/extracted-role/save')
+    def save_extracted_role(aid:str):
+        from backend.posting_role import missing_role
+        with store.db() as db:
+            db.execute('BEGIN IMMEDIATE')
+            row=db.execute('SELECT role,job_url,missing_fields FROM applications WHERE source_application_id=?',(aid,)).fetchone()
+            candidate=db.execute('SELECT * FROM posting_roles WHERE application_id=?',(aid,)).fetchone()
+            if not row or not candidate:raise ValueError('Extract a role from this posting first.')
+            if not missing_role(row['role']):raise ValueError('This application already has a role. Nothing was changed.')
+            if row['job_url']!=candidate['posting_url']:raise ValueError('The posting link changed. Extract the role again.')
+            missing=[field for field in json.loads(row['missing_fields']) if field!='role']
+            db.execute('UPDATE applications SET role=?,missing_fields=? WHERE source_application_id=?',(candidate['role'],json.dumps(missing),aid))
+            db.execute('UPDATE posting_roles SET saved_at=? WHERE application_id=?',(now(),aid))
+        return {'saved':True,'role':candidate['role'],'source_url':candidate['source_url']}
 
     @app.put('/api/applications/{aid}/outcome')
     def outcome(aid:str,value:OutcomeInput):

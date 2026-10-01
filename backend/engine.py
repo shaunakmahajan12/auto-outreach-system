@@ -60,13 +60,18 @@ class Engine:
                 self.failure('sync_runs','id',run['id'],error,attempt)
             return
         jobs=self.store.rows("SELECT * FROM jobs WHERE state IN ('queued','retry') AND next_attempt<=? ORDER BY rowid LIMIT 1",(time.time(),))
-        if not jobs:return
+        if not jobs:
+            if os.getenv('OUTREACH_AUTO_ROLE_EXTRACTION','true').lower()=='true' and os.getenv('OUTREACH_DEMO','false').lower()!='true':
+                from backend.posting_role import fill_next_missing_role
+                if await fill_next_missing_role(self.store):return
+            return
         job=jobs[0]; aid=job['application_id']; attempt=job['attempts']+1
         if attempt>3:
             self.failure('jobs','application_id',aid,Retryable('Research retry limit reached. Retry from Applications.'),attempt)
             return
         with self.store.db() as db:
-            db.execute("UPDATE jobs SET state='running',attempts=?,error=NULL WHERE application_id=?",(attempt,aid))
+            claimed=db.execute("UPDATE jobs SET state='running',attempts=?,error=NULL WHERE application_id=? AND state IN ('queued','retry')",(attempt,aid))
+            if not claimed.rowcount:return
             db.execute("UPDATE applications SET research_state='running',last_error=NULL WHERE source_application_id=?",(aid,))
         try:
             await asyncio.wait_for(self.research(aid),timeout=600)
@@ -112,9 +117,13 @@ class Engine:
         self.stage(aid,'ranking_candidates')
         ranked=await self.ollama.rank(app['company'],app['role'],sources) if sources else []
         output=[]
+        saved_drafts={row['source_key']:row for row in self.store.rows(
+            'SELECT c.source_key,d.note,d.dm,d.grounding FROM contacts c JOIN drafts d ON d.contact_id=c.id WHERE c.application_id=?',(aid,))}
         self.stage(aid,'drafting_messages')
         for pick,source in ranked:
-            drafts=await self.ollama.draft(app,pick,settings['facts'],settings)
+            saved=saved_drafts.get(source.id)
+            drafts=({'note':saved['note'],'dm':saved['dm'],'grounding':json.loads(saved['grounding'])}
+                    if saved else await self.ollama.draft(app,pick,settings['facts'],settings))
             output.append((pick,source,drafts))
         with self.store.db() as db:
             current=db.execute('SELECT source_status,historical,selected,confirmed_at_baseline FROM applications WHERE source_application_id=?',(aid,)).fetchone()

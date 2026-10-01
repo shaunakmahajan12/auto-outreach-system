@@ -10,6 +10,7 @@ from backend.main import create_app
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setenv('OUTREACH_DEMO', 'true')
+    monkeypatch.setenv('OUTREACH_AUTO_RESEARCH', 'true')
     monkeypatch.setenv('OUTREACH_DB', str(tmp_path / 'fictional.sqlite'))
     app = create_app(start_worker=False)
     with TestClient(app) as client:

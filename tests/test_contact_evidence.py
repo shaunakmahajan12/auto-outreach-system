@@ -3,7 +3,7 @@ import json
 import pytest
 from backend.contact_evidence import extract_title,backfill_titles,assess_relevance
 from backend.research import Ollama,Pick,DraftPlan,ConnectionNote,Ranking,Source,generated_note_issues
-from backend.security import Unavailable
+from backend.security import Unavailable, Retryable
 from test_workflow import client,advance
 
 FACT='I built a Python data pipeline that cut reporting time by 40% and added production monitoring.'
@@ -49,7 +49,7 @@ def test_relevance_criteria_do_not_use_rank_or_generated_notes():
     assert assess_relevance({**c,'title':None,'evidence':{},'relevance':'Avery is a recruiter at Cedar'})['level']=='unassessed'
 
 
-def test_ollama_rewrite_receives_actual_count_and_validates_before_publish():
+def test_invalid_model_note_uses_grounded_fallback_without_retries():
     model=Ollama();attempts=[]
     async def structured(schema,instruction,data):
         if schema is DraftPlan:return DraftPlan(fact_ids=['f'],connection_style='connect',dm_style='team')
@@ -58,14 +58,14 @@ def test_ollama_rewrite_receives_actual_count_and_validates_before_publish():
     model.structured=structured
     result=asyncio.run(model.draft({'company':'Cedar','role':'Engineer'},PICK,[{'id':'f','text':FACT}],{'note_limit':200,'dm_limit':1200}))
     assert len(result['note'])==200 and result['note']==NOTE
-    assert attempts[1]['previous_attempt']['actual_count']==199
-    assert attempts[1]['previous_attempt']['note']==NOTE[:-1]
-    assert len(attempts)==2
+    assert result['grounding']['validation_issues']==['Finish the sentence; do not truncate text.']
+    assert result['grounding']['fallback_used'] is True
+    assert len(attempts)==1
     assert generated_note_issues(NOTE.replace('40%','90%'),['f'],{'f':FACT},'Avery','Engineer','Cedar')
     assert len('😀')==1 # same code-point counting as Array.from in the frontend
 
 
-def test_exhausted_generation_preserves_saved_draft(client):
+def test_fallback_suggestion_preserves_saved_draft(client):
     client.post('/api/applications/FICTIONAL-HISTORY/research');advance(client)
     store=client.app.state.store;before=store.rows('SELECT * FROM drafts');cid=before[0]['contact_id']
     model=Ollama();attempts=[]
@@ -76,6 +76,35 @@ def test_exhausted_generation_preserves_saved_draft(client):
     model.structured=structured
     client.app.state.engine.ollama.draft=model.draft
     response=client.post(f'/api/contacts/{cid}/draft-suggestion')
-    assert response.status_code!=200 and '4 attempts' in response.text
-    assert len(attempts)==4
+    assert response.status_code==200
+    assert response.json()['grounding']['fallback_used'] is True
+    assert 'I built a fictional Python project.' in response.json()['note']
+    assert 'Too short.' not in response.json()['note']
+    assert len(attempts)==1
     assert store.rows('SELECT * FROM drafts')==before
+
+
+@pytest.mark.parametrize('text',[
+    NOTE.replace('40%','90%'),
+    NOTE+' I have led a team of 100 engineers.',
+    NOTE.replace('I’d value the chance to connect and learn more about the team.','Would you be willing to connect?'),
+])
+def test_fallback_discards_rejected_wording_and_preserves_approved_fact(text):
+    model=Ollama()
+    async def structured(schema,*args):
+        if schema is DraftPlan:return DraftPlan(fact_ids=['f'],connection_style='connect',dm_style='team')
+        return ConnectionNote(note=text,fact_ids=['f'])
+    model.structured=structured
+    result=asyncio.run(model.draft({'company':'Cedar','role':'Engineer'},PICK,[{'id':'f','text':FACT}],{'note_limit':200,'dm_limit':1200}))
+    assert result['note']==NOTE
+    assert result['grounding']['fallback_used'] is True
+    assert result['grounding']['note_fact_ids']==['f']
+
+
+def test_fallback_never_accepts_unapproved_plan_fact():
+    model=Ollama()
+    async def structured(*args):
+        return DraftPlan(fact_ids=['invented'],connection_style='connect',dm_style='team')
+    model.structured=structured
+    with pytest.raises(Retryable,match='unapproved fact'):
+        asyncio.run(model.draft({'company':'Cedar','role':'Engineer'},PICK,[{'id':'f','text':FACT}],{'note_limit':200,'dm_limit':1200}))

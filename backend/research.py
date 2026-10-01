@@ -27,11 +27,25 @@ class SearchProvider(Protocol):
 class Serper:
     def __init__(self,secrets_store):self.secrets=secrets_store
     async def search(self,company,role):
-        key=await asyncio.to_thread(self.secrets.get,'serper')
-        if not key:
-            raise Unavailable('Research unavailable: configure a Serper key in Settings, then retry.')
-        # Exactly one basic request. No crawl/extract, automatic advanced parameters, or paid-plan setup.
         query=f'"{company[:120]}" (recruiter OR "talent acquisition" OR "hiring manager" OR "technical founder") {role[:100]} site:linkedin.com/in/'
+        results=await self.results(query)
+        sources=[]
+        seen=set()
+        for row in results:
+            if not isinstance(row,dict):continue
+            try:url=public_url(row.get('link'),linkedin=True)
+            except ValueError:continue
+            if url in seen:continue
+            seen.add(url)
+            excerpt=str(row.get('snippet') or '')[:800]
+            title=str(row.get('title',''))[:200]
+            if not excerpt:continue
+            sources.append(Source(id=hashlib.sha256(url.encode()).hexdigest()[:16],url=url,title=title,excerpt=excerpt,checked_at=now()))
+        return sources[:6]
+
+    async def results(self,query):
+        key=await asyncio.to_thread(self.secrets.get,'serper')
+        if not key:raise Unavailable('Research unavailable: configure a Serper key in Settings, then retry.')
         async with httpx.AsyncClient(timeout=30,follow_redirects=False,trust_env=False) as client:
             try:
                 response=await client.post('https://google.serper.dev/search',headers={'X-API-KEY':key},json={
@@ -48,20 +62,8 @@ class Serper:
         try:
             results=response.json()['organic']
             if not isinstance(results,list):raise ValueError('Invalid result list')
-        except (ValueError,KeyError):raise Retryable('Search provider returned an invalid response.') from None
-        sources=[]
-        seen=set()
-        for row in results:
-            if not isinstance(row,dict):continue
-            try:url=public_url(row.get('link'),linkedin=True)
-            except ValueError:continue
-            if url in seen:continue
-            seen.add(url)
-            excerpt=str(row.get('snippet') or '')[:800]
-            title=str(row.get('title',''))[:200]
-            if not excerpt:continue
-            sources.append(Source(id=hashlib.sha256(url.encode()).hexdigest()[:16],url=url,title=title,excerpt=excerpt,checked_at=now()))
-        return sources[:6]
+        except (ValueError,KeyError,TypeError):raise Retryable('Search provider returned an invalid response.') from None
+        return results
 
 
 class Pick(BaseModel):
@@ -96,9 +98,7 @@ class ConnectionNote(BaseModel):
 
 
 def generated_note_issues(note, fact_ids, lookup, name, role, company, title=None):
-    # Count Unicode code points, matching Array.from(text).length in the UI.
     issues=[]
-    if len(note)!=200:issues.append(f'Actual count is {len(note)} Unicode characters; required count is exactly 200.')
     if note!=note.strip() or re.search(r'\s{2,}|[\t\n\r]',note):issues.append('Remove whitespace padding; use ordinary single spaces.')
     if not re.search(r'[.!?]$',note):issues.append('Finish the sentence; do not truncate text.')
     remaining=note
@@ -187,14 +187,14 @@ class Ollama:
         # LLM selects approved facts and framing; deterministic rendering prevents new factual claims.
         selected=facts[:12]
         if not selected:raise Unavailable('Drafting unavailable: approve resume/project facts in Settings, then retry.')
-        note_limit=200
+        note_limit=limits.get('note_limit',200)
         opening=f"Hi {pick.name.split()[0]}, I applied for {app.get('role') or 'open role'} at {app.get('company') or 'your company'}."
         note_budget=max(0,note_limit-len(opening)-len(' I’d be glad to connect.')-1)
         plan=await self.structured(DraftPlan,
             'Select up to three relevant approved fact IDs, strongest concrete accomplishment first, and a connection/DM framing. '
             'Facts not in the provided list are prohibited. Prefer facts relevant to the role. '
             'Choose note_fact_ids as up to three relevant approved facts whose full text together fits note_fact_budget characters; '
-            'put a concrete achievement first and add a supporting detail when it fits. Use an empty list if none fits. '
+            'put a concrete achievement first and add a supporting detail when it fits. The budget is a soft preference; select at least one relevant fact even if it exceeds it. '
             'note_fact_id is a backwards-compatible single choice and may be null. '
             'Do not assume the recipient recruits or owns the opening.',
             {'role':(app.get('role') or '')[:200],'company':(app.get('company') or '')[:120],
@@ -213,29 +213,30 @@ class Ollama:
         relevant=[{'id':fid,'text':lookup[fid]} for fid in candidates]
         if not relevant:raise Unavailable('No relevant approved experience selected. Retry generation or approve a concise relevant fact.')
         seed=opening+' '+relevant[0]['text']+' I’d value the chance to connect and learn more about the team.'
-        feedback={'note':seed,'actual_count':len(seed),'issues':['Use this grounded starting draft. If already 200 characters, return it unchanged; otherwise revise framing while preserving approved facts.']}
+        feedback={'note':seed,'issues':['Use this grounded starting draft. Keep it concise while preserving approved facts.']}
         note=None;note_facts=[]
-        for attempt in range(4):
-            result=await self.structured(ConnectionNote,
-                'Write a natural LinkedIn connection note of EXACTLY 200 Unicode characters, including spaces and punctuation. '
-                'You are an APPLICANT, not an employee. Say you applied for the role; never say fellow or imply you work at the company. '
-                'Include recipient first name and the exact role and company. Include at least one relevant approved experience '
-                'sentence copied word-for-word, including every number and punctuation mark. Put fact IDs ONLY in the fact_ids JSON field, never in the note. Add another approved detail when space permits. '
-                'Outside these facts, use only a greeting, application context and a request to connect. '
-                'Do not claim familiarity, praise the person, or assume hiring responsibility. No whitespace padding, filler, '
-                'new factual claims or truncated sentences. If previous_attempt is provided, rewrite the note using its actual '
-                'programmatically measured count and validation feedback. Adjust the framing or choose other approved facts '
-                'to reach exactly 200; do not merely report a count. If previous_attempt includes a grounded_revision, '
-                'it has already been measured at 200 characters: return that revision verbatim in note, with the fact IDs separately.',
-                {'recipient':name,'supported_title':context,'company':company,'role':role,
-                 'approved_facts':relevant,'application_description':(app.get('job_description') or '')[:600],'target_characters':200,'previous_attempt':feedback})
-            issues=generated_note_issues(result.note,result.fact_ids,lookup,name,role,company,context)
-            if not issues:
-                note=result.note;note_facts=result.fact_ids;break
-            feedback={'note':result.note,'actual_count':len(result.note),'characters_to_remove':len(result.note)-200,'issues':issues}
-            if len(seed)==200:feedback['grounded_revision']=seed
-        if note is None:
-            raise Unavailable('Could not generate an accurate 200-character note after 4 attempts. Retry generation; your saved draft is unchanged.')
+        result=await self.structured(ConnectionNote,
+            'Write a natural, concise LinkedIn connection note. The preferred length is a soft target, not a requirement. '
+            'You are an APPLICANT, not an employee. Say you applied for the role; never say fellow or imply you work at the company. '
+            'Include recipient first name and the exact role and company. Include at least one relevant approved experience '
+            'sentence copied word-for-word, including every number and punctuation mark. Put fact IDs ONLY in the fact_ids JSON field, never in the note. Add another approved detail when space permits. '
+            'Outside these facts, use only a greeting, application context and a request to connect. '
+            'Do not claim familiarity, praise the person, or assume hiring responsibility. No whitespace padding, filler, '
+            'new factual claims or truncated sentences. If previous_attempt is provided, address its validation feedback '
+            'while preserving approved facts. Do not pad or truncate the note to reach a character count.',
+            {'recipient':name,'supported_title':context,'company':company,'role':role,
+             'approved_facts':relevant,'application_description':(app.get('job_description') or '')[:600],'preferred_characters':note_limit,'previous_attempt':feedback})
+        issues=generated_note_issues(result.note,result.fact_ids,lookup,name,role,company,context)
+        if not issues:
+            note=result.note;note_facts=result.fact_ids
+        feedback={'note':result.note,'issues':issues}
+        fallback_used=note is None
+        validation_issues=feedback['issues'] if fallback_used else []
+        if fallback_used:
+            # Trusted framing plus a verbatim, validated fact ID needs no model rewrite.
+            # Never publish the rejected model text or overwrite a saved user draft.
+            note=seed
+            note_facts=[relevant[0]['id']]
         chosen=list(dict.fromkeys(plan.fact_ids))
         body=' '.join(lookup[fid] for fid in chosen)
         question=("Would you be open to sharing a little about the team?" if plan.dm_style=='team'
@@ -250,5 +251,6 @@ class Ollama:
         return {'note':note,'dm':dm,'grounding':{'fact_ids':chosen,'facts':[lookup[fid] for fid in dict.fromkeys(chosen+note_facts)],
             'note_fact_ids':note_facts,
             'note_explanation':(('Includes one whole approved fact selected for relevance.' if len(note_facts)==1 else f'Includes {len(note_facts)} whole approved facts: a relevant accomplishment and supporting detail.') if note_facts else 'No selected accomplishment fits in full alongside the role and company. Add a shorter approved fact; no claim was truncated.'),
-            'method':'Ollama writes and revises the note; exact approved experience and Unicode length validated before publication',
+            'method':('Standard framing with a model-selected approved fact copied verbatim' if fallback_used else 'Ollama note checked against approved experience and application context'),
+            'fallback_used':fallback_used,'validation_issues':validation_issues,
             'input_notes':'Ranked at most 6 search snippets; snippets capped at 600 characters. Draft used up to 12 approved facts. Job description unavailable unless source provides it.'}}

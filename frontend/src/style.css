@@ -55,3 +55,14 @@
  .queue-contact-card .card-actions{margin-top:14px}
  .queue-contact-card .card-actions .button{flex:1 1 110px}
 }
+
+
+.preparation-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;justify-self:end}.button.preparation-dismiss{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;min-height:30px;padding:0;color:var(--muted);border-radius:6px}.button.preparation-dismiss:hover:not(:disabled){color:#a42f39;border-color:#e7bdc2;background:#fff5f6}
+
+.extract-role{display:block;margin-top:6px;font-size:12px}
+
+.application-role-link{background:none;border:0;padding:0;text-align:left;font-size:12px;color:#667086;line-height:1.5}.application-role-link:hover{text-decoration:underline}
+
+.outreach-refresh-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px}.outreach-refresh-actions .hint{text-align:right}.outreach-refresh-actions .button{flex-shrink:0}
+
+.dialog-body,#draft-panel{min-width:0;max-width:100%}

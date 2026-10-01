@@ -80,6 +80,10 @@ class Store:
                 CREATE TABLE IF NOT EXISTS outreach_events (id INTEGER PRIMARY KEY, contact_id INTEGER NOT NULL REFERENCES contacts(id),
                     kind TEXT NOT NULL, created_at TEXT NOT NULL, note TEXT NOT NULL DEFAULT '', request_id TEXT UNIQUE NOT NULL);
                 CREATE TABLE IF NOT EXISTS research_cache (application_id TEXT PRIMARY KEY, sources TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS posting_roles (application_id TEXT PRIMARY KEY REFERENCES applications(source_application_id),
+                    role TEXT NOT NULL, source_url TEXT NOT NULL, posting_url TEXT NOT NULL, method TEXT NOT NULL, checked_at TEXT NOT NULL, saved_at TEXT);
+                CREATE TABLE IF NOT EXISTS posting_role_checks (application_id TEXT PRIMARY KEY REFERENCES applications(source_application_id),
+                    posting_url TEXT NOT NULL,status TEXT NOT NULL,error TEXT,checked_at TEXT NOT NULL);
             ''')
             db.execute('INSERT OR IGNORE INTO settings VALUES(1,?)', (json.dumps({'facts': [], 'note_limit': 200, 'dm_limit': 1200}),))
             db.execute("UPDATE sync_runs SET state='retry', error='Interrupted; will resume' WHERE state='running'")
@@ -107,7 +111,7 @@ class Store:
                 return active['id']
             return db.execute("INSERT INTO sync_runs(state,started_at) VALUES('queued',?)", (now(),)).lastrowid
 
-    def select_application(self, app_id):
+    def select_application(self, app_id, company=None, role=None):
         from backend.details import baseline_valid
         if not baseline_valid(self):raise ValueError('Original baseline is missing or inconsistent. Restore it before preparing outreach.')
         with self.db() as db:
@@ -117,10 +121,26 @@ class Store:
             if app['source_status'] != 'COMPLETED':
                 raise ValueError('Only a confirmed COMPLETED submission can be researched')
             if app['hiring_outcome'] in ('rejected','job_closed'):raise ValueError('This application is marked rejected or closed. Correct its hiring outcome before preparing new outreach.')
+            for field,value in (('company',company),('role',role)):
+                if value is not None:
+                    if not value.strip():raise ValueError('Company and role cannot be blank')
+                    db.execute(f'UPDATE applications SET {field}=? WHERE source_application_id=?',(value.strip(),app_id))
+            if app['research_state']=='no_contacts':
+                db.execute('DELETE FROM research_cache WHERE application_id=?',(app_id,))
+                db.execute("UPDATE jobs SET state='interrupted' WHERE application_id=? AND state='done'",(app_id,))
             db.execute('UPDATE applications SET selected=1 WHERE source_application_id=?', (app_id,))
             db.execute("INSERT OR IGNORE INTO jobs(application_id,state) VALUES(?,'queued')", (app_id,))
-            db.execute("UPDATE jobs SET state='queued',stage='queued',updated_at=?, attempts=0,next_attempt=0,error=NULL WHERE application_id=? AND state IN ('blocked','failed','interrupted')", (now(),app_id))
+            db.execute("UPDATE jobs SET state='queued',stage='queued',updated_at=?, attempts=0,next_attempt=0,error=NULL WHERE application_id=? AND state IN ('blocked','failed','interrupted','dismissed')", (now(),app_id))
             db.execute("UPDATE applications SET research_state=COALESCE((SELECT state FROM jobs WHERE application_id=?),'queued'),last_error=NULL WHERE source_application_id=?", (app_id,app_id))
+
+    def dismiss_preparation(self, app_id):
+        with self.db() as db:
+            job=db.execute('SELECT state FROM jobs WHERE application_id=?',(app_id,)).fetchone()
+            if not job:raise ValueError('No preparation to dismiss')
+            if job['state'] not in ('queued','retry','blocked','failed','interrupted','dismissed'):
+                raise ValueError('Preparation has already started or finished. Refresh to see its status.')
+            db.execute("UPDATE jobs SET state='dismissed',stage='dismissed',error=NULL,updated_at=? WHERE application_id=?",(now(),app_id))
+            db.execute("UPDATE applications SET research_state='dismissed',selected=0,last_error=NULL WHERE source_application_id=?",(app_id,))
 
     def apply_snapshot(self, rows):
         from scripts.tsenta_baseline import normalize_status
@@ -146,7 +166,7 @@ class Store:
                          normalize_status(status),row.get('createdAt'),row.get('updatedAt'),int(historical),json.dumps(missing),
                          'historical_no_outreach' if historical else 'awaiting_submission',now(),row.get('jobId')))
                 else:
-                    db.execute('''UPDATE applications SET company=?,role=?,job_url=?,source_status=?,normalized_status=?,
+                    db.execute('''UPDATE applications SET company=COALESCE(NULLIF(?,''),company),role=COALESCE(NULLIF(?,''),role),job_url=?,source_status=?,normalized_status=?,
                         source_updated_at=?,job_id=COALESCE(?,job_id),source_resume_profile_id=COALESCE(?,source_resume_profile_id)
                         WHERE source_application_id=?''',(row.get('companyName'),row.get('jobTitle'),row.get('url'),status,
                         normalize_status(status),row.get('updatedAt'),row.get('jobId'),row.get('resumeProfileId'),aid))
@@ -155,6 +175,8 @@ class Store:
                 sync_metadata(db,aid,row)
                 if status == 'COMPLETED' and (not old or old['hiring_outcome'] not in ('rejected','job_closed')) and (not historical or (old and (old['selected'] or not old['confirmed_at_baseline']))):
                     db.execute('UPDATE applications SET first_confirmed=COALESCE(first_confirmed,?) WHERE source_application_id=?',(now(),aid))
+                    if os.getenv('OUTREACH_AUTO_RESEARCH','true').lower() != 'true':
+                        continue
                     cur = db.execute("INSERT OR IGNORE INTO jobs(application_id,state) VALUES(?,'queued')", (aid,))
                     if cur.rowcount:
                         eligible += 1

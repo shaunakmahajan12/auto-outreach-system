@@ -147,18 +147,26 @@ def test_failed_job_exposes_error_and_retry(client):
     assert store.rows('SELECT * FROM jobs')[0]['state']=='queued'
 
 
-def test_note_includes_whole_approved_fact_and_respects_limit():
+@pytest.mark.parametrize('closing',['I’d be glad to connect.','I’d value the chance to connect and learn more about the team.','I would welcome the opportunity to connect and learn more about your team.'])
+def test_note_includes_whole_approved_fact_without_exact_length(closing):
     model=Ollama()
+    note='Hi Avery, I applied for Engineer at Cedar. I built a Python data pipeline that cut reporting time by 40% and added production monitoring. '+closing
+    calls=[]
     async def structured(schema,*args):
-        if schema is ConnectionNote:return ConnectionNote(note='Hi Avery, I applied for Engineer at Cedar. I built a Python data pipeline that cut reporting time by 40% and added production monitoring. I’d value the chance to connect and learn more about the team.',fact_ids=['fact'])
+        calls.append(schema)
+        if schema is ConnectionNote:return ConnectionNote(note=note,fact_ids=['fact'])
         return DraftPlan(fact_ids=['fact'],connection_style='connect',dm_style='team')
     model.structured=structured
     pick=Pick(source_id='fixture',name='Avery Example',title='Founder',company='Cedar',evidence_quote='Avery Example',relevance='Fictional relevance',uncertainty='Fictional')
     facts=[{'id':'fact','text':'I built a Python data pipeline that cut reporting time by 40% and added production monitoring.'}]
     draft=asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,facts,{'note_limit':200,'dm_limit':1200}))
-    assert facts[0]['text'] in draft['note'] and len(draft['note'])==200
-    assert len(asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,facts,{'note_limit':80,'dm_limit':1200}))['note'])==200
-    with pytest.raises(Unavailable,match='4 attempts'):asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,[{'id':'fact','text':'I use Python.'}],{'note_limit':200,'dm_limit':1200}))
+    assert facts[0]['text'] in draft['note'] and draft['note']==note
+    assert calls==[DraftPlan,ConnectionNote]
+    assert asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,facts,{'note_limit':80,'dm_limit':1200}))['note']==note
+    fallback=asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,[{'id':'fact','text':'I use Python.'}],{'note_limit':200,'dm_limit':1200}))
+    assert fallback['grounding']['fallback_used'] is True
+    assert 'I use Python.' in fallback['note']
+    assert '40%' not in fallback['note']
     with pytest.raises(Unavailable):asyncio.run(model.draft({'role':'Engineer','company':None},pick,facts,{'note_limit':200,'dm_limit':1200}))
 
 
