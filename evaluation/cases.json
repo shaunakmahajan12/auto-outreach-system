@@ -1,0 +1,5042 @@
+[
+  {
+    "id": "fictional-00",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Company 0",
+    "description": "Required: Design and maintain dependable customer-facing services using Python3; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Python service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional React service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Python team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Python system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 0."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 0."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-01",
+    "role": "Software Engineer",
+    "company": "Fictional Company 1",
+    "description": "Required: Design and maintain dependable customer-facing services using Postgres; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PostgreSQL service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional SQLite service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional PostgreSQL team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional PostgreSQL system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 1."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 1."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-02",
+    "role": "Software Engineer",
+    "company": "Fictional Company 2",
+    "description": "Required: Design and maintain dependable customer-facing services using Docker; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Docker service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Terraform service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Docker team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Docker system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 2."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 2."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-03",
+    "role": "Software Engineer",
+    "company": "Fictional Company 3",
+    "description": "Required: Design and maintain dependable customer-facing services using FastAPI; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional FastAPI service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Django service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional FastAPI team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional FastAPI system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 3."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 3."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-04",
+    "role": "Software Engineer",
+    "company": "Fictional Company 4",
+    "description": "Required: Design and maintain dependable customer-facing services using TypeScript; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional TypeScript service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Java service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional TypeScript team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional TypeScript system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 4."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 4."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-05",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Company 5",
+    "description": "Required: Design and maintain dependable customer-facing services using Redis; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Redis service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Elasticsearch service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Redis team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Redis system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 5."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 5."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-06",
+    "role": "Software Engineer",
+    "company": "Fictional Company 6",
+    "description": "Required: Design and maintain dependable customer-facing services using PyTorch; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PyTorch service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional TensorFlow service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional PyTorch team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional PyTorch system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 6."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 6."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-07",
+    "role": "Software Engineer",
+    "company": "Fictional Company 7",
+    "description": "Required: Design and maintain dependable customer-facing services using AWS; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional AWS service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Azure service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional AWS team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional AWS system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 7."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 7."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-08",
+    "role": "Software Engineer",
+    "company": "Fictional Company 8",
+    "description": "Required: Design and maintain dependable customer-facing services using React.js; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Python service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional React service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional React team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional React system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 8."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 8."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-09",
+    "role": "Software Engineer",
+    "company": "Fictional Company 9",
+    "description": "Required: Design and maintain dependable customer-facing services using SQLite; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PostgreSQL service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional SQLite service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional SQLite team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional SQLite system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 9."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 9."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-10",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Company 10",
+    "description": "Required: Design and maintain dependable customer-facing services using Terraform; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Docker service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Terraform service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Terraform team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Terraform system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 10."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 10."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-11",
+    "role": "Software Engineer",
+    "company": "Fictional Company 11",
+    "description": "Required: Design and maintain dependable customer-facing services using Django; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional FastAPI service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Django service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Django team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Django system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 11."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 11."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-12",
+    "role": "Software Engineer",
+    "company": "Fictional Company 12",
+    "description": "Required: Design and maintain dependable customer-facing services using Java; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional TypeScript service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Java service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Java team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Java system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 12."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 12."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-13",
+    "role": "Software Engineer",
+    "company": "Fictional Company 13",
+    "description": "Required: Design and maintain dependable customer-facing services using Elasticsearch; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Redis service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Elasticsearch service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Elasticsearch team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Elasticsearch system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 13."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 13."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-14",
+    "role": "Software Engineer",
+    "company": "Fictional Company 14",
+    "description": "Required: Design and maintain dependable customer-facing services using TensorFlow; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PyTorch service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional TensorFlow service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional TensorFlow team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional TensorFlow system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 14."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 14."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-15",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Company 15",
+    "description": "Required: Design and maintain dependable customer-facing services using Azure; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional AWS service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Azure service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Azure team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Azure system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 15."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 15."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-16",
+    "role": "Software Engineer",
+    "company": "Fictional Company 16",
+    "description": "Required: Design and maintain dependable customer-facing services using Python3; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Python service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional React service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Python team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Python system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 16."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 16."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-17",
+    "role": "Software Engineer",
+    "company": "Fictional Company 17",
+    "description": "Required: Design and maintain dependable customer-facing services using Postgres; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PostgreSQL service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional SQLite service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional PostgreSQL team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional PostgreSQL system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 17."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 17."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-18",
+    "role": "Software Engineer",
+    "company": "Fictional Company 18",
+    "description": "Required: Design and maintain dependable customer-facing services using Docker; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Docker service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Terraform service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Docker team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Docker system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 18."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 18."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-19",
+    "role": "Software Engineer",
+    "company": "Fictional Company 19",
+    "description": "Required: Design and maintain dependable customer-facing services using FastAPI; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional FastAPI service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Django service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional FastAPI team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional FastAPI system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 19."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 19."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-20",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Company 20",
+    "description": "Required: Design and maintain dependable customer-facing services using TypeScript; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional TypeScript service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Java service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional TypeScript team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional TypeScript system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 20."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 20."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-21",
+    "role": "Software Engineer",
+    "company": "Fictional Company 21",
+    "description": "Required: Design and maintain dependable customer-facing services using Redis; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Redis service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Elasticsearch service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Redis team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Redis system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 21."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 21."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-22",
+    "role": "Software Engineer",
+    "company": "Fictional Company 22",
+    "description": "Required: Design and maintain dependable customer-facing services using PyTorch; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PyTorch service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional TensorFlow service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional PyTorch team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional PyTorch system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 22."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 22."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-23",
+    "role": "Software Engineer",
+    "company": "Fictional Company 23",
+    "description": "Required: Design and maintain dependable customer-facing services using AWS; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional AWS service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Azure service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional AWS team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional AWS system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 23."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 23."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-24",
+    "role": "Software Engineer",
+    "company": "Fictional Company 24",
+    "description": "Required: Design and maintain dependable customer-facing services using React.js; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Python service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional React service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional React team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional React system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 24."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 24."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-25",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Company 25",
+    "description": "Required: Design and maintain dependable customer-facing services using SQLite; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PostgreSQL service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional SQLite service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional SQLite team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional SQLite system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 25."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 25."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-26",
+    "role": "Software Engineer",
+    "company": "Fictional Company 26",
+    "description": "Required: Design and maintain dependable customer-facing services using Terraform; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Docker service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Terraform service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Terraform team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Terraform system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 26."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 26."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-27",
+    "role": "Software Engineer",
+    "company": "Fictional Company 27",
+    "description": "Required: Design and maintain dependable customer-facing services using Django; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional FastAPI service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Django service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Django team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Django system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 27."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 27."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-28",
+    "role": "Software Engineer",
+    "company": "Fictional Company 28",
+    "description": "Required: Design and maintain dependable customer-facing services using Java; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional TypeScript service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Java service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Java team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Java system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 28."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 28."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-29",
+    "role": "Software Engineer",
+    "company": "Fictional Company 29",
+    "description": "Required: Design and maintain dependable customer-facing services using Elasticsearch; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Redis service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Elasticsearch service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Elasticsearch team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Elasticsearch system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 29."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 29."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-30",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Company 30",
+    "description": "Required: Design and maintain dependable customer-facing services using TensorFlow; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PyTorch service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional TensorFlow service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional TensorFlow team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional TensorFlow system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 30."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 30."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-31",
+    "role": "Software Engineer",
+    "company": "Fictional Company 31",
+    "description": "Required: Design and maintain dependable customer-facing services using Azure; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional AWS service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Azure service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Azure team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Azure system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 31."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 31."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-32",
+    "role": "Software Engineer",
+    "company": "Fictional Company 32",
+    "description": "Required: Design and maintain dependable customer-facing services using Python3; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Python service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional React service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Python team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Python system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 32."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 32."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-33",
+    "role": "Software Engineer",
+    "company": "Fictional Company 33",
+    "description": "Required: Design and maintain dependable customer-facing services using Postgres; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PostgreSQL service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional SQLite service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional PostgreSQL team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional PostgreSQL system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 33."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 33."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-34",
+    "role": "Software Engineer",
+    "company": "Fictional Company 34",
+    "description": "Required: Design and maintain dependable customer-facing services using Docker; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Docker service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Terraform service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Docker team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Docker system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 34."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 34."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-35",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Company 35",
+    "description": "Required: Design and maintain dependable customer-facing services using FastAPI; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional FastAPI service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Django service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional FastAPI team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional FastAPI system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 35."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 35."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-36",
+    "role": "Software Engineer",
+    "company": "Fictional Company 36",
+    "description": "Required: Design and maintain dependable customer-facing services using TypeScript; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional TypeScript service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Java service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional TypeScript team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional TypeScript system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 36."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 36."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-37",
+    "role": "Software Engineer",
+    "company": "Fictional Company 37",
+    "description": "Required: Design and maintain dependable customer-facing services using Redis; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Redis service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Elasticsearch service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Redis team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Redis system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 37."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 37."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-38",
+    "role": "Software Engineer",
+    "company": "Fictional Company 38",
+    "description": "Required: Design and maintain dependable customer-facing services using PyTorch; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PyTorch service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional TensorFlow service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional PyTorch team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional PyTorch system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 38."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 38."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-39",
+    "role": "Software Engineer",
+    "company": "Fictional Company 39",
+    "description": "Required: Design and maintain dependable customer-facing services using AWS; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional AWS service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Azure service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional AWS team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional AWS system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Company 39."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Company 39."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0"
+    ],
+    "expected_contact_ids": [
+      "recruiter"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-00",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Harbor Research 0",
+    "description": "Required: Design and maintain dependable customer-facing services using Python3; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: React for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Python service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional React service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Python team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Python system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 0."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 0."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 0."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 0 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-01",
+    "role": "Software Engineer",
+    "company": "Fictional Harbor Research 1",
+    "description": "Required: Design and maintain dependable customer-facing services using Postgres; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: SQLite for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PostgreSQL service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional SQLite service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional PostgreSQL team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional PostgreSQL system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 1."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 1."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 1."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 1 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-02",
+    "role": "Software Engineer",
+    "company": "Fictional Harbor Research 2",
+    "description": "Required: Design and maintain dependable customer-facing services using Docker; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: Terraform for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Docker service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Terraform service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Terraform"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Docker team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Docker system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Docker"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 2."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 2."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 2."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 2 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-03",
+    "role": "Software Engineer",
+    "company": "Fictional Harbor Research 3",
+    "description": "Required: Design and maintain dependable customer-facing services using FastAPI; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: Django for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional FastAPI service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Django service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Django"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional FastAPI team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional FastAPI system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "FastAPI"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 3."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 3."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 3."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 3 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-04",
+    "role": "Software Engineer",
+    "company": "Fictional Harbor Research 4",
+    "description": "Required: Design and maintain dependable customer-facing services using TypeScript; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: Java for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional TypeScript service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Java service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Java"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional TypeScript team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional TypeScript system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "TypeScript"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 4."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 4."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 4."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 4 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-05",
+    "role": "Senior Software Engineer, Customer Platform and Distributed Application Infrastructure",
+    "company": "Fictional Harbor Research 5",
+    "description": "Required: Design and maintain dependable customer-facing services using Redis; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: Elasticsearch for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Redis service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Elasticsearch service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Elasticsearch"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional Redis team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional Redis system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "Redis"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 5."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 5."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 5."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 5 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-06",
+    "role": "Software Engineer",
+    "company": "Fictional Harbor Research 6",
+    "description": "Required: Design and maintain dependable customer-facing services using PyTorch; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: TensorFlow for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PyTorch service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional TensorFlow service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "TensorFlow"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional PyTorch team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional PyTorch system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "PyTorch"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 6."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 6."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 6."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 6 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-07",
+    "role": "Software Engineer",
+    "company": "Fictional Harbor Research 7",
+    "description": "Required: Design and maintain dependable customer-facing services using AWS; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: Azure for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional AWS service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional Azure service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "Azure"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional AWS team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional AWS system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "AWS"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 7."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 7."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 7."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 7 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-08",
+    "role": "Software Engineer",
+    "company": "Fictional Harbor Research 8",
+    "description": "Required: Design and maintain dependable customer-facing services using Python3; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: React for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional Python service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "Python"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional React service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional React team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional React system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "React"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 8."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 8."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 8."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 8 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  },
+  {
+    "id": "fictional-expanded-09",
+    "role": "Software Engineer",
+    "company": "Fictional Harbor Research 9",
+    "description": "Required: Design and maintain dependable customer-facing services using Postgres; review changes and investigate service incidents.\nPreferred: Kubernetes deployment experience.\nCollaborate with product teams to clarify delivery requirements and document operational decisions.\nRequired: SQLite for internal tools and reusable application components.\nPreferred: Helm chart maintenance with peer-reviewed changes.",
+    "facts": [
+      {
+        "id": "fact-0",
+        "text": "I built a fictional PostgreSQL service.",
+        "project": "Fictional Project 0",
+        "technologies": [
+          "PostgreSQL"
+        ],
+        "source_reference": "fictional portfolio 0",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-1",
+        "text": "I built a fictional SQLite service.",
+        "project": "Fictional Project 1",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "fictional portfolio 1",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-2",
+        "text": "I built a fictional Rust service.",
+        "project": "Fictional Project 2",
+        "technologies": [
+          "Rust"
+        ],
+        "source_reference": "fictional portfolio 2",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "fact-3",
+        "text": "I built a fictional Go service.",
+        "project": "Fictional Project 3",
+        "technologies": [
+          "Go"
+        ],
+        "source_reference": "fictional portfolio 3",
+        "status": "approved",
+        "version": 1
+      },
+      {
+        "id": "unapproved",
+        "text": "I led a fictional SQLite team.",
+        "project": "Fictional Unverified",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "unverified",
+        "status": "draft",
+        "version": 1
+      },
+      {
+        "id": "retired",
+        "text": "I maintained a fictional SQLite system.",
+        "project": "Fictional Retired",
+        "technologies": [
+          "SQLite"
+        ],
+        "source_reference": "retired",
+        "status": "retired",
+        "version": 1
+      },
+      {
+        "id": "generic-service",
+        "text": "I develop fictional services using COBOL.",
+        "project": "Unrelated example",
+        "technologies": [
+          "COBOL"
+        ],
+        "source_reference": "fictional service notes",
+        "status": "approved",
+        "version": 1
+      }
+    ],
+    "contacts": [
+      {
+        "id": "recruiter",
+        "title": "Technical Recruiter",
+        "evidence": "Avery Example recruits engineers at Fictional Harbor Research 9."
+      },
+      {
+        "id": "unrelated",
+        "title": "Accountant",
+        "evidence": "Robin Example is an accountant at Fictional Harbor Research 9."
+      },
+      {
+        "id": "manager",
+        "title": "Engineering Manager, Customer Platform and Developer Infrastructure",
+        "evidence": "Taylor Fictional is Engineering Manager, Customer Platform and Developer Infrastructure at Fictional Harbor Research 9."
+      },
+      {
+        "id": "former",
+        "title": "Former Technical Recruiter",
+        "evidence": "Casey Fictional previously recruited at Fictional Harbor Research 9 and now works elsewhere."
+      }
+    ],
+    "expected_fact_ids": [
+      "fact-0",
+      "fact-1"
+    ],
+    "expected_contact_ids": [
+      "recruiter",
+      "manager"
+    ],
+    "expected_unsupported": [
+      "Kubernetes deployment experience",
+      "Helm chart maintenance"
+    ],
+    "label_origin": "synthetic author-assigned explicit technology evidence; not independent human judgments"
+  }
+]

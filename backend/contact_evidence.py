@@ -43,13 +43,19 @@ def assess_relevance(contact):
     headline=evidence.get('source_title','');excerpt=evidence.get('excerpt','')
     title=contact.get('title') or extract_title(contact.get('name',''),evidence)
     company=(contact.get('application_company') or '').strip()
-    def result(level,explanation):return {'level':level,'explanation':explanation,'method':'source-rules-v1'}
+    def result(level,explanation):return {'level':level,'explanation':explanation,'method':'source-rules-v2'}
     if not title or not company or not contact.get('role') or contact.get('review_status')=='conflicting':
         return result('unassessed','A supported title, application role, and company association are needed; conflicting evidence requires review.')
     text=headline+' '+excerpt
+    if title.casefold() not in text.casefold():
+        return result('unassessed','The saved source does not support the displayed title. Review a current source before preparing outreach.')
     # An explicit at/@ association is stronger than mere company mention or model inference.
     association=re.compile(r'(?:\bat\s+|@\s*)'+re.escape(company)+r'(?!\w)',re.I)
-    associated=any(association.search(sentence) and not re.search(r'\b(?:former|previously|past|ex-)\b',sentence,re.I) for sentence in re.split(r'[.!?]\s+',text))
+    name=(contact.get('name') or '').strip()
+    associated=bool(name) and any(
+        re.search(re.escape(name)+r'.{0,180}'+association.pattern,sentence,re.I)
+        and not re.search(r'\b(?:former|previously|past|ex-)\b',sentence,re.I)
+        for sentence in (headline,*re.split(r'[.!?]\s+',excerpt)))
     if not associated:return result('low','The saved source does not explicitly associate this person’s professional context with the application company.')
     domains=[name for name,pattern in DOMAINS.items() if re.search(pattern,contact['role'],re.I) and re.search(pattern,title+' '+excerpt,re.I)]
     recruiting=bool(re.search(r'recruit|talent acquisition',title,re.I))

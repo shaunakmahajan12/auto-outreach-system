@@ -1,0 +1,2 @@
+# Optional writable Secrets Manager credential store. No AWS calls in local/demo mode.
+boto3>=1.35,<2

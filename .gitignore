@@ -16,3 +16,5 @@ dist/
 docs/private-development-history.md
 docs/build-review-2026-09-18.md
 docs/tsenta-verification.md
+frontend/test-results/
+frontend/playwright-report/

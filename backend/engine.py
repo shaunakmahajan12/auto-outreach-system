@@ -38,7 +38,7 @@ class Engine:
 
     async def tick(self):
         from backend.details import baseline_valid
-        if not baseline_valid(self.store):return
+        if not self.store.path.exists() or not baseline_valid(self.store):return
         if self.poll_active:
             last=self.store.rows('SELECT started_at FROM sync_runs ORDER BY id DESC LIMIT 1')
             from datetime import datetime
@@ -85,61 +85,28 @@ class Engine:
         if app['hiring_outcome'] in ('rejected','job_closed'):raise Unavailable('Application is marked rejected or closed; new outreach preparation stopped.')
         if app['source_status']!='COMPLETED' or (app['historical'] and app['confirmed_at_baseline'] and not app['selected']):
             raise Unavailable('Application is not eligible for research.')
-        # Check configuration before spending a search credit or enriching details.
-        settings=self.store.settings()
-        self.stage(aid,'checking_configuration')
-        if not settings['facts']:raise Unavailable('Research unavailable: approve resume/project facts in Settings, then retry.')
-        health=await self.ollama.health()
-        if not health['available']:raise Unavailable('Drafting unavailable: '+health['message'])
-        cache=self.store.rows('SELECT sources FROM research_cache WHERE application_id=?',(aid,))
-        self.stage(aid,'researching_contacts')
-        if cache:sources=[Source.model_validate(s) for s in json.loads(cache[0]['sources'])]
-        else:
-            if not app['company'] or not app['role']:raise Unavailable('Research unavailable: source company or role is missing.')
-            sources=await self.search.search(app['company'],app['role'])
-            with self.store.db() as db:
-                db.execute('INSERT OR REPLACE INTO research_cache VALUES(?,?)',(aid,json.dumps([s.model_dump() for s in sources])))
-        # Same verified detail tool; unknown source status never gets promoted to success.
-        self.stage(aid,'checking_sources')
-        if not app['detail_checked']:
-            detail=await self.tsenta.read('get-application-status',{'applicationId':aid,'include':['resumePdfUrl']})
-            if detail.get('applicationId')!=aid or detail.get('status')!='COMPLETED' or detail.get('isTerminal') is not True:
-                raise Unavailable('Tsenta detail no longer confirms this submission. Run Sync now before retrying.')
-            reference=detail.get('resumePdfUrl')
-            if reference:
-                try:reference=public_url(reference)
-                except ValueError:reference=None
-            missing=json.loads(app['missing_fields'])
-            if reference and 'submitted_resume_reference' in missing:missing.remove('submitted_resume_reference')
-            with self.store.db() as db:
-                db.execute('UPDATE applications SET submitted_resume_reference=?,detail_checked=?,missing_fields=? WHERE source_application_id=?',
-                    (reference,now(),json.dumps(missing),aid))
-        self.stage(aid,'ranking_candidates')
-        ranked=await self.ollama.rank(app['company'],app['role'],sources) if sources else []
-        output=[]
-        saved_drafts={row['source_key']:row for row in self.store.rows(
-            'SELECT c.source_key,d.note,d.dm,d.grounding FROM contacts c JOIN drafts d ON d.contact_id=c.id WHERE c.application_id=?',(aid,))}
-        self.stage(aid,'drafting_messages')
-        for pick,source in ranked:
-            saved=saved_drafts.get(source.id)
-            drafts=({'note':saved['note'],'dm':saved['dm'],'grounding':json.loads(saved['grounding'])}
-                    if saved else await self.ollama.draft(app,pick,settings['facts'],settings))
-            output.append((pick,source,drafts))
+        if not hasattr(self,'experience'):
+            from backend.experience import ExperienceRepository
+            self.experience=ExperienceRepository(self.store);self.experience.initialize()
+        from backend.preparation import execute
+        resume=bool(self.store.rows('SELECT * FROM preparation_resume_requests WHERE application_id=?',(aid,)))
+        rid,complete,has_output=await execute(self,aid,resume=resume)
+        with self.store.db() as db:db.execute('DELETE FROM preparation_resume_requests WHERE application_id=?',(aid,))
+        if hasattr(self,'resume_runs'):self.resume_runs.discard(aid)
         with self.store.db() as db:
-            current=db.execute('SELECT source_status,historical,selected,confirmed_at_baseline FROM applications WHERE source_application_id=?',(aid,)).fetchone()
-            if current['source_status']!='COMPLETED' or (current['historical'] and current['confirmed_at_baseline'] and not current['selected']):
-                raise Unavailable('Application eligibility changed. Results were not published.')
-            for rank,(pick,source,draft) in enumerate(output,1):
-                db.execute('''INSERT OR IGNORE INTO contacts(application_id,source_key,name,title,company,linkedin_url,rank,evidence,relevance,uncertainty)
-                    VALUES(?,?,?,?,?,?,?,?,?,?)''',(aid,source.id,pick.name,pick.title,pick.company,public_url(source.url,True),rank,
-                    json.dumps({'url':source.url,'excerpt':pick.evidence_quote,'checked_at':source.checked_at,'source_title':source.title}),
-                    pick.relevance,pick.uncertainty+' Public-search snippet only; current employment and ownership of this opening are not independently confirmed.'))
-                cid=db.execute('SELECT id FROM contacts WHERE application_id=? AND source_key=?',(aid,source.id)).fetchone()[0]
-                # Never overwrite user edits on restarts/retries.
-                db.execute('INSERT OR IGNORE INTO drafts VALUES(?,?,?,?,?)',(cid,draft['note'],draft['dm'],json.dumps(draft['grounding']),now()))
-            state='ready' if output else 'no_contacts'
-            db.execute("UPDATE jobs SET state='done',stage='done',updated_at=?,error=NULL WHERE application_id=?",(now(),aid))
-            db.execute('UPDATE applications SET research_state=?,last_error=NULL WHERE source_application_id=?',(state,aid))
+            db.execute('UPDATE jobs SET state=?,stage=?,updated_at=?,error=NULL WHERE application_id=?',
+                ('done' if complete else 'blocked','done' if complete else 'awaiting_review',now(),aid))
+            db.execute('UPDATE applications SET research_state=?,last_error=? WHERE source_application_id=?',
+                ('ready' if complete and has_output else ('no_contacts' if complete else 'blocked'),None if complete else 'Preparation paused. Review the run and resume.',aid))
+
+    def recover_pending(self):
+        # Graph checkpoints own progress; this restores only the scheduling projection.
+        if not self.store.path.with_name(self.store.path.name+'.checkpoints.sqlite').exists():return
+        with self.store.db() as db:
+            db.execute("""UPDATE jobs SET state='queued',stage='queued',attempts=0,error=NULL WHERE state='interrupted'
+                AND application_id IN (SELECT application_id FROM preparation_runs)
+                AND application_id IN (SELECT source_application_id FROM applications WHERE source_status='COMPLETED'
+                    AND hiring_outcome NOT IN ('rejected','job_closed'))""")
 
     async def run(self):
         while not self.stop.is_set():

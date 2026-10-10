@@ -17,4 +17,4 @@ if __name__=='__main__':
     lock=open(root/'.local'/f'{name}.lock','w')
     try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     except BlockingIOError:raise SystemExit('Another app instance is already running. Use its dashboard.')
-    uvicorn.run('backend.main:create_app',factory=True,host='127.0.0.1',port=8765,workers=1,access_log=False,log_level='warning')
+    uvicorn.run('backend.main:create_app',factory=True,host=os.getenv('BIND_HOST','127.0.0.1'),port=8765,workers=1,access_log=False,log_level='warning')

@@ -1,0 +1,31 @@
+services:
+  app:
+    build: .
+    ports: ["127.0.0.1:8765:8765"]
+    environment:
+      OUTREACH_DEMO: "true"
+      OUTREACH_AUTO_ROLE_EXTRACTION: "false"
+      TSENTA_POLL_ENABLED: "false"
+      OLLAMA_URL: "http://host.docker.internal:11434"
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes: ["demo-data:/app/.local"]
+  postgres:
+    image: pgvector/pgvector:pg16
+    profiles: ["retrieval"]
+    environment:
+      POSTGRES_DB: outreach
+      POSTGRES_USER: outreach
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets: [postgres_password]
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U outreach -d outreach"]
+      interval: 5s
+      retries: 10
+volumes:
+  demo-data:
+  postgres-data:
+secrets:
+  postgres_password:
+    file: .local/postgres-password

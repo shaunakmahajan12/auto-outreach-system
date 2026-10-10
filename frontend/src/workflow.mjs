@@ -48,7 +48,7 @@ export function displayValue(value) {
 }
 
 export const initialFilters={query:'',submission:'completed',sort:'source-desc'};
-export const statusLabels={dismissed:'Dismissed',all:'All',completed:'Submitted',skipped:'Skipped',failed:'Failed',pending:'In progress',unknown:'Not recorded',rejected:'Rejected',job_closed:'Job closed',interviewing:'Interviewing',offer:'Offer',ready:'Drafts ready',historical_no_outreach:'Not started',awaiting_submission:'Not started',no_contacts:'No candidates',queued:'Queued',running:'Preparing',retry:'Retry scheduled',blocked:'Needs attention',interrupted:'Interrupted',history:'Imported history',new:'New or selected', 'observed-desc':'Recently added','observed-asc':'Oldest added','submitted-desc':'Recently submitted','submitted-asc':'Oldest submitted'};
+export const statusLabels={dismissed:'Dismissed',all:'All',completed:'Submitted',skipped:'Skipped',failed:'Failed',pending:'In progress',unknown:'Not recorded',rejected:'Rejected',job_closed:'Job closed',interviewing:'Interviewing',offer:'Offer',ready:'Drafts ready',historical_no_outreach:'Not started',not_started:'Not started',awaiting_submission:'Awaiting submission',no_contacts:'No candidates',queued:'Queued',running:'Preparing',retry:'Retry scheduled',blocked:'Needs attention',interrupted:'Interrupted',history:'Imported history',new:'New or selected', 'observed-desc':'Recently added','observed-asc':'Oldest added','submitted-desc':'Recently submitted','submitted-asc':'Oldest submitted'};
 export const statusLabel=v=>({'source-desc':'Tsenta order (newest first)','source-asc':'Tsenta order (oldest first)'})[v]||statusLabels[v]||displayValue(v).replaceAll('_',' ');
 export const findApplication=(rows,id)=>rows.find(a=>a.source_application_id===id);
 export const activeEvents=c=>(c.events||[]).filter(e=>!e.undone_at).sort((a,b)=>Date.parse(a.created_at)-Date.parse(b.created_at)||a.id-b.id);
@@ -122,3 +122,11 @@ export function preparationGroups(applications) {
     completed:byState('done').sort((a,b)=>Date.parse(b.job?.updated_at||0)-Date.parse(a.job?.updated_at||0)||String(a.source_application_id).localeCompare(String(b.source_application_id)))
   };
 }
+
+export function filterQueue(contacts, {query='',showDismissed=false,relevance='recommended'}={}) {
+ return contacts.filter(c=>!inTracker(c)&&(showDismissed||!c.dismissed)
+   && (relevance==='all'||(relevance==='recommended'?['high','medium'].includes(c.relevance_assessment?.level):c.review_status!=='supported'))
+   && `${c.name||''} ${c.application_company||''} ${c.role||''}`.toLowerCase().includes(query.toLowerCase()));
+}
+
+Object.assign(stages,{missing_description:'Using role-based fallback',no_contacts_review:'No supported contacts found',requirements_extraction:'Reading job requirements',experience_retrieval:'Finding approved experience',contact_research:'Researching contacts',evidence_assessment:'Reviewing contact evidence',drafting:'Preparing drafts',validation:'Checking evidence',review:'Waiting for your review',persistence:'Saving suggestions',awaiting_review:'Needs your input',insufficient_evidence:'Needs approved evidence'});

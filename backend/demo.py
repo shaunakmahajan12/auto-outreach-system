@@ -37,16 +37,24 @@ class FixtureTsenta:
 class FixtureSearch:
     async def search(self,company,role):
         return [Source(id='fictional-source',url='https://www.linkedin.com/in/fictional-cedar-example',
-            title='Avery Example — Fictional technical founder',excerpt='Avery Example is the fictional technical founder at Fictional Cedar Labs. Development fixture, not a real contact.',checked_at=now())]
+            title=f'Avery Example — Fictional technical founder at {company}',excerpt=f'Avery Example is the fictional technical founder at {company}. Development fixture, not a real contact.',checked_at=now())]
 
 
 class FixtureOllama:
+    async def structured(self,schema,instruction,data):
+        from backend.matching import Requirements
+        if schema is Requirements:
+            lines=[line.strip() for line in data['description'].splitlines() if line.strip()]
+            return Requirements(requirements=[{'text':line,'excerpt':line,'category':'skill','priority':'preferred' if 'preferred' in line.lower() else 'required'} for line in lines[:24]])
+        raise ValueError('Fictional fixture supports requirements only')
     async def health(self):return {'available':True,'model':'FICTIONAL fixture (no model request)','message':'Fictional demo'}
     async def rank(self,company,role,sources):
-        return [(Pick(source_id=sources[0].id,name='Avery Example',title='technical founder',company='Fictional Cedar Labs',
-            evidence_quote='Avery Example is the fictional technical founder at Fictional Cedar Labs.',
+        return [(Pick(source_id=sources[0].id,name='Avery Example',title='technical founder',company=company,
+            evidence_quote=sources[0].excerpt[:350],
             relevance='Fictional small-company founder candidate for workflow testing.',uncertainty='Fictional fixture. Do not contact.'),sources[0])]
     async def draft(self,app,pick,facts,limits):
-        return {'note':'FICTIONAL DEMO: Hello Avery, I applied for Software Engineer (fictional) at Fictional Cedar Labs. I built a fictional Python project. I would value the chance to connect and learn more about the team.',
-            'dm':'FICTIONAL DEMO: Hi Avery, I applied for the engineering role at Fictional Cedar Labs. I built a fictional Python project. Could you share more about the team?',
-            'grounding':{'fact_ids':['fictional-fact'],'facts':['I built a fictional Python project.'],'method':'Fictional fixture, not model output'}}
+        from backend.note_renderer import render_note
+        note,ids,explanation=render_note(pick.name,app['role'],app['company'],facts,limits.get('note_limit',200),exact=limits.get('exact_note_200',True),prefix='FICTIONAL DEMO: ')
+        return {'note':note,'dm':'FICTIONAL DEMO: '+' '.join(f['text'] for f in facts[:2]),
+            'grounding':{'fact_ids':[f['id'] for f in facts[:2]],'note_fact_ids':ids,'facts':[f['text'] for f in facts[:2]],
+                'note_explanation':explanation,'method':'Fictional fixture, not model output'}}

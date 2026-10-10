@@ -1,0 +1,2776 @@
+{
+  "mode": "mock_harness_only",
+  "case_count": 50,
+  "label_origin": "synthetic, not independently validated",
+  "limitations": [
+    "Synthetic authored labels include aliases, multi-requirement and unsupported cases; they are not independent human judgments.",
+    "Unsupported claims validator only checks recognized first-person experience spans; not a proof of factuality.",
+    "Mock generation is exact fact concatenation, not LLM drafting. Contact ranking mock is a title heuristic.",
+    "Latencies include local Python and temporary database overhead; no speedup claim."
+  ],
+  "constraints": {
+    "max_selected_facts": 6,
+    "fact_text_characters": 2800,
+    "generated_note_characters": 200,
+    "dm_limit": 1200,
+    "real_generation": "same renderer and model interface for both methods",
+    "embedding_mode": "forced when requested; fallback counted separately"
+  },
+  "summary": {
+    "baseline": {
+      "precision": 0.6,
+      "recall": 1.0,
+      "contact_ndcg": 0.9754430630676099,
+      "latency_ms": 0.03429751959629357,
+      "model_calls": 0,
+      "failure_rate": 0.0,
+      "unsupported_claim_rate": 0.0,
+      "per_stage_mean_ms": {
+        "validation": 0.005449998425319791,
+        "contact_ranking": 0.0015208171680569649,
+        "generation": 0.0007767014903947711,
+        "fact_selection": 0.011951638734899461
+      },
+      "retrieval_methods": {
+        "role_only": 50
+      },
+      "embedding_calls": 0,
+      "lexical_fallback_cases": 0,
+      "available_token_counts": 0
+    },
+    "upgraded": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.9754430630676099,
+      "latency_ms": 1.6954283200902864,
+      "model_calls": 0,
+      "failure_rate": 0.0,
+      "unsupported_claim_rate": 0.0,
+      "per_stage_mean_ms": {
+        "extraction": 0.011786581599153578,
+        "retrieval": 0.3049408196238801,
+        "generation": 0.0005449412856251001,
+        "validation": 0.002265802468173206,
+        "contact_ranking": 0.0011299963807687163
+      },
+      "retrieval_methods": {
+        "lexical": 50
+      },
+      "embedding_calls": 0,
+      "lexical_fallback_cases": 0,
+      "available_token_counts": 0
+    }
+  },
+  "cases": [
+    {
+      "case_id": "fictional-00",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.13612498878501356,
+      "stages_ms": {
+        "fact_selection": 0.016584002878516912,
+        "contact_ranking": 0.0019999861251562834,
+        "generation": 0.0009580107871443033,
+        "validation": 0.08987498586066067
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-00",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 2.8615419869311154,
+      "stages_ms": {
+        "extraction": 0.013833981938660145,
+        "retrieval": 0.35933300387114286,
+        "contact_ranking": 0.0012080126907676458,
+        "generation": 0.000667001586407423,
+        "validation": 0.002875021891668439
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-01",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.035792007111012936,
+      "stages_ms": {
+        "fact_selection": 0.013791985111311078,
+        "contact_ranking": 0.001500011421740055,
+        "generation": 0.0008330098353326321,
+        "validation": 0.004083005478605628
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-01",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4725829823873937,
+      "stages_ms": {
+        "extraction": 0.013333017705008388,
+        "retrieval": 0.3139580076094717,
+        "contact_ranking": 0.001374981366097927,
+        "generation": 0.0005830079317092896,
+        "validation": 0.002374988980591297
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-02",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.038291007513180375,
+      "stages_ms": {
+        "fact_selection": 0.013542012311518192,
+        "contact_ranking": 0.0014170072972774506,
+        "generation": 0.0008330098353326321,
+        "validation": 0.004792003892362118
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-02",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4767499815206975,
+      "stages_ms": {
+        "extraction": 0.013874989235773683,
+        "retrieval": 0.2970420173369348,
+        "contact_ranking": 0.0010829826351255178,
+        "generation": 0.000500003807246685,
+        "validation": 0.002375018084421754
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-03",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03420800203457475,
+      "stages_ms": {
+        "fact_selection": 0.01287501072511077,
+        "contact_ranking": 0.0015829864423722029,
+        "generation": 0.0007500057108700275,
+        "validation": 0.004375004209578037
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-03",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.6472089919261634,
+      "stages_ms": {
+        "extraction": 0.012208009138703346,
+        "retrieval": 0.4916669859085232,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.0005410111043602228,
+        "validation": 0.002874992787837982
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-04",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.030916999094188213,
+      "stages_ms": {
+        "fact_selection": 0.01158300437964499,
+        "contact_ranking": 0.0013750104699283838,
+        "generation": 0.0007079797796905041,
+        "validation": 0.0036249984987080097
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-04",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.454665994970128,
+      "stages_ms": {
+        "extraction": 0.011541007552295923,
+        "retrieval": 0.2849580196198076,
+        "contact_ranking": 0.00104197533801198,
+        "generation": 0.000500003807246685,
+        "validation": 0.002042012056335807
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-05",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03312499029561877,
+      "stages_ms": {
+        "fact_selection": 0.012791017070412636,
+        "contact_ranking": 0.0014579854905605316,
+        "generation": 0.0007920025382190943,
+        "validation": 0.003749999450519681
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-05",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.444624998839572,
+      "stages_ms": {
+        "extraction": 0.011374999303370714,
+        "retrieval": 0.2872080076485872,
+        "contact_ranking": 0.0010409858077764511,
+        "generation": 0.000500003807246685,
+        "validation": 0.002209009835496545
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-06",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.031625007977709174,
+      "stages_ms": {
+        "fact_selection": 0.012415985111147165,
+        "contact_ranking": 0.001374981366097927,
+        "generation": 0.0007500057108700275,
+        "validation": 0.0036249984987080097
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-06",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.5163750213105232,
+      "stages_ms": {
+        "extraction": 0.011124997399747372,
+        "retrieval": 0.3020000003743917,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.00045899651013314724,
+        "validation": 0.0021250161807984114
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-07",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03312499029561877,
+      "stages_ms": {
+        "fact_selection": 0.014332996215671301,
+        "contact_ranking": 0.0012920063454657793,
+        "generation": 0.0006669724825769663,
+        "validation": 0.003583001671358943
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-07",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.408417010679841,
+      "stages_ms": {
+        "extraction": 0.01200000406242907,
+        "retrieval": 0.28091701096855104,
+        "contact_ranking": 0.0010420044418424368,
+        "generation": 0.0004580069798976183,
+        "validation": 0.002082990249618888
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-08",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.04083299427293241,
+      "stages_ms": {
+        "fact_selection": 0.01562500256113708,
+        "contact_ranking": 0.00204198295250535,
+        "generation": 0.0008750066626816988,
+        "validation": 0.004624977009370923
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-08",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.5714579785708338,
+      "stages_ms": {
+        "extraction": 0.013917015166953206,
+        "retrieval": 0.33229199470952153,
+        "contact_ranking": 0.0010409858077764511,
+        "generation": 0.0005420006345957518,
+        "validation": 0.0022909953258931637
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-09",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03300001844763756,
+      "stages_ms": {
+        "fact_selection": 0.012500007869675756,
+        "contact_ranking": 0.0014999823179095984,
+        "generation": 0.0007500057108700275,
+        "validation": 0.0038750004023313522
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-09",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4914580096956342,
+      "stages_ms": {
+        "extraction": 0.011541997082531452,
+        "retrieval": 0.29495800845324993,
+        "contact_ranking": 0.00104197533801198,
+        "generation": 0.000500003807246685,
+        "validation": 0.0023329921532422304
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-10",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.030041992431506515,
+      "stages_ms": {
+        "fact_selection": 0.011541997082531452,
+        "contact_ranking": 0.001333013642579317,
+        "generation": 0.0007089984137564898,
+        "validation": 0.0034590193536132574
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-10",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.418458006810397,
+      "stages_ms": {
+        "extraction": 0.01041698851622641,
+        "retrieval": 0.2723749785218388,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.000459025613963604,
+        "validation": 0.0019579892978072166
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-11",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.029749993700534105,
+      "stages_ms": {
+        "fact_selection": 0.011416996130719781,
+        "contact_ranking": 0.0013329845387488604,
+        "generation": 0.0007089984137564898,
+        "validation": 0.003416993422433734
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-11",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4094590151216835,
+      "stages_ms": {
+        "extraction": 0.011042022379115224,
+        "retrieval": 0.2772919833660126,
+        "contact_ranking": 0.0009580107871443033,
+        "generation": 0.000500003807246685,
+        "validation": 0.00200001522898674
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-12",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.029583985451608896,
+      "stages_ms": {
+        "fact_selection": 0.01108401920646429,
+        "contact_ranking": 0.0013750104699283838,
+        "generation": 0.0007080088835209608,
+        "validation": 0.0034999975468963385
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-12",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4140830026008189,
+      "stages_ms": {
+        "extraction": 0.01025001984089613,
+        "retrieval": 0.2757500042207539,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.000500003807246685,
+        "validation": 0.0019170111045241356
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-13",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03462500171735883,
+      "stages_ms": {
+        "fact_selection": 0.013458979083225131,
+        "contact_ranking": 0.0015829864423722029,
+        "generation": 0.000833999365568161,
+        "validation": 0.004125002305954695
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-13",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4672910037916154,
+      "stages_ms": {
+        "extraction": 0.01220798003487289,
+        "retrieval": 0.27845799922943115,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.000500003807246685,
+        "validation": 0.0021250161807984114
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-14",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03083300543949008,
+      "stages_ms": {
+        "fact_selection": 0.011666998034343123,
+        "contact_ranking": 0.0013329845387488604,
+        "generation": 0.0007500057108700275,
+        "validation": 0.003708992153406143
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-14",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4342919748742133,
+      "stages_ms": {
+        "extraction": 0.011041993275284767,
+        "retrieval": 0.27445799787528813,
+        "contact_ranking": 0.0010409858077764511,
+        "generation": 0.000500003807246685,
+        "validation": 0.0019999861251562834
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-15",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.030416005756706,
+      "stages_ms": {
+        "fact_selection": 0.011208001524209976,
+        "contact_ranking": 0.0014169781934469938,
+        "generation": 0.0007089984137564898,
+        "validation": 0.0034580007195472717
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-15",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.5864169981796294,
+      "stages_ms": {
+        "extraction": 0.010792020475491881,
+        "retrieval": 0.457874994026497,
+        "contact_ranking": 0.0010409858077764511,
+        "generation": 0.0005410111043602228,
+        "validation": 0.002040993422269821
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-16",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03691701567731798,
+      "stages_ms": {
+        "fact_selection": 0.012083008186891675,
+        "contact_ranking": 0.0012910168152302504,
+        "generation": 0.0007910130079835653,
+        "validation": 0.0036669953260570765
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-16",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.430833013728261,
+      "stages_ms": {
+        "extraction": 0.011500000255182385,
+        "retrieval": 0.27766599669121206,
+        "contact_ranking": 0.0009590003173798323,
+        "generation": 0.00045899651013314724,
+        "validation": 0.002082990249618888
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-17",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03283299156464636,
+      "stages_ms": {
+        "fact_selection": 0.012416974641382694,
+        "contact_ranking": 0.0014169781934469938,
+        "generation": 0.0007500057108700275,
+        "validation": 0.0037910067476332188
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-17",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4244999911170453,
+      "stages_ms": {
+        "extraction": 0.01158300437964499,
+        "retrieval": 0.2800830116029829,
+        "contact_ranking": 0.0009589712135493755,
+        "generation": 0.000500003807246685,
+        "validation": 0.0021659943740814924
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-18",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.031083007343113422,
+      "stages_ms": {
+        "fact_selection": 0.011665979400277138,
+        "contact_ranking": 0.001374981366097927,
+        "generation": 0.000833999365568161,
+        "validation": 0.0036660057958215475
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-18",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4354159939102829,
+      "stages_ms": {
+        "extraction": 0.011083000572398305,
+        "retrieval": 0.2760839997790754,
+        "contact_ranking": 0.0010420044418424368,
+        "generation": 0.0004999747034162283,
+        "validation": 0.0020840088836848736
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-19",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.031208997825160623,
+      "stages_ms": {
+        "fact_selection": 0.011458992958068848,
+        "contact_ranking": 0.001374981366097927,
+        "generation": 0.0007910130079835653,
+        "validation": 0.0037080026231706142
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-19",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4183750026859343,
+      "stages_ms": {
+        "extraction": 0.011665979400277138,
+        "retrieval": 0.27512499946169555,
+        "contact_ranking": 0.00104197533801198,
+        "generation": 0.0005410111043602228,
+        "validation": 0.00200001522898674
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-20",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.02983299782499671,
+      "stages_ms": {
+        "fact_selection": 0.010832998668774962,
+        "contact_ranking": 0.0016250123735517263,
+        "generation": 0.0007910130079835653,
+        "validation": 0.0034589902497828007
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-20",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.416040991898626,
+      "stages_ms": {
+        "extraction": 0.0109999964479357,
+        "retrieval": 0.2806670090649277,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.000500003807246685,
+        "validation": 0.0021249870769679546
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-21",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.029375019948929548,
+      "stages_ms": {
+        "fact_selection": 0.01087499549612403,
+        "contact_ranking": 0.0014160177670419216,
+        "generation": 0.0007920025382190943,
+        "validation": 0.003583001671358943
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-21",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4270420069806278,
+      "stages_ms": {
+        "extraction": 0.010457995813339949,
+        "retrieval": 0.2739999908953905,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.000541971530765295,
+        "validation": 0.00200001522898674
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-22",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03254201146773994,
+      "stages_ms": {
+        "fact_selection": 0.012042000889778137,
+        "contact_ranking": 0.0014580145943909883,
+        "generation": 0.0008750066626816988,
+        "validation": 0.0038330035749822855
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-22",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.440624997485429,
+      "stages_ms": {
+        "extraction": 0.011957978131249547,
+        "retrieval": 0.2799999783746898,
+        "contact_ranking": 0.0010410149116069078,
+        "generation": 0.000500003807246685,
+        "validation": 0.002041022526100278
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-23",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03191700670868158,
+      "stages_ms": {
+        "fact_selection": 0.012042000889778137,
+        "contact_ranking": 0.001374981366097927,
+        "generation": 0.0007910130079835653,
+        "validation": 0.003749999450519681
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-23",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4384590031113476,
+      "stages_ms": {
+        "extraction": 0.01300001167692244,
+        "retrieval": 0.2833339967764914,
+        "contact_ranking": 0.0010410149116069078,
+        "generation": 0.0005830079317092896,
+        "validation": 0.0020830193534493446
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-24",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.030166993383318186,
+      "stages_ms": {
+        "fact_selection": 0.011416996130719781,
+        "contact_ranking": 0.001334003172814846,
+        "generation": 0.0007920025382190943,
+        "validation": 0.003749999450519681
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-24",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.3984169927425683,
+      "stages_ms": {
+        "extraction": 0.01058299676515162,
+        "retrieval": 0.27141699683852494,
+        "contact_ranking": 0.0010840012691915035,
+        "generation": 0.000500003807246685,
+        "validation": 0.002207991201430559
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-25",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03024999750778079,
+      "stages_ms": {
+        "fact_selection": 0.011500000255182385,
+        "contact_ranking": 0.0012920063454657793,
+        "generation": 0.0007919734343886375,
+        "validation": 0.003583001671358943
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-25",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.3959170028101653,
+      "stages_ms": {
+        "extraction": 0.010499992640689015,
+        "retrieval": 0.2756659814622253,
+        "contact_ranking": 0.0009580107871443033,
+        "generation": 0.000500003807246685,
+        "validation": 0.0021250161807984114
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-26",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.028292008209973574,
+      "stages_ms": {
+        "fact_selection": 0.010709016351029277,
+        "contact_ranking": 0.0012499804142862558,
+        "generation": 0.0007089984137564898,
+        "validation": 0.0033329997677356005
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-26",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.5160829934757203,
+      "stages_ms": {
+        "extraction": 0.010207993909716606,
+        "retrieval": 0.2828330034390092,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.0005410111043602228,
+        "validation": 0.0021669839043170214
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-27",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.030916999094188213,
+      "stages_ms": {
+        "fact_selection": 0.011541007552295923,
+        "contact_ranking": 0.0012920063454657793,
+        "generation": 0.0007080088835209608,
+        "validation": 0.003416003892198205
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-27",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.3966250116936862,
+      "stages_ms": {
+        "extraction": 0.010499992640689015,
+        "retrieval": 0.27187500381842256,
+        "contact_ranking": 0.0009579816833138466,
+        "generation": 0.0004169996827840805,
+        "validation": 0.0019590079318732023
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-28",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.030458992114290595,
+      "stages_ms": {
+        "fact_selection": 0.01158300437964499,
+        "contact_ranking": 0.001334003172814846,
+        "generation": 0.0008329807315021753,
+        "validation": 0.0034999975468963385
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-28",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4017909998074174,
+      "stages_ms": {
+        "extraction": 0.010707997716963291,
+        "retrieval": 0.27058401610702276,
+        "contact_ranking": 0.0010420044418424368,
+        "generation": 0.0004580069798976183,
+        "validation": 0.00204198295250535
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-29",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.029082992114126682,
+      "stages_ms": {
+        "fact_selection": 0.010707997716963291,
+        "contact_ranking": 0.001374981366097927,
+        "generation": 0.0007500057108700275,
+        "validation": 0.003583991201594472
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-29",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4016669883858413,
+      "stages_ms": {
+        "extraction": 0.01008401159197092,
+        "retrieval": 0.2704590151552111,
+        "contact_ranking": 0.0009590003173798323,
+        "generation": 0.0005420006345957518,
+        "validation": 0.002042012056335807
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-30",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.031333009246736765,
+      "stages_ms": {
+        "fact_selection": 0.011708005331456661,
+        "contact_ranking": 0.0014580145943909883,
+        "generation": 0.0007920025382190943,
+        "validation": 0.0036669953260570765
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-30",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4227920037228614,
+      "stages_ms": {
+        "extraction": 0.01158300437964499,
+        "retrieval": 0.27600000612437725,
+        "contact_ranking": 0.0009579816833138466,
+        "generation": 0.000500003807246685,
+        "validation": 0.00200001522898674
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-31",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.031249976018443704,
+      "stages_ms": {
+        "fact_selection": 0.011625001206994057,
+        "contact_ranking": 0.0013750104699283838,
+        "generation": 0.0007500057108700275,
+        "validation": 0.003708992153406143
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-31",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.3936670147813857,
+      "stages_ms": {
+        "extraction": 0.010832998668774962,
+        "retrieval": 0.2769579878076911,
+        "contact_ranking": 0.00104197533801198,
+        "generation": 0.0004580069798976183,
+        "validation": 0.0020840088836848736
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-32",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.029874994652345777,
+      "stages_ms": {
+        "fact_selection": 0.01087499549612403,
+        "contact_ranking": 0.0014170072972774506,
+        "generation": 0.0007089984137564898,
+        "validation": 0.0036249984987080097
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-32",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.5949159860610962,
+      "stages_ms": {
+        "extraction": 0.01029099803417921,
+        "retrieval": 0.46637500054202974,
+        "contact_ranking": 0.0009590003173798323,
+        "generation": 0.000500003807246685,
+        "validation": 0.00204198295250535
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-33",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.029499991796910763,
+      "stages_ms": {
+        "fact_selection": 0.010916992323473096,
+        "contact_ranking": 0.0014170072972774506,
+        "generation": 0.0007499766070395708,
+        "validation": 0.0035410048440098763
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-33",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4060419925954193,
+      "stages_ms": {
+        "extraction": 0.01016599708236754,
+        "retrieval": 0.27266598772257566,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.000500003807246685,
+        "validation": 0.002040993422269821
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-34",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.031124975066632032,
+      "stages_ms": {
+        "fact_selection": 0.011957978131249547,
+        "contact_ranking": 0.001374981366097927,
+        "generation": 0.0008330098353326321,
+        "validation": 0.0034999975468963385
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-34",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.5758750087115914,
+      "stages_ms": {
+        "extraction": 0.011083990102633834,
+        "retrieval": 0.2754580054897815,
+        "contact_ranking": 0.0014170072972774506,
+        "generation": 0.0005830079317092896,
+        "validation": 0.0026659981813281775
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-35",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03095800639130175,
+      "stages_ms": {
+        "fact_selection": 0.011333002476021647,
+        "contact_ranking": 0.0014160177670419216,
+        "generation": 0.0008750066626816988,
+        "validation": 0.0038750004023313522
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-35",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4497500087600201,
+      "stages_ms": {
+        "extraction": 0.011249998351559043,
+        "retrieval": 0.2753330045379698,
+        "contact_ranking": 0.0011249794624745846,
+        "generation": 0.000500003807246685,
+        "validation": 0.002082990249618888
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-36",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.02933401265181601,
+      "stages_ms": {
+        "fact_selection": 0.011249998351559043,
+        "contact_ranking": 0.0012499804142862558,
+        "generation": 0.0007920025382190943,
+        "validation": 0.003374996595084667
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-36",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.417749997926876,
+      "stages_ms": {
+        "extraction": 0.010583025868982077,
+        "retrieval": 0.2739169867709279,
+        "contact_ranking": 0.0009579816833138466,
+        "generation": 0.000500003807246685,
+        "validation": 0.00200001522898674
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-37",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.029874994652345777,
+      "stages_ms": {
+        "fact_selection": 0.01129100564867258,
+        "contact_ranking": 0.0014169781934469938,
+        "generation": 0.0007080088835209608,
+        "validation": 0.0036669953260570765
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-37",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.4192499802447855,
+      "stages_ms": {
+        "extraction": 0.010540999937802553,
+        "retrieval": 0.2721250057220459,
+        "contact_ranking": 0.00100000761449337,
+        "generation": 0.000500003807246685,
+        "validation": 0.002082990249618888
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-38",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.029041984817013144,
+      "stages_ms": {
+        "fact_selection": 0.010791001841425896,
+        "contact_ranking": 0.001374981366097927,
+        "generation": 0.0007920025382190943,
+        "validation": 0.0034999975468963385
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-38",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.412333978805691,
+      "stages_ms": {
+        "extraction": 0.010209012543782592,
+        "retrieval": 0.2733750152401626,
+        "contact_ranking": 0.0010420044418424368,
+        "generation": 0.0005409820005297661,
+        "validation": 0.0019590079318732023
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-39",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 0.5,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.030666007660329342,
+      "stages_ms": {
+        "fact_selection": 0.011208001524209976,
+        "contact_ranking": 0.001333013642579317,
+        "generation": 0.0007920025382190943,
+        "validation": 0.003583991201594472
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-39",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 1.0,
+      "unsupported_claims": 0,
+      "checked_claims": 1,
+      "failure": null,
+      "latency_ms": 1.6013339918572456,
+      "stages_ms": {
+        "extraction": 0.01108401920646429,
+        "retrieval": 0.46412498340941966,
+        "contact_ranking": 0.0010829826351255178,
+        "generation": 0.000500003807246685,
+        "validation": 0.002041022526100278
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-00",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03337502130307257,
+      "stages_ms": {
+        "fact_selection": 0.011124997399747372,
+        "contact_ranking": 0.0017909915186464787,
+        "generation": 0.0008750066626816988,
+        "validation": 0.003749999450519681
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-00",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.402167010586709,
+      "stages_ms": {
+        "extraction": 0.014165998436510563,
+        "retrieval": 0.2952499780803919,
+        "contact_ranking": 0.0014580145943909883,
+        "generation": 0.0006249756552278996,
+        "validation": 0.0025840126909315586
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-01",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.033666001399978995,
+      "stages_ms": {
+        "fact_selection": 0.011416996130719781,
+        "contact_ranking": 0.0019169820006936789,
+        "generation": 0.0007080088835209608,
+        "validation": 0.0037080026231706142
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-01",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.5540410133544356,
+      "stages_ms": {
+        "extraction": 0.013375014532357454,
+        "retrieval": 0.2987500047311187,
+        "contact_ranking": 0.0016249832697212696,
+        "generation": 0.0007500057108700275,
+        "validation": 0.002874992787837982
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-02",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03379100235179067,
+      "stages_ms": {
+        "fact_selection": 0.011708005331456661,
+        "contact_ranking": 0.001834006980061531,
+        "generation": 0.0007500057108700275,
+        "validation": 0.0036660057958215475
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-02",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.455999987432733,
+      "stages_ms": {
+        "extraction": 0.013457989552989602,
+        "retrieval": 0.3049160004593432,
+        "contact_ranking": 0.001374981366097927,
+        "generation": 0.0006660120561718941,
+        "validation": 0.002541986759752035
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-03",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03620801726356149,
+      "stages_ms": {
+        "fact_selection": 0.012417003745213151,
+        "contact_ranking": 0.0021250161807984114,
+        "generation": 0.0007909839041531086,
+        "validation": 0.003916997229680419
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-03",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.5416670250706375,
+      "stages_ms": {
+        "extraction": 0.014250021195039153,
+        "retrieval": 0.29395800083875656,
+        "contact_ranking": 0.0014590041246265173,
+        "generation": 0.0007079797796905041,
+        "validation": 0.002666027285158634
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-04",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.034500000765547156,
+      "stages_ms": {
+        "fact_selection": 0.011458003427833319,
+        "contact_ranking": 0.0020830193534493446,
+        "generation": 0.0007920025382190943,
+        "validation": 0.003708992153406143
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-04",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.4596659932285547,
+      "stages_ms": {
+        "extraction": 0.013415992725640535,
+        "retrieval": 0.29512500623241067,
+        "contact_ranking": 0.0014579854905605316,
+        "generation": 0.0005839974619448185,
+        "validation": 0.002749991836026311
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-05",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03345898585394025,
+      "stages_ms": {
+        "fact_selection": 0.011540978448465466,
+        "contact_ranking": 0.0018330174498260021,
+        "generation": 0.0007500057108700275,
+        "validation": 0.003749999450519681
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-05",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.4718749918974936,
+      "stages_ms": {
+        "extraction": 0.013082986697554588,
+        "retrieval": 0.2956249809358269,
+        "contact_ranking": 0.0014170072972774506,
+        "generation": 0.0007080088835209608,
+        "validation": 0.0028329959604889154
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-06",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03391699283383787,
+      "stages_ms": {
+        "fact_selection": 0.011458003427833319,
+        "contact_ranking": 0.0017499842215329409,
+        "generation": 0.0007500057108700275,
+        "validation": 0.003916997229680419
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-06",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.526584023144096,
+      "stages_ms": {
+        "extraction": 0.01316601992584765,
+        "retrieval": 0.2941249986179173,
+        "contact_ranking": 0.0016250123735517263,
+        "generation": 0.0007079797796905041,
+        "validation": 0.0028329959604889154
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-07",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03691698657348752,
+      "stages_ms": {
+        "fact_selection": 0.012791977496817708,
+        "contact_ranking": 0.002040993422269821,
+        "generation": 0.000833999365568161,
+        "validation": 0.004083005478605628
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-07",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.6964160206262022,
+      "stages_ms": {
+        "extraction": 0.014416989870369434,
+        "retrieval": 0.49866701010614634,
+        "contact_ranking": 0.0016249832697212696,
+        "generation": 0.0007499766070395708,
+        "validation": 0.0029170187190175056
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-08",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.03441699664108455,
+      "stages_ms": {
+        "fact_selection": 0.011916999937966466,
+        "contact_ranking": 0.0017919810488820076,
+        "generation": 0.0007500057108700275,
+        "validation": 0.0036669953260570765
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-08",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.4175000144168735,
+      "stages_ms": {
+        "extraction": 0.013958022464066744,
+        "retrieval": 0.2981249999720603,
+        "contact_ranking": 0.0014169781934469938,
+        "generation": 0.0006250047590583563,
+        "validation": 0.0027919886633753777
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-09",
+      "method": "baseline",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 0.034500000765547156,
+      "stages_ms": {
+        "fact_selection": 0.011500000255182385,
+        "contact_ranking": 0.0019170111045241356,
+        "generation": 0.0007079797796905041,
+        "validation": 0.003790977643802762
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "role_only",
+      "retrieval_warning": null
+    },
+    {
+      "case_id": "fictional-expanded-09",
+      "method": "upgraded",
+      "selected_fact_ids": [
+        "fact-0",
+        "fact-1"
+      ],
+      "precision": 1.0,
+      "recall": 1.0,
+      "contact_ndcg": 0.8772153153380493,
+      "unsupported_claims": 0,
+      "checked_claims": 2,
+      "failure": null,
+      "latency_ms": 2.534916013246402,
+      "stages_ms": {
+        "extraction": 0.013084005331620574,
+        "retrieval": 0.29583400464616716,
+        "contact_ranking": 0.0014580145943909883,
+        "generation": 0.0007080088835209608,
+        "validation": 0.002749991836026311
+      },
+      "model_calls": 0,
+      "token_counts": [],
+      "embedding_requested": false,
+      "embedding_calls": 0,
+      "retrieval_method": "lexical",
+      "retrieval_warning": null
+    }
+  ]
+}

@@ -49,7 +49,7 @@ def test_relevance_criteria_do_not_use_rank_or_generated_notes():
     assert assess_relevance({**c,'title':None,'evidence':{},'relevance':'Avery is a recruiter at Cedar'})['level']=='unassessed'
 
 
-def test_invalid_model_note_uses_grounded_fallback_without_retries():
+def test_deterministic_note_never_requests_unconstrained_model_text():
     model=Ollama();attempts=[]
     async def structured(schema,instruction,data):
         if schema is DraftPlan:return DraftPlan(fact_ids=['f'],connection_style='connect',dm_style='team')
@@ -58,9 +58,9 @@ def test_invalid_model_note_uses_grounded_fallback_without_retries():
     model.structured=structured
     result=asyncio.run(model.draft({'company':'Cedar','role':'Engineer'},PICK,[{'id':'f','text':FACT}],{'note_limit':200,'dm_limit':1200}))
     assert len(result['note'])==200 and result['note']==NOTE
-    assert result['grounding']['validation_issues']==['Finish the sentence; do not truncate text.']
-    assert result['grounding']['fallback_used'] is True
-    assert len(attempts)==1
+    assert result['grounding']['validation_issues']==[]
+    assert result['grounding']['fallback_used'] is False
+    assert len(attempts)==0
     assert generated_note_issues(NOTE.replace('40%','90%'),['f'],{'f':FACT},'Avery','Engineer','Cedar')
     assert len('😀')==1 # same code-point counting as Array.from in the frontend
 
@@ -77,10 +77,10 @@ def test_fallback_suggestion_preserves_saved_draft(client):
     client.app.state.engine.ollama.draft=model.draft
     response=client.post(f'/api/contacts/{cid}/draft-suggestion')
     assert response.status_code==200
-    assert response.json()['grounding']['fallback_used'] is True
+    assert response.json()['grounding']['fallback_used'] is False
     assert 'I built a fictional Python project.' in response.json()['note']
     assert 'Too short.' not in response.json()['note']
-    assert len(attempts)==1
+    assert len(attempts)==0
     assert store.rows('SELECT * FROM drafts')==before
 
 
@@ -89,7 +89,7 @@ def test_fallback_suggestion_preserves_saved_draft(client):
     NOTE+' I have led a team of 100 engineers.',
     NOTE.replace('I’d value the chance to connect and learn more about the team.','Would you be willing to connect?'),
 ])
-def test_fallback_discards_rejected_wording_and_preserves_approved_fact(text):
+def test_renderer_ignores_unrequested_wording_and_preserves_approved_fact(text):
     model=Ollama()
     async def structured(schema,*args):
         if schema is DraftPlan:return DraftPlan(fact_ids=['f'],connection_style='connect',dm_style='team')
@@ -97,7 +97,7 @@ def test_fallback_discards_rejected_wording_and_preserves_approved_fact(text):
     model.structured=structured
     result=asyncio.run(model.draft({'company':'Cedar','role':'Engineer'},PICK,[{'id':'f','text':FACT}],{'note_limit':200,'dm_limit':1200}))
     assert result['note']==NOTE
-    assert result['grounding']['fallback_used'] is True
+    assert result['grounding']['fallback_used'] is False
     assert result['grounding']['note_fact_ids']==['f']
 
 

@@ -1,6 +1,6 @@
 # Repository and architecture guide
 
-This guide describes the code inspected on September 20, 2026. Groq, Tavily, Supabase, and Render were discussed as future possibilities; they are not the current implementation.
+Historical architecture reference: this guide describes the code inspected on September 20, 2026. For the October 10 upgrade, use [operations](operations.md), [evaluation](evaluation.md), and the [completion report](completion-report.md). Groq, Tavily, Supabase, and Render were discussed as future possibilities; they are not the current implementation.
 
 ## 1. Purpose and architecture
 

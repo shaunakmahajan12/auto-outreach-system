@@ -1,3 +1,4 @@
+import os
 """OAuth and read-only MCP adapter reusing the live-verified diagnostic transport."""
 import asyncio
 import base64
@@ -56,7 +57,9 @@ class Tsenta:
             u=urlsplit(metadata.get(key,''))
             if u.scheme!='https' or u.netloc!='api.autojobs.me' or u.query or u.fragment:
                 raise Unavailable('Unexpected OAuth endpoint; connection stopped.')
-        redirect='http://127.0.0.1:8765/api/tsenta/callback'
+        redirect=os.getenv('TSENTA_OAUTH_CALLBACK','http://127.0.0.1:8765/api/tsenta/callback')
+        if os.getenv('OUTREACH_REMOTE')=='true' and os.getenv('TSENTA_CALLBACK_VERIFIED')!='true':
+            raise Unavailable('Remote Tsenta callbacks require provider verification. Set TSENTA_OAUTH_CALLBACK and record verification before enabling sign-in.')
         registration,_=await self.http(metadata['registration_endpoint'],{
             'client_name':'Application Outreach Assistant (local)', 'redirect_uris':[redirect],
             'token_endpoint_auth_method':'none','grant_types':['authorization_code','refresh_token'],'response_types':['code']})

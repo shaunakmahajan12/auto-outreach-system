@@ -28,6 +28,14 @@ class Store:
     def initialize(self):
         if not self.path.exists():
             raise RuntimeError('Original Tsenta baseline missing. Restore .local/outreach.sqlite; never create a replacement baseline.')
+        backup=self.path.with_name(self.path.stem+'-before-engineering-v1.sqlite')
+        if not backup.exists():
+            with sqlite3.connect(self.path) as source,sqlite3.connect(backup) as target:source.backup(target)
+            os.chmod(backup,0o600)
+        backup2=self.path.with_name(self.path.stem+'-before-correctness-v2.sqlite')
+        if not backup2.exists():
+            with sqlite3.connect(self.path) as source,sqlite3.connect(backup2) as target:source.backup(target)
+            os.chmod(backup2,0o600)
         os.chmod(self.path, 0o600)
         with self.db() as db:
             baseline = db.execute('SELECT * FROM baseline WHERE singleton=1').fetchone()
@@ -95,10 +103,22 @@ class Store:
             db.execute("UPDATE jobs SET stage=state WHERE state!='running' AND stage='queued' AND state!='queued'")
             db.execute("UPDATE jobs SET state='interrupted',stage='interrupted',error='Preparation was interrupted. Retry to resume using saved results.',updated_at=? WHERE state='running'",(now(),))
             db.execute("UPDATE applications SET research_state='interrupted',last_error='Preparation was interrupted. Retry to resume.' WHERE source_application_id IN (SELECT application_id FROM jobs WHERE state='interrupted')")
+        self.reconcile_preparation_states()
+        from backend.upgrades import migrate as upgrade
+        upgrade(self)
+
+    def reconcile_preparation_states(self):
+        with self.db() as db:
+            db.execute("UPDATE applications SET research_state='not_started' WHERE source_status='COMPLETED' AND research_state='awaiting_submission'")
+            db.execute("UPDATE applications SET research_state='awaiting_submission' WHERE source_status!='COMPLETED' AND research_state='not_started'")
 
     def settings(self):
+        if not self.path.exists():return {'facts':[],'note_limit':200,'dm_limit':1200}
         with self.db() as db:
-            return json.loads(db.execute('SELECT data FROM settings WHERE id=1').fetchone()[0])
+            value=json.loads(db.execute('SELECT data FROM settings WHERE id=1').fetchone()[0])
+            value.setdefault('exact_note_200',True)
+            if value['exact_note_200']:value['note_limit']=200
+            return value
 
     def settings_save(self, value):
         with self.db() as db:
@@ -126,6 +146,7 @@ class Store:
                     if not value.strip():raise ValueError('Company and role cannot be blank')
                     db.execute(f'UPDATE applications SET {field}=? WHERE source_application_id=?',(value.strip(),app_id))
             if app['research_state']=='no_contacts':
+                db.execute('INSERT INTO preparation_epochs VALUES(?,1) ON CONFLICT(application_id) DO UPDATE SET epoch=preparation_epochs.epoch+1',(app_id,))
                 db.execute('DELETE FROM research_cache WHERE application_id=?',(app_id,))
                 db.execute("UPDATE jobs SET state='interrupted' WHERE application_id=? AND state='done'",(app_id,))
             db.execute('UPDATE applications SET selected=1 WHERE source_application_id=?', (app_id,))
@@ -164,7 +185,7 @@ class Store:
                         missing_fields,research_state,first_seen,job_id) VALUES(?,?,?,?,?,?,?,?,?,?,0,?,?,?,?)''',
                         (aid,row.get('companyName'),row.get('jobTitle'),row.get('url'),row.get('resumeProfileId'),status,
                          normalize_status(status),row.get('createdAt'),row.get('updatedAt'),int(historical),json.dumps(missing),
-                         'historical_no_outreach' if historical else 'awaiting_submission',now(),row.get('jobId')))
+                         'historical_no_outreach' if historical else ('not_started' if status=='COMPLETED' else 'awaiting_submission'),now(),row.get('jobId')))
                 else:
                     db.execute('''UPDATE applications SET company=COALESCE(NULLIF(?,''),company),role=COALESCE(NULLIF(?,''),role),job_url=?,source_status=?,normalized_status=?,
                         source_updated_at=?,job_id=COALESCE(?,job_id),source_resume_profile_id=COALESCE(?,source_resume_profile_id)
@@ -173,6 +194,8 @@ class Store:
                 # Membership, not a movable timestamp/high-water mark, excludes the original 281.
                 # Newly observed COMPLETED IDs qualify even after offline/development gaps.
                 sync_metadata(db,aid,row)
+                db.execute("UPDATE applications SET research_state='not_started' WHERE source_application_id=? AND source_status='COMPLETED' AND research_state='awaiting_submission'",(aid,))
+                db.execute("UPDATE applications SET research_state='awaiting_submission' WHERE source_application_id=? AND source_status!='COMPLETED' AND research_state='not_started'",(aid,))
                 if status == 'COMPLETED' and (not old or old['hiring_outcome'] not in ('rejected','job_closed')) and (not historical or (old and (old['selected'] or not old['confirmed_at_baseline']))):
                     db.execute('UPDATE applications SET first_confirmed=COALESCE(first_confirmed,?) WHERE source_application_id=?',(now(),aid))
                     if os.getenv('OUTREACH_AUTO_RESEARCH','true').lower() != 'true':

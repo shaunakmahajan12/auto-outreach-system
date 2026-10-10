@@ -1,0 +1,10 @@
+.git
+.env*
+.local
+.venv
+**/node_modules
+**/dist
+**/__pycache__
+**/*.sqlite*
+**/*.log
+docs

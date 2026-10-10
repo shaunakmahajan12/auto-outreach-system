@@ -126,7 +126,7 @@ def test_stages_retry_idempotence_and_restart(client):
     def stage(aid,value):observed.append(value);original(aid,value)
     engine.stage=stage
     advance(client)
-    assert observed==['checking_configuration','researching_contacts','checking_sources','ranking_candidates','drafting_messages']
+    assert observed==['missing_description','experience_retrieval','contact_research','evidence_assessment','drafting','validation','review','persistence']
     assert client.get('/api/state').json()['applications'][0]['job']['stage']=='done'
     with store.db() as db:db.execute("UPDATE jobs SET state='running'")
     store.initialize()
@@ -139,10 +139,13 @@ def test_stages_retry_idempotence_and_restart(client):
 
 def test_failed_job_exposes_error_and_retry(client):
     store=client.app.state.store
-    config=store.settings();config['facts']=[];store.settings_save(config)
+    from backend.experience import ExperienceInput
+    repo=client.app.state.engine.experience
+    for fact in repo.list():repo.save(ExperienceInput(text=fact['text'],status='retired'),fact['id'])
     client.post('/api/applications/FICTIONAL-HISTORY/research');advance(client)
     app=client.get('/api/state').json()['applications'][0]
-    assert app['job']['state']=='blocked' and 'approve' in app['job']['error']
+    assert app['job']['state']=='blocked'
+    assert client.get('/api/applications/FICTIONAL-HISTORY/preparation').json()['interrupts'][0]['reason']=='insufficient_evidence'
     assert client.post('/api/applications/FICTIONAL-HISTORY/research').status_code==200
     assert store.rows('SELECT * FROM jobs')[0]['state']=='queued'
 
@@ -160,11 +163,12 @@ def test_note_includes_whole_approved_fact_without_exact_length(closing):
     pick=Pick(source_id='fixture',name='Avery Example',title='Founder',company='Cedar',evidence_quote='Avery Example',relevance='Fictional relevance',uncertainty='Fictional')
     facts=[{'id':'fact','text':'I built a Python data pipeline that cut reporting time by 40% and added production monitoring.'}]
     draft=asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,facts,{'note_limit':200,'dm_limit':1200}))
-    assert facts[0]['text'] in draft['note'] and draft['note']==note
-    assert calls==[DraftPlan,ConnectionNote]
-    assert asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,facts,{'note_limit':80,'dm_limit':1200}))['note']==note
-    fallback=asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,[{'id':'fact','text':'I use Python.'}],{'note_limit':200,'dm_limit':1200}))
-    assert fallback['grounding']['fallback_used'] is True
+    assert facts[0]['text'] in draft['note'] and len(draft['note'])==200
+    assert calls==[DraftPlan]
+    short=asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,facts,{'note_limit':80,'dm_limit':1200,'exact_note_200':False}))
+    assert len(short['note'])<=80 and facts[0]['text'] in short['dm']
+    fallback=asyncio.run(model.draft({'role':'Engineer','company':'Cedar'},pick,[{'id':'fact','text':'I use Python.'}],{'note_limit':200,'dm_limit':1200,'exact_note_200':False}))
+    assert fallback['grounding']['fallback_used'] is False
     assert 'I use Python.' in fallback['note']
     assert '40%' not in fallback['note']
     with pytest.raises(Unavailable):asyncio.run(model.draft({'role':'Engineer','company':None},pick,facts,{'note_limit':200,'dm_limit':1200}))
