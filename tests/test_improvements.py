@@ -8,7 +8,7 @@ import pytest
 from backend.demo import row, seed
 from backend.details import baseline_valid, backfill_captures
 from backend.outreach import record_event, state_for
-from backend.research import DraftPlan, Ollama, Pick, ConnectionNote
+from backend.research import DraftPlan, Ollama, Pick
 from backend.store import Store
 from backend.security import Unavailable
 from test_workflow import client, advance
@@ -150,14 +150,11 @@ def test_failed_job_exposes_error_and_retry(client):
     assert store.rows('SELECT * FROM jobs')[0]['state']=='queued'
 
 
-@pytest.mark.parametrize('closing',['I’d be glad to connect.','I’d value the chance to connect and learn more about the team.','I would welcome the opportunity to connect and learn more about your team.'])
-def test_note_includes_whole_approved_fact_without_exact_length(closing):
+def test_note_includes_whole_approved_fact_without_exact_length():
     model=Ollama()
-    note='Hi Avery, I applied for Engineer at Cedar. I built a Python data pipeline that cut reporting time by 40% and added production monitoring. '+closing
     calls=[]
     async def structured(schema,*args):
         calls.append(schema)
-        if schema is ConnectionNote:return ConnectionNote(note=note,fact_ids=['fact'])
         return DraftPlan(fact_ids=['fact'],connection_style='connect',dm_style='team')
     model.structured=structured
     pick=Pick(source_id='fixture',name='Avery Example',title='Founder',company='Cedar',evidence_quote='Avery Example',relevance='Fictional relevance',uncertainty='Fictional')

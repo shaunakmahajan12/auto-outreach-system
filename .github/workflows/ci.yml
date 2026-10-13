@@ -36,3 +36,11 @@ jobs:
       - run: .venv/bin/python -m evaluation.run --output /tmp/benchmark.mock.json
       - uses: actions/upload-artifact@v4
         with: {name: mock-harness-results, path: /tmp/benchmark.mock.json}
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: python scripts/container_smoke.py

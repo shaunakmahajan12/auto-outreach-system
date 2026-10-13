@@ -1,2 +1,0 @@
-# Optional, basic demo does not enable exports.
-langfuse>=3,<4

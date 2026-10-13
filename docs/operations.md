@@ -10,14 +10,26 @@ Open http://127.0.0.1:8765. This creates only `.local/demo.sqlite`, uses fiction
 providers, and needs no Serper, Tsenta or Ollama credentials. Demo credentials and
 external profile opening are disabled. To start containers instead, install Docker
 and run `docker compose up --build`; only localhost port 8765 is published. No cloud
-resource or paid service is created. Docker was not available in the implementation
-environment; run the container smoke check on your host before deployment.
+resource or paid service is created. The production image and Compose workflow have been verified locally. Run `python3 scripts/container_smoke.py` before deployment. This builds
+the image and checks readiness, immutable-history availability, fictional submission
+transitions and draft preparation in a temporary container with an empty private
+tmpfs. It publishes a random localhost port, mounts no workspace data and stops the
+container on completion. The same check now runs in a separate CI job; a configured
+job is not evidence that it has passed.
 
 Local live mode retains `.local/outreach.sqlite`, native macOS Keychain and localhost.
 Never point demo mode at that file. Ollama defaults to http://127.0.0.1:11434; set
 OLLAMA_URL for a container (`http://host.docker.internal:11434`) or protected endpoint.
 No alternate proprietary API protocol is implied. Use an Ollama-compatible endpoint
 or implement/test another provider through the structured model interface.
+
+Fresh live workspaces open Settings automatically. The setup checklist shows source
+connection, initial import, search configuration, model readiness and approved
+experience. Use Refresh setup status after external sign-in/model changes. Initial
+import reads complete history and preserves it as historical, without queuing outreach.
+An existing baseline cannot be replaced through onboarding. Provider failures leave
+the workspace uninitialized so import can be retried. An existing `.initializing`
+file is retained for review instead of being overwritten.
 
 Experience is versioned independently of legacy Settings facts. Existing approved
 text and IDs are imported unchanged; an existing record is never rewritten by the
@@ -92,9 +104,10 @@ PostgreSQL startup marker and LangGraph SQLite checkpoints need a persistent pri
 jobs are scheduling and status projections. No competing graph scheduler runs.
 
 PostgreSQL runtime tests use TEST_DATABASE_URL and an ephemeral pgvector CI service.
-The local implementation environment has no Docker/PostgreSQL binary; PostgreSQL
-schema compilation is locally checked but live import/vector tests must pass in CI
-before switching a real database. Do not treat an unrun CI configuration as a pass.
+Run `.venv/bin/python scripts/postgres_smoke.py` to create a disposable PostgreSQL/pgvector
+container, execute real import/vector/ledger tests and rehearse pg_dump/pg_restore with
+all-table content comparisons. This has passed locally. Target-environment tests and
+backups are still required before switching a real database; an unrun CI job is not a pass.
 
 Graph run IDs derive from application ID + description/version + role/company +
 experience revision + explicit no-contact retry epoch. Changed inputs produce a new
@@ -120,3 +133,5 @@ Playwright starts a temporary fictional server with test-only provider/tick cont
 Those routes are absent from the production factory. Traces/screenshots/video are
 turned off. `/health` reports process availability; `/ready` checks ledger/baseline
 integrity, not provider account access. Provider availability is shown in Settings.
+
+Live provider checks: `.venv/bin/python scripts/verify_live.py --provider tsenta --provider serper --provider ollama`. This reads complete Tsenta history without importing it, makes one public Serper test query, and checks Ollama availability. Reports contain counts/status only. Existing credentials are required; normal token refresh may update the credential store. No OAuth reconnect or remote callback registration is attempted.

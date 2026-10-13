@@ -1,0 +1,19 @@
+let buckets = Resources.*[ Type == 'AWS::S3::Bucket' ]
+rule private_encrypted_bucket when %buckets !empty {
+  %buckets.Properties.PublicAccessBlockConfiguration {
+    BlockPublicAcls == true
+    IgnorePublicAcls == true
+    BlockPublicPolicy == true
+    RestrictPublicBuckets == true
+  }
+  %buckets.Properties.BucketEncryption.ServerSideEncryptionConfiguration[*].ServerSideEncryptionByDefault.SSEAlgorithm == 'AES256'
+}
+let hosts = Resources.*[ Type == 'AWS::EC2::Instance' ]
+rule protected_host when %hosts !empty {
+  %hosts.Properties.MetadataOptions.HttpTokens == 'required'
+  %hosts.Properties.BlockDeviceMappings[*].Ebs.Encrypted == true
+}
+let groups = Resources.*[ Type == 'AWS::EC2::SecurityGroup' ]
+rule no_inbound_access when %groups !empty {
+  %groups.Properties.SecurityGroupIngress empty
+}

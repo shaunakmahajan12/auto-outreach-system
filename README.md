@@ -17,7 +17,7 @@ Use Python 3.11 and Node.js 22. Live credential storage requires macOS; the fict
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements.lock.txt
 cd frontend
 npm ci
 npm run build
@@ -75,13 +75,18 @@ credentials. Keep the live `.local/outreach.sqlite` database private and separat
 - [Setup, backups, migration and rollback](docs/operations.md)
 - [Benchmark protocol and limitations](docs/evaluation.md)
 - [Private AWS deployment guide](docs/private-aws.md)
-- [Implementation checklist and baseline](docs/implementation-checklist.md)
-- [Completion and verification report](docs/completion-report.md)
+- [Verified temporary AWS deployment and cleanup](docs/aws-deployment-verification.md)
+- [Test results and verification boundaries](docs/verification.md)
 
 Run `.venv/bin/python -m evaluation.run` for mock harness verification; use
 `--real-model --output .local/results.real.json` only when Ollama is available.
-Checked-in synthetic/mock results are not evidence of actual LLM quality or speed.
+Generated mock results stay in ignored `.local/` or CI artifacts and are not
+evidence of actual LLM quality or speed.
 Docker, real PostgreSQL and provider integration must be verified in your deployment
 environment before a database switch or remote rollout.
 
-Current correctness and visual redesign: [implementation and validation report](docs/redesign-report.md), [fictional screenshot gallery](docs/screenshots/README.md).
+See the [fictional screenshot gallery](docs/screenshots/README.md) for desktop and mobile examples.
+Fresh live workspaces now show a setup checklist. Run `python3 scripts/container_smoke.py`
+on a Docker host to verify the packaged fictional workflow. For a short actual
+Ollama check, use `--real-model --embeddings --limit 3 --require-success` with the
+evaluation command; partial results are explicitly labeled and failures exit nonzero.

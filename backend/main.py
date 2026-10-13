@@ -341,7 +341,8 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
             search_ready=bool(await asyncio.to_thread(vault.get,'serper'))
             keychain_error=None
         except Unavailable as error:connected=search_ready=False;keychain_error=str(error)
-        return {**value,'tsenta_connected':connected,'search_configured':search_ready,'keychain_error':keychain_error,
+        return {**value,'approved_experience_count':len(experience.list(approved=True)) if store.path.exists() else 0,
+                'tsenta_connected':connected,'search_configured':search_ready,'keychain_error':keychain_error,
                 'ollama':await ollama.health(),'scheduler':engine.scheduler_info(),'demo':demo,'onboarding_required':not store.path.exists()}
 
     @app.post('/api/settings')

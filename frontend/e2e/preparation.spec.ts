@@ -1,6 +1,7 @@
 import {test,expect} from '@playwright/test';
 import path from 'node:path';
 test('completed preparation rows, actual count and keyboard navigation at desktop and mobile',async({page})=>{
+ const screenshotDir=process.env.UPDATE_SCREENSHOTS==='true'?path.resolve('../docs/screenshots'):test.info().outputPath('screenshots');
  const token=(await (await page.request.get('/api/bootstrap')).json()).token;
  const snapshot=await (await page.request.get('/api/state',{headers:{'X-Outreach-Token':token}})).json();
  const original=snapshot.applications[0];
@@ -20,7 +21,7 @@ test('completed preparation rows, actual count and keyboard navigation at deskto
   expect(rects[1].top).toBeGreaterThanOrEqual(rects[0].bottom);
   for(const row of rects)expect(Math.abs(row.right-row.actionRight)).toBeLessThan(2);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
-  await summary.locator('..').screenshot({path:path.resolve('../docs/screenshots',`${size}-preparation-completed.png`)});
+  await summary.locator('..').screenshot({path:path.join(screenshotDir,`${size}-preparation-completed.png`)});
   await page.getByRole('button',{name:'View all 63 completed',exact:true}).click();await expect(list.getByRole('listitem')).toHaveCount(63);
   await page.getByRole('button',{name:'Show latest three',exact:true}).click();await expect(list.getByRole('listitem')).toHaveCount(3);
   const action=list.getByRole('button',{name:'View outreach for Fictional Cedar Labs · Platform Engineer',exact:true});

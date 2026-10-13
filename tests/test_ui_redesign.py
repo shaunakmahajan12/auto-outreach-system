@@ -3,7 +3,7 @@ import asyncio
 import json
 import sqlite3
 from backend.details import backfill_captures, baseline_valid, company_metadata
-from backend.research import Ollama, Pick, DraftPlan, ConnectionNote
+from backend.research import Ollama, Pick, DraftPlan
 from backend.outreach import prepare, state_for
 from test_workflow import client, advance
 
@@ -64,7 +64,6 @@ def test_note_budget_and_verified_context():
     model=Ollama();captured={}
     async def structured(schema,instruction,data):
         captured.update(data)
-        if schema is ConnectionNote:return ConnectionNote(note='Hi Avery, I applied for Engineer at Cedar. I built a Python data pipeline that cut reporting time by 40% and added production monitoring. I’d value the chance to connect and learn more about the team.',fact_ids=['fact'])
         return DraftPlan(fact_ids=['fact'],note_fact_ids=['fact'],connection_style='connect',dm_style='team')
     model.structured=structured
     facts=[{'id':'fact','text':'I built a Python data pipeline that cut reporting time by 40% and added production monitoring.'}]

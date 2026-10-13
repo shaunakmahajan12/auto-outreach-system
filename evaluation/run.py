@@ -7,6 +7,10 @@ import re
 import statistics
 import tempfile
 import time
+import os
+import platform
+from datetime import datetime, timezone
+import httpx
 from pathlib import Path
 from backend.demo import seed, FixtureOllama
 from backend.store import Store
@@ -37,15 +41,40 @@ def ndcg(ranked,expected):
     ideal=sum(1/math.log2(i+2) for i in range(len(expected)))
     return gain/ideal if ideal else 1
 
-async def benchmark(real=False,embeddings=False):
-    cases=json.loads(Path('evaluation/cases.json').read_text());model=Ollama() if real else MockModel();results=[]
+async def runtime_metadata(model, embeddings):
+    names={'generation':model.model}
+    if embeddings:names['embedding']=os.getenv('EMBEDDING_MODEL','nomic-embed-text')
+    result={'recorded_at':datetime.now(timezone.utc).isoformat(),
+            'system':platform.system(),'architecture':platform.machine(),
+            'python':platform.python_version(),'embedding_version':os.getenv('EMBEDDING_VERSION','1') if embeddings else None,
+            'models':{key:{'name':name,'digest':None} for key,name in names.items()}}
+    try:
+        async with httpx.AsyncClient(timeout=5,trust_env=False) as client:
+            response=await client.get(os.getenv('OLLAMA_URL','http://127.0.0.1:11434').rstrip('/')+'/api/tags')
+            response.raise_for_status()
+            tags=response.json()['models']
+            for key,name in names.items():
+                canonical=name if ':' in name else name+':latest'
+                result['models'][key]['digest']=next((tag.get('digest') for tag in tags if tag.get('name') in (name,canonical)),None)
+    except (httpx.HTTPError,ValueError,KeyError,TypeError):
+        result['metadata_warning']='Model digests unavailable; do not assume identical model weights across runs.'
+    return result
+
+async def benchmark(real=False,embeddings=False,limit=None):
+    cases=json.loads(Path(__file__).with_name('cases.json').read_text())
+    corpus_count=len(cases)
+    if limit is not None:
+        if limit<1:raise ValueError('Case limit must be positive')
+        cases=cases[:limit]
+    model=Ollama() if real else MockModel();results=[]
+    runtime=await runtime_metadata(model,embeddings) if real else None
     for case in cases:
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/'benchmark.sqlite';seed(path);store=Store(path);store.initialize()
             repo=ExperienceRepository(store,url=f'sqlite:///{path}');repo.initialize()
             for f in case['facts']:repo.save(ExperienceInput(**{k:f[k] for k in ('text','project','technologies','source_reference','status')}),f['id'])
             for method in ('baseline','upgraded'):
-                stages={};calls=[];marker=metrics.set(calls);start=time.perf_counter();error=None;selected=[];ranked=[];text='';bad=0;total_claims=0;retrieval_method='role_only' if method=='baseline' else 'lexical';retrieval_warning=None;embedding_calls=0
+                stages={};calls=[];marker=metrics.set(calls);start=time.perf_counter();error=None;selected=[];ranked=[];text='';bad=0;total_claims=0;retrieval_method='role_only' if method=='baseline' else 'lexical';retrieval_warning=None;embedding_calls=0;extracted_requirements=[]
                 async def timed(name,fn):
                     before=time.perf_counter()
                     try:return await fn()
@@ -54,6 +83,7 @@ async def benchmark(real=False,embeddings=False):
                     if method=='baseline':selected=await timed('fact_selection',lambda:baseline_select(model,case))
                     else:
                         req=await timed('extraction',lambda:extract(model,case['description']))
+                        extracted_requirements=req.model_dump()['requirements']
                         query=' '.join(r.text for r in req.requirements)
                         if not embeddings:
                             # Explicit lexical comparison, independent of ambient threshold.
@@ -101,7 +131,8 @@ async def benchmark(real=False,embeddings=False):
                     'contact_ndcg':ndcg(ranked,set(case['expected_contact_ids'])),'unsupported_claims':bad,'checked_claims':total_claims,
                     'failure':error,'latency_ms':(time.perf_counter()-start)*1000,'stages_ms':stages,
                     'model_calls':len(calls) if real else 0,'token_counts':[c.get('tokens') for c in calls if c.get('tokens')],
-                    'embedding_requested':embeddings,'embedding_calls':embedding_calls,'retrieval_method':retrieval_method,'retrieval_warning':retrieval_warning})
+                    'embedding_requested':embeddings,'embedding_calls':embedding_calls,'retrieval_method':retrieval_method,'retrieval_warning':retrieval_warning,
+                    'extracted_requirements':extracted_requirements})
             repo.engine.dispose()
     summary={}
     for method in ('baseline','upgraded'):
@@ -113,11 +144,29 @@ async def benchmark(real=False,embeddings=False):
             retrieval_methods={name:sum(r['retrieval_method']==name for r in rows) for name in sorted({r['retrieval_method'] for r in rows})},
             embedding_calls=sum(r['embedding_calls'] for r in rows),lexical_fallback_cases=sum(bool(r['retrieval_warning']) for r in rows),
             available_token_counts=sum(bool(r['token_counts']) for r in rows))
-    return {'mode':'real_model' if real else 'mock_harness_only','case_count':len(cases),'label_origin':'synthetic, not independently validated',
+    return {'mode':'real_model' if real else 'mock_harness_only','runtime':runtime,'case_count':len(cases),'corpus_count':corpus_count,'partial_run':len(cases)<corpus_count,'label_origin':'synthetic, not independently validated',
         'limitations':['Synthetic authored labels include aliases, multi-requirement and unsupported cases; they are not independent human judgments.',
         'Unsupported claims validator only checks recognized first-person experience spans; not a proof of factuality.',
         'Mock generation is exact fact concatenation, not LLM drafting. Contact ranking mock is a title heuristic.',
         'Latencies include local Python and temporary database overhead; no speedup claim.'], 'constraints':{'max_selected_facts':6,'fact_text_characters':2800,'generated_note_characters':200,'dm_limit':1200,'real_generation':'same renderer and model interface for both methods','embedding_mode':'forced when requested; fallback counted separately'}, 'summary':summary,'cases':results}
-if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--real-model',action='store_true');p.add_argument('--embeddings',action='store_true');p.add_argument('--output',default='evaluation/results.mock.json');a=p.parse_args()
-    result=asyncio.run(benchmark(a.real_model,a.embeddings));Path(a.output).write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({k:v for k,v in result.items() if k!='cases'},indent=2))
+def main():
+    p=argparse.ArgumentParser()
+    p.add_argument('--real-model',action='store_true')
+    p.add_argument('--embeddings',action='store_true')
+    p.add_argument('--limit',type=int,help='Run the first N cases; output explicitly marks partial runs.')
+    p.add_argument('--require-success',action='store_true',help='Exit unsuccessfully for any case failure or requested embedding fallback.')
+    p.add_argument('--output',help='Result path; defaults to an ignored local file for mock and real-model runs.')
+    a=p.parse_args()
+    if a.limit is not None and a.limit<1:p.error('--limit must be positive')
+    if a.embeddings and not a.real_model:p.error('--embeddings requires --real-model')
+    output=Path(a.output or ('.local/results.real.json' if a.real_model else '.local/results.mock.json'))
+    result=asyncio.run(benchmark(a.real_model,a.embeddings,a.limit))
+    output.parent.mkdir(parents=True,exist_ok=True)
+    output.write_text(json.dumps(result,indent=2)+'\n')
+    print(json.dumps({k:v for k,v in result.items() if k!='cases'},indent=2))
+    if a.require_success and any(r['failure'] or (r['method']=='upgraded' and a.embeddings and
+            (r['retrieval_warning'] or r['retrieval_method'] not in ('embedding cosine','pgvector cosine'))) for r in result['cases']):
+        raise SystemExit(1)
+
+
+if __name__=='__main__':main()

@@ -2,7 +2,7 @@ import asyncio
 import json
 import pytest
 from backend.contact_evidence import extract_title,backfill_titles,assess_relevance
-from backend.research import Ollama,Pick,DraftPlan,ConnectionNote,Ranking,Source,generated_note_issues
+from backend.research import Ollama,Pick,DraftPlan,Ranking,Source
 from backend.security import Unavailable, Retryable
 from test_workflow import client,advance
 
@@ -54,14 +54,16 @@ def test_deterministic_note_never_requests_unconstrained_model_text():
     async def structured(schema,instruction,data):
         if schema is DraftPlan:return DraftPlan(fact_ids=['f'],connection_style='connect',dm_style='team')
         attempts.append(data)
-        return ConnectionNote(note=NOTE[:-1] if len(attempts)==1 else NOTE,fact_ids=['f'])
+        raise AssertionError('Drafting must only request a fact-selection plan')
     model.structured=structured
     result=asyncio.run(model.draft({'company':'Cedar','role':'Engineer'},PICK,[{'id':'f','text':FACT}],{'note_limit':200,'dm_limit':1200}))
     assert len(result['note'])==200 and result['note']==NOTE
     assert result['grounding']['validation_issues']==[]
     assert result['grounding']['fallback_used'] is False
     assert len(attempts)==0
-    assert generated_note_issues(NOTE.replace('40%','90%'),['f'],{'f':FACT},'Avery','Engineer','Cedar')
+    assert result['grounding']['note_fact_ids']==['f']
+    assert FACT in result['note']
+    assert '90%' not in result['note']
     assert len('😀')==1 # same code-point counting as Array.from in the frontend
 
 
@@ -72,7 +74,7 @@ def test_fallback_suggestion_preserves_saved_draft(client):
     async def structured(schema,instruction,data):
         if schema is DraftPlan:return DraftPlan(fact_ids=['fictional-fact'],connection_style='connect',dm_style='team')
         attempts.append(data)
-        return ConnectionNote(note='Too short.',fact_ids=['fictional-fact'])
+        raise AssertionError('Drafting must only request a fact-selection plan')
     model.structured=structured
     client.app.state.engine.ollama.draft=model.draft
     response=client.post(f'/api/contacts/{cid}/draft-suggestion')
@@ -82,23 +84,6 @@ def test_fallback_suggestion_preserves_saved_draft(client):
     assert 'Too short.' not in response.json()['note']
     assert len(attempts)==0
     assert store.rows('SELECT * FROM drafts')==before
-
-
-@pytest.mark.parametrize('text',[
-    NOTE.replace('40%','90%'),
-    NOTE+' I have led a team of 100 engineers.',
-    NOTE.replace('I’d value the chance to connect and learn more about the team.','Would you be willing to connect?'),
-])
-def test_renderer_ignores_unrequested_wording_and_preserves_approved_fact(text):
-    model=Ollama()
-    async def structured(schema,*args):
-        if schema is DraftPlan:return DraftPlan(fact_ids=['f'],connection_style='connect',dm_style='team')
-        return ConnectionNote(note=text,fact_ids=['f'])
-    model.structured=structured
-    result=asyncio.run(model.draft({'company':'Cedar','role':'Engineer'},PICK,[{'id':'f','text':FACT}],{'note_limit':200,'dm_limit':1200}))
-    assert result['note']==NOTE
-    assert result['grounding']['fallback_used'] is False
-    assert result['grounding']['note_fact_ids']==['f']
 
 
 def test_fallback_never_accepts_unapproved_plan_fact():

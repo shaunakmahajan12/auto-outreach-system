@@ -38,6 +38,29 @@ def test_excerpts_must_be_exact():
         async def structured(self,*args):return Requirements(requirements=[{'text':'Python','excerpt':'invented excerpt','category':'skill','priority':'required'}])
     with pytest.raises(Retryable,match='excerpts'):asyncio.run(extract(Bad(),'Required: Python'))
 
+def test_extraction_retries_invalid_evidence_once_without_repairing_it():
+    class Recovering:
+        calls=[]
+        async def structured(self,schema,instruction,data):
+            self.calls.append((instruction,data))
+            return Requirements(requirements=[{'text':'Python','excerpt':'invented' if len(self.calls)==1 else 'Python','category':'skill','priority':'required'}])
+    model=Recovering()
+    result=asyncio.run(extract(model,'Required: Python'))
+    assert len(model.calls)==2 and result.requirements[0].excerpt=='Python'
+    assert model.calls[0][1]==model.calls[1][1]=={'source_spans':['Required: Python']}
+    assert 'failed validation' in model.calls[1][0]
+
+def test_extraction_retry_is_bounded_for_schema_failure():
+    from backend.security import InvalidOutput
+    class BadSchema:
+        calls=0
+        async def structured(self,*args):
+            self.calls+=1
+            raise InvalidOutput('Fictional schema failure')
+    model=BadSchema()
+    with pytest.raises(InvalidOutput):asyncio.run(extract(model,'Required: Python'))
+    assert model.calls==2
+
 def test_retired_unapproved_never_retrieved_and_versions(client,monkeypatch):
     repo=client.app.state.engine.experience
     for status in ('draft','retired','approved'):

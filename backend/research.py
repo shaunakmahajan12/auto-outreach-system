@@ -4,7 +4,7 @@ import re
 from backend.contact_evidence import extract_title
 import json
 import os
-from typing import Literal, Protocol
+from typing import Literal
 import httpx
 from pydantic import BaseModel, ConfigDict, Field
 from backend.security import Unavailable, Retryable, InvalidOutput, public_url
@@ -18,10 +18,6 @@ class Source(BaseModel):
     title: str
     excerpt: str
     checked_at: str
-
-
-class SearchProvider(Protocol):
-    async def search(self,company: str,role: str) -> list[Source]: ...
 
 
 class Serper:
@@ -89,37 +85,6 @@ class DraftPlan(BaseModel):
     note_fact_id: str | None = None
     connection_style: Literal['connect','learn']
     dm_style: Literal['team','direction']
-
-
-class ConnectionNote(BaseModel):
-    model_config=ConfigDict(extra='forbid')
-    note: str=Field(max_length=1200)
-    fact_ids: list[str]=Field(min_length=1,max_length=3)
-
-
-def generated_note_issues(note, fact_ids, lookup, name, role, company, title=None):
-    issues=[]
-    if note!=note.strip() or re.search(r'\s{2,}|[\t\n\r]',note):issues.append('Remove whitespace padding; use ordinary single spaces.')
-    if not re.search(r'[.!?]$',note):issues.append('Finish the sentence; do not truncate text.')
-    remaining=note
-    for fid in fact_ids:
-        if fid not in lookup or lookup[fid] not in note:
-            issues.append('Use cited approved experience sentences verbatim; do not invent or paraphrase factual claims.')
-        else:remaining=remaining.replace(lookup[fid],'')
-    for value in (name,role,company):
-        if value.casefold() not in note.casefold():issues.append('Include the recipient first name and exact application role/company.')
-    if not re.search(r'\b(?:applied|application|applying)\b',remaining,re.I):
-        issues.append('Describe an application, not existing employment at the company.')
-    if re.search(r"\b(?:I work|I am|I'm|I’m)\s+(?:an?\s+)?"+re.escape(role)+r'\b',remaining,re.I):
-        issues.append('Do not imply you already hold the application role.')
-    for value in sorted([name,role,company,title or ''],key=len,reverse=True):
-        if value:remaining=re.sub(re.escape(value),'',remaining,flags=re.I)
-    # All experience must come from the exact approved sentences above. The rest
-    # can only frame the application and request a connection, not add new claims.
-    framing=set("hi hello dear i i'm i’m i've i’ve am have applied applying for the a an role position at my application to your as work perspective and would i'd i’d like love value welcome appreciate be glad happy chance opportunity connect connecting connection learn more about team discuss this that you could can we let's let’s thanks thank reaching out regarding on of in hope open sharing".split())
-    if any(word.casefold() not in framing for word in re.findall(r"[\w’']+",remaining)):
-        issues.append('Outside the approved facts, use only a greeting, application context, and a connection request; no additional claims.')
-    return issues
 
 
 class Ollama:

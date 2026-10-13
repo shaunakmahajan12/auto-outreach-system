@@ -42,10 +42,9 @@ class FixtureSearch:
 
 class FixtureOllama:
     async def structured(self,schema,instruction,data):
-        from backend.matching import Requirements
-        if schema is Requirements:
-            lines=[line.strip() for line in data['description'].splitlines() if line.strip()]
-            return Requirements(requirements=[{'text':line,'excerpt':line,'category':'skill','priority':'preferred' if 'preferred' in line.lower() else 'required'} for line in lines[:24]])
+        from backend.matching import RequirementReferences
+        if schema is RequirementReferences:
+            return RequirementReferences(requirements=[{'text':line,'source_index':i,'category':'skill','priority':'preferred' if 'preferred' in line.lower() else 'required'} for i,line in enumerate(data['source_spans'][:24])])
         raise ValueError('Fictional fixture supports requirements only')
     async def health(self):return {'available':True,'model':'FICTIONAL fixture (no model request)','message':'Fictional demo'}
     async def rank(self,company,role,sources):

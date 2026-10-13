@@ -1,9 +1,15 @@
-# Private AWS deployment guide (not deployed)
+# Private AWS deployment guide
 
-This is a single-workspace application, not a multi-tenant SaaS product. The local
-and fictional paths are tested. Live PostgreSQL, AWS, TLS and real model behavior
-need environment verification before any private rollout. No cloud resources were
-provisioned and no application was published.
+A temporary private EC2 deployment was completed and verified on October 13, 2026;
+see [AWS deployment verification](aws-deployment-verification.md). Teardown is
+complete to conserve Free Plan credits. The guide below describes broader remote
+deployment requirements; public HTTPS and remote OAuth callbacks remain unverified.
+
+This is a single-workspace application, not a multi-tenant SaaS product. The local, fictional, Docker/Compose and actual PostgreSQL/pgvector paths are tested.
+Live provider reads and a three-case real-model smoke check also pass; see
+[verification report](verification.md). AWS, target TLS, remote OAuth callbacks and
+target model connectivity were pending when this guide was first written. The
+linked AWS report records the subsequent private EC2 verification and its limits.
 
 A small private deployment can use one ECS container task behind an HTTPS load
 balancer, RDS PostgreSQL/pgvector, Secrets Manager and a persistent encrypted volume

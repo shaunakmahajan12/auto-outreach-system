@@ -23,6 +23,9 @@ def test_full_import_repeatability_ledger_and_pgvector(tmp_path,monkeypatch):
     assert migrate(source,url)==counts
     pg=PostgresStore(url,tmp_path/'postgres.marker');pg.initialize()
     for table,rows in before.items():assert pg.rows('SELECT * FROM '+table)==rows
+    # Keep the fictional cached model stable through graph retrieval. A real local
+    # Ollama service must not overwrite this cache with a different model identity.
+    monkeypatch.setattr('backend.experience.Embeddings',CachedProvider)
     pg.select_application('FICTIONAL-HISTORY');assert pg.rows('SELECT * FROM jobs')[0]['state']=='queued'
     from backend.engine import Engine
     engine=Engine(pg,FixtureTsenta(pg),FixtureSearch(),FixtureOllama());engine.experience=ExperienceRepository(pg,url)
