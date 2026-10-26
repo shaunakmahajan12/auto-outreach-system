@@ -1,6 +1,6 @@
-import os
 """OAuth and read-only MCP adapter reusing the live-verified diagnostic transport."""
 import asyncio
+import os
 import base64
 import hashlib
 import secrets
@@ -8,8 +8,8 @@ import time
 import urllib.error
 from email.utils import parsedate_to_datetime
 from urllib.parse import urlencode, urlsplit
-from scripts.inspect_tsenta import ORIGIN, RESOURCE, request, validate_read
-from scripts.tsenta_baseline import validate_snapshot
+from backend.tsenta_transport import ORIGIN, RESOURCE, request, validate_read
+from backend.baseline import validate_snapshot
 from backend.security import Retryable, Unavailable
 
 

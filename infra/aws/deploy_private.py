@@ -1,5 +1,6 @@
 """Deploy the private, single-host workspace. No credentials enter release archives."""
 import argparse
+import functools
 import hashlib
 import json
 import os
@@ -12,11 +13,20 @@ ROOT = Path(__file__).resolve().parents[2]
 LOCAL = ROOT / '.local/aws-deployment'
 LOCAL.mkdir(parents=True, exist_ok=True)
 PROFILE = 'outreach'
-REGION = 'us-east-2'
 STACK = 'outreach-private'
+# Pinned for reproducible deploys; update deliberately after checking the release.
+OLLAMA_IMAGE = 'ollama/ollama:0.34.1@sha256:0c0a83210471fb50226bcdc2d6611d20ab13ae87e024cc304c94a6a5765c5e65'
+
+@functools.cache
+def region():
+    # The project's assigned Region, as configured for the deployment profile.
+    r = subprocess.run(['aws', 'configure', 'get', 'region', '--profile', PROFILE], text=True, capture_output=True)
+    if r.returncode or not r.stdout.strip():
+        raise SystemExit(f'Set the Region for the {PROFILE} profile: aws configure set region <Region> --profile {PROFILE}')
+    return r.stdout.strip()
 
 def aws(*args, raw=False, data=None):
-    r = subprocess.run(['aws', *args, '--profile', PROFILE, '--region', REGION,
+    r = subprocess.run(['aws', *args, '--profile', PROFILE, '--region', region(),
                         '--output', 'json'], input=data, text=True, capture_output=True)
     if r.returncode:
         raise RuntimeError(r.stderr)
@@ -34,7 +44,9 @@ def provision(create=True):
         'PublicAccessBlockConfiguration':dict.fromkeys(['BlockPublicAcls','IgnorePublicAcls','BlockPublicPolicy','RestrictPublicBuckets'],True),
         'BucketEncryption':{'ServerSideEncryptionConfiguration':[{'ServerSideEncryptionByDefault':{'SSEAlgorithm':'AES256'}}]},
         'VersioningConfiguration':{'Status':'Enabled'},
-        'LifecycleConfiguration':{'Rules':[{'Id':'ExpireReleases','Status':'Enabled','ExpirationInDays':30}]}}},
+        'LifecycleConfiguration':{'Rules':[{'Id':'ExpireReleases','Status':'Enabled','ExpirationInDays':30,
+          # Versioned expiry only adds delete markers; also remove the superseded private copies.
+          'NoncurrentVersionExpiration':{'NoncurrentDays':1},'AbortIncompleteMultipartUpload':{'DaysAfterInitiation':1}}]}}},
       'Credentials': {'Type':'AWS::SecretsManager::Secret','Properties':{'Description':'Private outreach provider credentials','SecretString':'{}'}},
       'HostRole': {'Type':'AWS::IAM::Role','Properties':{
         'AssumeRolePolicyDocument':{'Version':'2012-10-17','Statement':[{'Effect':'Allow','Principal':{'Service':'ec2.amazonaws.com'},'Action':'sts:AssumeRole'}]},
@@ -107,12 +119,22 @@ def release():
     aws('secretsmanager','put-secret-value','--secret-id',out['CredentialSecret'],
         '--secret-string','file:///dev/stdin',data=json.dumps(secrets))
     script=(ROOT/'infra/aws/install_host.sh').read_text()
-    script=script.replace('__BUCKET__',out['ReleaseBucket']).replace('__KEY__',key).replace('__SHA__',digest).replace('__SECRET__',out['CredentialSecret'])
+    script=script.replace('__REGION__',region()).replace('__OLLAMA_IMAGE__',OLLAMA_IMAGE).replace('__BUCKET__',out['ReleaseBucket']).replace('__KEY__',key).replace('__SHA__',digest).replace('__SECRET__',out['CredentialSecret'])
     params=LOCAL/'install-parameters.json'
     params.write_text(json.dumps({'commands':[script],'executionTimeout':['3600']}))
     result=aws('ssm','send-command','--instance-ids',out['InstanceId'],'--document-name','AWS-RunShellScript','--parameters','file://'+str(params),'--timeout-seconds','3600')
     (LOCAL/'install-command.json').write_text(json.dumps(result,indent=2))
     print('Install command:',result['Command']['CommandId'])
+
+def delete_versions(bucket, prefix=None):
+    while True:
+        versions=aws('s3api','list-object-versions','--bucket',bucket,*(['--prefix',prefix] if prefix else []))
+        objects=[{'Key':v['Key'],'VersionId':v['VersionId']} for k in ['Versions','DeleteMarkers'] for v in versions.get(k,[])
+                 if prefix is None or v['Key']==prefix]
+        if not objects:break
+        path=LOCAL/'delete-objects.json';path.write_text(json.dumps({'Objects':objects[:1000],'Quiet':True}))
+        result=aws('s3api','delete-objects','--bucket',bucket,'--delete','file://'+str(path))
+        assert not result.get('Errors'),result
 
 def command_status():
     out=json.loads((LOCAL/'outputs.json').read_text())
@@ -120,6 +142,10 @@ def command_status():
     result=aws('ssm','get-command-invocation','--command-id',cmd,'--instance-id',out['InstanceId'])
     (LOCAL/'install-result.json').write_text(json.dumps(result,indent=2))
     print('Install status:',result['Status'])
+    if result['Status']=='Success':
+        # The host holds the restored workspace now; keep no private ledger copy in S3.
+        delete_versions(out['ReleaseBucket'],'workspace.tar.gz')
+        print('Removed the uploaded workspace copy from the release bucket.')
     print(result.get('StandardOutputContent','')[-2500:])
     print(result.get('StandardErrorContent','')[-1500:])
 
@@ -164,14 +190,7 @@ def cleanup():
     instance=aws('ec2','describe-instances','--instance-ids',out['InstanceId'])['Reservations'][0]['Instances'][0]
     volumes=[v['Ebs']['VolumeId'] for v in instance['BlockDeviceMappings']]
     (LOCAL/'cleanup-volumes.json').write_text(json.dumps(volumes))
-    bucket=out['ReleaseBucket']
-    while True:
-        versions=aws('s3api','list-object-versions','--bucket',bucket)
-        objects=[{'Key':v['Key'],'VersionId':v['VersionId']} for k in ['Versions','DeleteMarkers'] for v in versions.get(k,[])]
-        if not objects:break
-        path=LOCAL/'delete-objects.json';path.write_text(json.dumps({'Objects':objects[:1000],'Quiet':True}))
-        result=aws('s3api','delete-objects','--bucket',bucket,'--delete','file://'+str(path))
-        assert not result.get('Errors'),result
+    delete_versions(out['ReleaseBucket'])
     aws('cloudformation','delete-stack','--stack-name',STACK)
     print('Stack deletion requested; retained disk identifiers saved for final removal')
 

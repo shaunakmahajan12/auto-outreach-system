@@ -15,6 +15,7 @@ class Result:
         row=self.result.mappings().first()
         return Row(row) if row is not None else None
     def __iter__(self):return (Row(r) for r in self.result.mappings())
+    def fetchall(self):return list(self)
 class Connection:
     def __init__(self,connection,tables):self.connection=connection;self.tables=tables
     def execute(self,sql,args=()):

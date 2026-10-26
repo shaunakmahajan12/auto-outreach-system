@@ -35,6 +35,20 @@ def test_full_import_repeatability_ledger_and_pgvector(tmp_path,monkeypatch):
     record_event(pg,cid,'dm_sent','fictional','fictional-pg-request')
     record_event(pg,cid,'dm_sent','fictional','fictional-pg-request')
     assert len(pg.rows('SELECT * FROM outreach_events'))==1
+    # Contact review SQL through the API route: dismissal alone is not a correction.
+    from fastapi.testclient import TestClient
+    from backend.main import create_app
+    monkeypatch.setenv('DATABASE_URL',url)
+    app=create_app(store=pg,tsenta=FixtureTsenta(pg),search=FixtureSearch(),ollama=FixtureOllama(),vault=MemorySecrets(),start_worker=False)
+    with TestClient(app) as client:
+        client.headers['x-outreach-token']=client.get('/api/bootstrap').json()['token']
+        contact=pg.rows('SELECT * FROM contacts WHERE id=?',(cid,))[0]
+        body={'name':contact['name'],'title':contact['title'] or '','company':contact['company'] or '','linkedin_url':contact['linkedin_url'],
+              'review_status':contact['review_status'],'review_note':contact['review_note'],'review_source':contact['review_source'] or ''}
+        for dismissed in (True,False):assert client.put(f'/api/contacts/{cid}',json={**body,'dismissed':dismissed}).status_code==200
+        assert pg.rows('SELECT original_fields,reviewed_at FROM contacts WHERE id=?',(cid,))[0]=={'original_fields':None,'reviewed_at':None}
+        assert client.put(f'/api/contacts/{cid}',json={**body,'title':'Corrected fictional title','dismissed':False}).status_code==200
+        assert pg.rows('SELECT original_fields FROM contacts WHERE id=?',(cid,))[0]['original_fields']
     with pytest.raises(Exception):
         with pg.db() as db:db.execute('DELETE FROM baseline')
     monkeypatch.setenv('RETRIEVAL_EMBEDDING_THRESHOLD','1')

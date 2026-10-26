@@ -1,6 +1,6 @@
 """Explicitly fictional development fixtures. Never imported into the live database."""
 from pathlib import Path
-from scripts.tsenta_baseline import save_baseline
+from backend.baseline import save_baseline
 from backend.research import Source, Pick
 from backend.store import now
 

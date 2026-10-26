@@ -77,6 +77,7 @@ credentials. Keep the live `.local/outreach.sqlite` database private and separat
 - [Private AWS deployment guide](docs/private-aws.md)
 - [Verified temporary AWS deployment and cleanup](docs/aws-deployment-verification.md)
 - [Test results and verification boundaries](docs/verification.md)
+- [Interview explanation and code walkthrough](docs/interview-guide.md)
 
 Run `.venv/bin/python -m evaluation.run` for mock harness verification; use
 `--real-model --output .local/results.real.json` only when Ollama is available.

@@ -85,6 +85,9 @@ class Engine:
         if app['hiring_outcome'] in ('rejected','job_closed'):raise Unavailable('Application is marked rejected or closed; new outreach preparation stopped.')
         if app['source_status']!='COMPLETED' or (app['historical'] and app['confirmed_at_baseline'] and not app['selected']):
             raise Unavailable('Application is not eligible for research.')
+        from backend.posting_role import missing_details
+        if missing_details(app['company'],app['role']):
+            raise Unavailable('Add the company and role before preparing outreach.')
         if not hasattr(self,'experience'):
             from backend.experience import ExperienceRepository
             self.experience=ExperienceRepository(self.store);self.experience.initialize()

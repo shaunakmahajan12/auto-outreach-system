@@ -32,8 +32,8 @@ flowchart LR
 - `backend/engine.py`, `preparation.py`: single-worker scheduling, persistent graph
   checkpoints, bounded retries, review pauses, and explicit resume behavior.
 - `backend/tsenta.py`: OAuth/PKCE, credential refresh, and complete read-only snapshots.
-  Shared MCP transport and snapshot validation currently live in
-  `scripts/inspect_tsenta.py` and `scripts/tsenta_baseline.py`; both are runtime dependencies.
+  The shared MCP transport (`tsenta_transport.py`) and snapshot validation/baseline writer
+  (`baseline.py`) also back the `scripts/inspect_tsenta.py` and `scripts/tsenta_baseline.py` CLIs.
 - `backend/research.py`, `contact_evidence.py`, `posting_role.py`: bounded provider
   reads, source validation, contact assessment, and posting-based role extraction.
 - `backend/experience.py`, `matching.py`, `skill_evidence.py`: versioned approved

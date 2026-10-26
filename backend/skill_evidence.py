@@ -16,6 +16,12 @@ ALIASES = {
  'accessibility': ('accessibility','a11y','wcag'), 'linux': ('linux',),
  'machine learning': ('machine learning','ml'), 'langgraph': ('langgraph',),
 }
+# Ordinary phrases that reuse a short alias; removed before that skill is matched.
+NOT_SKILLS = {
+ 'helm': r'\b(?:at|take|takes|took|taking) the helm\b',
+ 'typescript': r'\bts/sci\b',
+ 'machine learning': r'\b\d+(?:\.\d+)?\s*ml\b',
+}
 def skills(value):
     value=value.casefold()
     found=set()
@@ -24,5 +30,6 @@ def skills(value):
         target=re.sub(r'\b(?:react|node)\.js\b','',value) if name=='javascript' else value
         if name=='golang':
             target=re.sub(r'\bgo\b','',target) if not re.search(r'\b(?:using|in|with) go\b|\bgo (?:service|language|application|project)\b',target) else target
+        if name in NOT_SKILLS:target=re.sub(NOT_SKILLS[name],'',target)
         if any(re.search(r'(?<![\w+#])'+re.escape(alias)+r'(?![\w+#])',target) for alias in aliases):found.add(name)
     return found

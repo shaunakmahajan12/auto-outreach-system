@@ -7,9 +7,11 @@ from backend.security import Unavailable
 from backend.store import now
 
 
-def repair_notes(store):
+def repair_notes(store,experience=None):
     settings=store.settings()
     facts={f['id']:f for f in settings['facts']}
+    # Versioned experience is the current fact source; legacy settings facts remain recognized.
+    if experience is not None:facts.update({f['id']:f for f in experience.list(approved=True)})
     planned=[]
     with store.db() as db:
         rows=db.execute('''SELECT d.*,c.name,c.original_fields,c.dismissed,a.role,a.company
@@ -34,10 +36,13 @@ def repair_notes(store):
             method='Standard framing with whole model-selected approved facts',fallback_used=False,
             validation_issues=[],previous_generated_note=row['note'])
         planned.append((note,json.dumps(grounding),row['contact_id'],row['note'],row['grounding']))
+    # A PostgreSQL store's path is only a marker file; its backups are database snapshots.
+    postgres=hasattr(store,'engine')
     if planned:
-        backup=store.path.with_name(store.path.stem+'-before-note-repair-'+now().replace(':','-')+'.sqlite')
-        with sqlite3.connect(store.path) as source,sqlite3.connect(backup) as target:source.backup(target)
-        os.chmod(backup,0o600)
+        if not postgres:
+            backup=store.path.with_name(store.path.stem+'-before-note-repair-'+now().replace(':','-')+'.sqlite')
+            with sqlite3.connect(store.path) as source,sqlite3.connect(backup) as target:source.backup(target)
+            os.chmod(backup,0o600)
         with store.db() as db:
             changed=0
             for note,grounding,cid,old,old_grounding in planned:
@@ -45,5 +50,6 @@ def repair_notes(store):
                     WHERE contact_id=? AND note=? AND grounding=?
                     AND NOT EXISTS(SELECT 1 FROM outreach_events WHERE contact_id=?)''',
                     (note,grounding,now(),cid,old,old_grounding,cid)).rowcount
+        if postgres:return {'repaired':changed,'backup_created':False,'backup_note':'Take a PostgreSQL snapshot before repairs; no file backup applies.'}
         return {'repaired':changed,'backup_created':True}
     return {'repaired':0,'backup_created':False}
