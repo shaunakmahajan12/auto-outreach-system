@@ -1,152 +1,1970 @@
-import type {Application,Contact,Snapshot,Configuration,Filters,CompanyGroup,QueueGroup,Action,RoleCandidate,Quality,OutreachEvent} from './types';
-import {DescriptionReview,ExperienceManager} from './Personalization';
-import React,{useEffect,useRef,useState} from 'react';
-import {Trash2} from 'lucide-react';
-import {linkedinUrl} from './actions.mjs';
-import {api} from './api';
-import {SettingsView} from './SettingsView';
-import {Dialog,DraftDialog} from './DraftDialog';
-import {activeJob,completedWhileViewing,eventLabels,filterApplications,stages,submissionGroup,displayValue,initialFilters,preparationGroups,groupQueueCompanies,compareContactRelevance,relevanceLabel,statusLabel,findApplication,inTracker,filterTracker,trackerStatus,allowedEvents,safeLink,filterQueue} from './workflow.mjs';
+import type {
+  Application,
+  Contact,
+  Snapshot,
+  Configuration,
+  Filters,
+  CompanyGroup,
+  QueueGroup,
+  Action,
+  RoleCandidate,
+  Quality,
+  OutreachEvent,
+} from './types';
+import { DescriptionReview, ExperienceManager } from './Personalization';
+import React, { useEffect, useRef, useState } from 'react';
+import { Trash2 } from 'lucide-react';
+import { linkedinUrl } from './actions.mjs';
+import { api } from './api';
+import { SettingsView } from './SettingsView';
+import { Dialog, DraftDialog } from './DraftDialog';
+import {
+  activeJob,
+  completedWhileViewing,
+  eventLabels,
+  filterApplications,
+  stages,
+  submissionGroup,
+  displayValue,
+  initialFilters,
+  preparationGroups,
+  groupQueueCompanies,
+  compareContactRelevance,
+  relevanceLabel,
+  statusLabel,
+  findApplication,
+  inTracker,
+  filterTracker,
+  trackerStatus,
+  allowedEvents,
+  safeLink,
+  filterQueue,
+} from './workflow.mjs';
 
-const when=(v:string|null|undefined)=>v&&!Number.isNaN(Date.parse(v))?new Date(v).toLocaleString(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}):'';
-const names:Record<string,string>={Applications:'Your applications','Outreach queue':'Contacts to review','Outreach tracker':'Your outreach, in one place',Experience:'Experience collection',Settings:'Workspace settings'};
-const subtitles:Record<string,string>={Applications:'Find an application and prepare your next introduction.','Outreach queue':'Review the person, check the evidence, then make it personal.','Outreach tracker':'Keep track of conversations and the next action.',Experience:'Factual evidence you approve for personalization.',Settings:'Sources, models and drafting preferences.'};
-const label=(kind:string)=>(eventLabels as Record<string,string>)[kind]||statusLabel(kind);
-const savedFilters=()=>{try{const saved=JSON.parse(sessionStorage.getItem('outreach-filters-v2')||'{}');return {query:String(saved.query||''),submission:String(saved.submission||initialFilters.submission),sort:!saved.sort||saved.sort==='submitted-desc'?'source-desc':saved.sort==='submitted-asc'?'source-asc':String(saved.sort)}}catch{return {...initialFilters}}};
-const savedCollapsedCompanies=()=>{try{return new Set<string>(JSON.parse(sessionStorage.getItem('outreach-collapsed-companies-v1')||'[]'))}catch{return new Set<string>()}};
-export function Badge({children,tone='neutral'}:{children:React.ReactNode;tone?:string}){return children?<span className={'status-badge '+tone}>{children}</span>:null}
-export function Workspace(){
- const [data,setData]=useState<Snapshot|null>(null),[config,setConfig]=useState<Configuration|null>(null),[view,setView]=useState('Applications');
- const [filters,setFilters]=useState(savedFilters),[focus,setFocus]=useState<string|null>(null),[draftId,setDraftId]=useState<number|null>(null),[activityId,setActivityId]=useState<number|null>(null);
- const [refreshing,setRefreshing]=useState(false),[remote,setRemote]=useState(false),[refreshNotice,setRefreshNotice]=useState('');
- const [error,setError]=useState(''),[notice,setNotice]=useState(''),[pending,setPending]=useState<string[]>([]),[page,setPage]=useState(1);
- const [query,setQuery]=useState(''),[showDismissed,setShowDismissed]=useState(false),[relevanceFilter,setRelevanceFilter]=useState('recommended'),[missingOnly,setMissingOnly]=useState(false),[trackerFilter,setTrackerFilter]=useState('all'),[collapsedCompanies,setCollapsedCompanies]=useState(savedCollapsedCompanies);
- const [olderOpen,setOlderOpen]=useState(false),[prepareDetails,setPrepareDetails]=useState<Application|null>(null),[roleCandidate,setRoleCandidate]=useState<RoleCandidate|null>(null);
- const [editContact,setEditContact]=useState<Contact|null>(null),[undoDismiss,setUndoDismiss]=useState<Contact|null>(null);
- const lastJobs=useRef<Record<string,string>>({}),busy=useRef(new Set<string>()),fetching=useRef(false),selected=useRef<string|null>(null);selected.current=focus;
- async function refresh(){if(fetching.current)return;fetching.current=true;setRefreshing(true);try{const next=await api<Snapshot>('/state');for(const r of completedWhileViewing(lastJobs.current,next.applications,selected.current)){const a=findApplication(next.applications,r.id);setNotice(`${displayValue(a?.company)||'Application'}: ${r.ready?'drafts are ready.':'research finished; no candidates found.'}`)}lastJobs.current=Object.fromEntries(next.applications.map((a:Application)=>[a.source_application_id,a.job?.state||'']));setData(next)}finally{fetching.current=false;setRefreshing(false)}}
- async function refreshPage(){if(fetching.current)return;setError('');setRefreshNotice('');try{await refresh();setRefreshNotice('Latest outreach data loaded.')}catch(e){setError((e as Error).message)}}
- const settings=async()=>setConfig(await api<Configuration>('/settings'));
- useEffect(()=>{let alive=true;api('/bootstrap').then(async(boot)=>{if(alive){setRemote(!!boot.remote);await refresh();await settings();if(alive){const setup=await api('/bootstrap');if(setup.onboarding_required)setView('Settings')}}}).catch(e=>setError(e.message));const timer=setInterval(()=>{if(alive&&!document.hidden)refresh().catch(e=>setError(e.message))},5000);return()=>{alive=false;clearInterval(timer)}},[]);
- useEffect(()=>{try{sessionStorage.setItem('outreach-filters-v2',JSON.stringify(filters))}catch{}setPage(1)},[filters]);
- useEffect(()=>{try{sessionStorage.setItem('outreach-collapsed-companies-v1',JSON.stringify([...collapsedCompanies]))}catch{}},[collapsedCompanies]);
- async function action(key:string,fn:()=>Promise<unknown>,message=''){if(busy.current.has(key))return;busy.current.add(key);setPending([...busy.current]);setError('');try{await fn();await refresh();if(message)setNotice(message)}catch(e){setError((e as Error).message)}finally{busy.current.delete(key);setPending([...busy.current])}}
- const apps=data?.applications||[],contacts=data?.contacts||[],shown=filterApplications(apps,filters).filter((a:Application)=>!missingOnly||!displayValue(a.role)),detail=findApplication(apps,focus);
- const pages=Math.max(1,Math.ceil(shown.length/25)),currentPage=Math.min(page,pages),rows=shown.slice((currentPage-1)*25,currentPage*25);
- const draft=contacts.find((c:Contact)=>c.id===draftId),activity=contacts.find((c:Contact)=>c.id===activityId);
- const queueBase:Contact[]=filterQueue(contacts,{relevance:'all'});
- const queueQuality:Quality={...(data?.quality||{} as Quality),recommended_contacts:queueBase.filter(c=>['high','medium'].includes(c.relevance_assessment?.level)).length,needs_review:queueBase.filter(c=>c.review_status!=='supported').length,notes_over_limit:queueBase.filter(c=>Array.from(c.note||'').length>(config?.note_limit||200)).length};
- const queue=filterQueue(contacts,{query,showDismissed,relevance:relevanceFilter});
- const queueCompanies=groupQueueCompanies(queue,apps,filters.sort);
- const tracker=filterTracker(contacts,trackerFilter,query);
- function navigate(v:string){setView(v);setNotice('');setRefreshNotice('');setError('');setQuery('');if(v==='Settings')settings().catch(e=>setError(e.message));window.scrollTo(0,0)}
- function openApplication(id:string){setView('Applications');setFocus(id);window.scrollTo(0,0)}
- function prepare(a:Application){if(!displayValue(a.company)||!displayValue(a.role)){setPrepareDetails(a);return;}return action('prepare-'+a.source_application_id,()=>api(`/applications/${encodeURIComponent(a.source_application_id)}/research`,'POST'),'Preparation queued. You can continue browsing.');}
- function extractRole(a:Application){if(a.role_candidate){setRoleCandidate({...a.role_candidate,company:a.company});return;}return action('extract-role-'+a.source_application_id,async()=>{const result=await api(`/applications/${encodeURIComponent(a.source_application_id)}/extract-role`,'POST');setRoleCandidate({...result,application_id:a.source_application_id,company:a.company})})}
- const extractRoleButton=(a:Application)=>!displayValue(a.role)&&safeLink(a.job_url)?<button className="text-button extract-role" disabled={pending.includes('extract-role-'+a.source_application_id)} onClick={()=>extractRole(a)}>{pending.includes('extract-role-'+a.source_application_id)?'Reading posting…':a.role_candidate?'Review extracted role':'Extract role from posting'}</button>:null;
- function canPrepare(a:Application){return data?.baseline_valid&&a.source_status==='COMPLETED'&&!['rejected','job_closed'].includes(a.hiring_outcome)&&!activeJob(a)}
- function dismissPreparation(a:Application){return action('dismiss-preparation-'+a.source_application_id,()=>api(`/applications/${encodeURIComponent(a.source_application_id)}/research/dismiss`,'POST'),'Preparation dismissed. You can prepare it again from Applications.')}
- function hasOutreach(a:Application){return a.research_state==='ready'&&contacts.some((c:Contact)=>c.application_id===a.source_application_id)}
- function toggleCompany(key:string){setCollapsedCompanies(previous=>{const next=new Set(previous);next.has(key)?next.delete(key):next.add(key);return next})}
- async function dismiss(c:Contact,dismissed:boolean){await api(`/contacts/${c.id}`,'PUT',{name:c.name,title:c.title||'',company:c.company||'',linkedin_url:c.linkedin_url,review_status:c.review_status,review_note:c.review_note||'',review_source:c.review_source||'',dismissed});setUndoDismiss(dismissed?c:null)}
- const renderCompany=(company:CompanyGroup)=>{const collapsed=!query.trim()&&collapsedCompanies.has(company.key),contentId='company-'+company.key.replace(/[^a-z0-9_-]/gi,'-');return <section className="panel company-group" key={company.key}><button className="company-toggle" type="button" aria-expanded={!collapsed} aria-controls={contentId} onClick={()=>toggleCompany(company.key)}><svg viewBox="0 0 20 20" aria-hidden="true" className={collapsed?'':'expanded'}><path d="m7 5 5 5-5 5"/></svg><span><strong>{displayValue(company.company)||'Company not supplied'}</strong><small>{company.contact_count} {company.contact_count===1?'contact':'contacts'}</small></span></button>{!collapsed&&<div id={contentId} className="company-applications">{company.applications.map((group:QueueGroup)=><section className="queue-group" key={group.application_id}><div className="application-group-header"><div><p className="eyebrow">APPLICATION</p><h3>{displayValue(group.role)||'Role not supplied'}</h3></div>{group.submitted_at&&<Badge tone="green">Submitted {when(group.submitted_at)}</Badge>}</div><div className="contact-grid">{group.contacts.map((c:Contact)=><ContactCard key={c.id} c={c} demo={data?.demo||false} onDraft={()=>setDraftId(c.id)} onEdit={()=>setEditContact(c)} onDismiss={()=>action('dismiss-'+c.id,()=>dismiss(c,!c.dismissed),c.dismissed?'Contact restored.':'Contact dismissed.')} onRecord={()=>setActivityId(c.id)}/>)}</div></section>)}</div>}</section>};
- return <div className="shell"><aside><a className="brand" href="/"><svg className="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="9" cy="9" r="4"/><circle cx="23" cy="23" r="4"/><path d="M12 12c3 1.6 6.4 5 8 8"/><path d="m16.5 19.5 4 .5-.5-4"/></svg><span className="brand-name">outreach<span>.</span></span></a><p className="eyebrow workspace">YOUR WORKSPACE</p><nav aria-label="Workspace">{['Applications','Outreach queue','Outreach tracker','Experience','Settings'].map((v,i)=><button key={v} aria-current={view===v?'page':undefined} className={view===v?'nav-active':''} onClick={()=>navigate(v)}><span aria-hidden="true">{['▦','◎','↗','◇','⚙'][i]}</span>{v}</button>)}</nav><div className="sidebar-note"><strong>A thoughtful introduction.</strong><p>Your experience. Your words.<br/>Every message approved by you.</p><Badge tone="green">{remote?'Private remote workspace':'Local workspace'}</Badge></div></aside>
- <main><header><span>Workspace <span className="muted">/ {view}</span></span><span className="local-indicator">● {remote?'Private remote workspace':'Local workspace'}</span></header><div className="content">
- {data?.demo&&<div className="notice warning">FICTIONAL TEST WORKSPACE · Separate database. No real outreach.</div>}
- <div className="page-title"><div><h1>{names[view]}</h1><p className="subtitle">{subtitles[view]}</p></div>{view==='Applications'&&<div className="sync-actions"><span className="sync-meta">{data?.last_successful_sync?'Last synced '+when(data.last_successful_sync):'No sync completed yet'}</span><button className="button" disabled={pending.includes('sync')||['queued','running','retry'].includes(data?.sync?.state||'')} onClick={()=>action('sync',()=>api('/sync','POST'),'One sync requested.')}><span aria-hidden="true">↻</span> {['queued','running','retry'].includes(data?.sync?.state||'')?'Syncing…':'Sync applications'}</button></div>}{['Outreach queue','Outreach tracker'].includes(view)&&<div className="outreach-refresh-actions"><span className="hint" role="status">{refreshNotice}</span><button className="button" disabled={refreshing||!data} aria-busy={refreshing} onClick={refreshPage}><span aria-hidden="true">↻</span> {refreshing?'Refreshing…':'Refresh'}</button></div>}</div>
- {error&&<div className="notice error" role="alert">{error}<button className="text-button" onClick={()=>setError('')}>Dismiss</button></div>}
- {notice&&<div className="notice success" role="status">{notice}{undoDismiss&&<button className="text-button" onClick={()=>action('restore',()=>dismiss(undoDismiss,false),'Contact restored.')}>Undo dismissal</button>}<button className="text-button" onClick={()=>setNotice('')}>Dismiss</button></div>}
- {roleCandidate&&<Dialog title="Review extracted role" onClose={()=>setRoleCandidate(null)}><div className="dialog-body form-stack"><p>Check that this is the role for {displayValue(roleCandidate.company)||'this application'}.</p><strong>{roleCandidate.role}</strong><p className="hint">Found in: {roleCandidate.method}</p><a href={safeLink(roleCandidate.source_url)!} target="_blank" rel="noopener noreferrer">View source posting ↗</a><p className="hint">Saving fills the missing role. Outreach preparation starts only when you request it.</p>{error&&<p className="notice error" role="alert">{error}</p>}<button className="button primary" disabled={pending.includes('save-role')} onClick={()=>action('save-role',async()=>{await api(`/applications/${encodeURIComponent(roleCandidate!.application_id)}/extracted-role/save`,'POST');setRoleCandidate(null)},'Role saved from the posting.')}>Save role</button></div></Dialog>}
- {prepareDetails&&<PrepareDetails app={prepareDetails} onClose={()=>setPrepareDetails(null)} onSave={async(value:{company:string;role:string})=>{await api(`/applications/${encodeURIComponent(prepareDetails!.source_application_id)}/research`,'POST',value);setPrepareDetails(null);await refresh();setNotice('Preparation queued.')}}/>}
- {!data?<section className="panel empty" role="status"><h2>Loading your workspace…</h2><p>Reading your saved applications and drafts.</p>{error&&<button className="button" onClick={()=>location.reload()}>Try again</button>}</section>:<>
- {!data?.baseline_valid&&!data.onboarding_required&&<div className="notice error">Original baseline needs attention. Research is disabled until it is restored.</div>}
- {view==='Applications'&&<>
- {detail?<><button className="text-button back" onClick={()=>setFocus(null)}>← Back to results · {shown.length} matching</button><section className="panel application-detail"><div className="section-heading"><div><p className="eyebrow">APPLICATION</p><h2>{safeLink(detail.job_url)?<a href={safeLink(detail.job_url)!} target="_blank" rel="noopener noreferrer" title="Open job posting in a new tab">{displayValue(detail.company)||'Application '+detail.source_application_id.slice(0,8)} ↗</a>:displayValue(detail.company)||'Application '+detail.source_application_id.slice(0,8)}</h2>{displayValue(detail.role)&&<p className="role-title">{detail.role}</p>}{extractRoleButton(detail)}</div><Badge tone={submissionGroup(detail)==='completed'?'green':'neutral'}>{statusLabel(submissionGroup(detail))}</Badge></div>
- <div className="company-info"><div><h3>Company information</h3>{displayValue(detail.company)?<p>{detail.company}</p>:<p className="muted">The source did not provide a company name.</p>}<div className="link-row">{safeLink(detail.company_website)?<a href={safeLink(detail.company_website)!} target="_blank" rel="noopener noreferrer">Company website ↗</a>:<span className="hint">No company website supplied.</span>}{safeLink(detail.job_url)&&<a href={safeLink(detail.job_url)!} target="_blank" rel="noopener noreferrer">Original job posting ↗</a>}</div>{detail.locations?.length>0?<p>{detail.locations.join(' · ')}</p>:<p className="hint">No location supplied by the source.</p>}</div><div><h3>Application details</h3><p>Added {when(detail.first_seen)}</p>{detail.submitted_at&&<p>Submitted {when(detail.submitted_at)}</p>}<p className="hint">{detail.submitted_at?'':'Tsenta did not supply a submission date. The added date is when this app first observed the record.'}</p><Badge>{displayValue(detail.hiring_outcome)&&statusLabel(detail.hiring_outcome)}</Badge><details className="secondary-details"><summary>Record hiring outcome</summary><Outcome key={`${detail.source_application_id}:${detail.hiring_outcome}:${detail.outcome_note||''}`} app={detail} action={action}/></details></div></div>
- </section>
- <DescriptionReview key={detail.source_application_id} application={detail} onSaved={refresh}/><section className="section-block"><div className="section-heading"><div><h2>Contacts to review</h2><p className="muted">People suggested for this application. Check their evidence before reaching out.</p></div>{!hasOutreach(detail)&&<button className="button primary" disabled={!canPrepare(detail)||pending.includes('prepare-'+focus)} onClick={()=>prepare(detail)}>{activeJob(detail)||pending.includes('prepare-'+focus)?'Preparing…':['failed','blocked','interrupted'].includes(detail.research_state)?'Retry preparation':'Prepare outreach'}</button>}</div><Progress app={detail}/>{contacts.filter((c:Contact)=>c.application_id===focus&&!c.dismissed).sort(compareContactRelevance).map((c:Contact)=><ContactCard key={c.id} c={c} onDraft={()=>setDraftId(c.id)} onEdit={()=>setEditContact(c)} onDismiss={()=>action('dismiss-'+c.id,()=>dismiss(c,true),'Contact dismissed.')} demo={data?.demo||false}/>)}{!contacts.some((c:Contact)=>c.application_id===focus&&!c.dismissed)&&!activeJob(detail)&&<div className="panel empty"><h3>{detail.research_state==='no_contacts'?'No suitable contacts found':'No contacts prepared yet'}</h3><p>{canPrepare(detail)?'Prepare outreach to research candidates and create drafts from your approved experience.':'Preparation requires a confirmed submission, a company, and a role.'}</p></div>}</section></>:<>
- <PreparationDashboard apps={apps} onView={openApplication} onRetry={prepare} onDismiss={dismissPreparation} pending={pending}/>
- {data.sync?.error&&<div role="alert" className="notice error">{data.sync.error}</div>}
- <ApplicationFilters apps={apps} filters={filters} setFilters={setFilters} count={shown.length} missingOnly={missingOnly} onMissing={(value:boolean)=>{setMissingOnly(value);setPage(1)}}/>
- <section className="panel application-list"><div className="table-scroll"><table><thead><tr><th>Company & role</th><th>Submission</th><th>Outreach</th><th>Added</th><th><span className="sr-only">Outreach action</span></th></tr></thead><tbody>{rows.map((a:Application)=><tr key={a.source_application_id} data-application-id={a.source_application_id}><td><div className="application-cell"><strong>{safeLink(a.job_url)?<a href={safeLink(a.job_url)!} target="_blank" rel="noopener noreferrer" title="Open job posting in a new tab">{displayValue(a.company)||'Application '+a.source_application_id.slice(0,8)} ↗</a>:displayValue(a.company)||'Application '+a.source_application_id.slice(0,8)}</strong><button className="application-role-link" onClick={()=>openApplication(a.source_application_id)} title="View application details">{displayValue(a.role)||'View application details'}</button></div>{extractRoleButton(a)}{displayValue(a.hiring_outcome)&&<Badge>{statusLabel(a.hiring_outcome)} · recorded by you</Badge>}</td><td><Badge tone={submissionGroup(a)==='completed'?'green':'neutral'}>{statusLabel(submissionGroup(a))}</Badge></td><td><Badge tone={a.research_state==='ready'?'purple':['blocked','failed','interrupted'].includes(a.research_state)?'amber':'neutral'}>{activeJob(a)?'Preparing…':statusLabel(a.research_state)}</Badge></td><td className="date-cell">{when(a.first_seen)}</td><td className="application-action">{hasOutreach(a)?<button className="button small" onClick={()=>openApplication(a.source_application_id)}>View outreach</button>:<button className="button small" disabled={!canPrepare(a)||pending.includes('prepare-'+a.source_application_id)} onClick={()=>prepare(a)}>{activeJob(a)||pending.includes('prepare-'+a.source_application_id)?'Preparing…':['failed','blocked','interrupted'].includes(a.research_state)?'Retry preparation':'Prepare outreach'}</button>}</td></tr>)}</tbody></table></div>{!shown.length?<div className="empty"><h3>No applications match</h3><p>Try a broader search or choose another submission status.</p><button className="button" onClick={()=>setFilters({...initialFilters})}>Reset filters</button></div>:<div className="pagination"><span>{(currentPage-1)*25+1}–{Math.min(currentPage*25,shown.length)} of {shown.length}</span><div className="button-row"><button className="button small" disabled={currentPage===1} onClick={()=>setPage(currentPage-1)}>Previous</button><span>Page {currentPage} of {pages}</span><button className="button small" disabled={currentPage===pages} onClick={()=>setPage(currentPage+1)}>Next</button></div></div>}</section>
- </>}{data.demo&&<button className="button small" onClick={()=>action('demo',()=>api('/demo/transition','POST'),'Fictional application advanced.')}>Simulate pending → submitted (fictional)</button>}</>}
- {view==='Outreach queue'&&<><QualitySummary quality={queueQuality} onRecommended={()=>setRelevanceFilter('recommended')} onEvidence={()=>setRelevanceFilter('needs_evidence')} onRepair={()=>navigate('Settings')}/><PreparationDashboard apps={apps} onView={openApplication} onRetry={prepare} onDismiss={dismissPreparation} pending={pending} compact/><section className="panel toolbar"><label className="contact-search">Find a contact<input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Name, company or role"/></label><label>Relevance / review<select value={relevanceFilter} onChange={e=>setRelevanceFilter(e.target.value)}><option value="recommended">High / medium relevance</option><option value="needs_evidence">Needs stronger evidence</option><option value="all">All candidates</option></select></label><label className="check-field"><input type="checkbox" checked={showDismissed} onChange={e=>setShowDismissed(e.target.checked)}/>Show dismissed</label><span className="result-count">{queue.length} contacts</span></section><div className="queue-companies">{queueCompanies.slice(0,3).map(renderCompany)}{queueCompanies.length>3&&<details className="older-outreach" open={!!query.trim()||olderOpen} onToggle={e=>{if(!query.trim())setOlderOpen(e.currentTarget.open)}}><summary>Older outreach <span>· {queueCompanies.length-3} companies</span></summary><div className="queue-companies">{queueCompanies.slice(3).map(renderCompany)}</div></details>}</div>{!queue.length&&<div className="panel empty"><h2>No contacts to review</h2><p>{query?'Try a broader search.':'Try All candidates to inspect saved contacts, or prepare outreach from a submitted application.'}</p><button className="button" onClick={()=>setRelevanceFilter('all')}>Show all candidates</button><button className="button" onClick={()=>navigate('Applications')}>Browse applications</button></div>}</>}
- {view==='Outreach tracker'&&<><OutcomeSummary quality={data.quality}/><p className="hint">Manually tracked. Record actions after taking them on LinkedIn.</p><section className="panel toolbar"><label className="contact-search">Find a contact<input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Name, company or role"/></label><label>Activity<select value={trackerFilter} onChange={e=>setTrackerFilter(e.target.value)}>{[['all','All contacted'],['pending','Pending invitations'],['connected','Connected'],['awaiting','Awaiting reply'],['replied','Replied'],['followup','Follow-up due'],['closed','Closed']].map(([v,l])=><option value={v} key={v}>{l}</option>)}</select></label><span>{tracker.length} {tracker.length===1?'person':'people'}</span></section><div className="tracker-list">{tracker.map((c:Contact)=>{const s=trackerStatus(c);return <section className="panel tracker-card" key={c.id}><div><h2>{c.name}</h2><p><strong>{displayValue(c.application_company)}</strong>{displayValue(c.role)&&<> · {c.role}</>}</p><div className="badge-row"><Badge tone="purple">{s.invitation}</Badge><Badge tone={s.group==='replied'?'green':s.group==='followup'?'amber':'neutral'}>{s.message}</Badge>{s.group==='followup'&&<Badge tone="amber">Follow-up due</Badge>}</div></div><div><small>LAST ACTIVITY</small><p>{label(s.last.kind)} · {when(s.last.created_at)}</p><small>NEXT ACTION</small><p>{c.conversation.next_action}</p></div><div className="button-row"><button className="button primary" onClick={()=>setActivityId(c.id)}>Timeline & update</button><button className="button" onClick={()=>setDraftId(c.id)}>View drafts</button></div></section>})}</div>{!tracker.length&&<div className="panel empty"><h2>{trackerFilter!=='all'||query?'No matching activity':'Your outreach starts here'}</h2><p>After sending an invitation or message on LinkedIn, choose “Record activity” on a contact. Drafts alone stay in the Outreach queue. Undone actions do not count as contact.</p><button className="button" onClick={()=>navigate('Outreach queue')}>Review prepared contacts</button></div>}</>}
- {view==='Experience'&&<ExperienceManager/>}
- {view==='Settings'&&(config?<SettingsView config={config} action={action} refreshSettings={settings} openExperience={()=>setView('Experience')}/>:<p role="status">Checking your tools…</p>)}
- </>}<footer>Prepared locally. Reviewed by you.</footer></div></main>
- {draft&&<DraftDialog key={draft.id} c={draft} config={config} demo={data?.demo||false} onSaved={refresh} onClose={()=>setDraftId(null)}/>}
- {activity&&<ActivityDialog c={activity} onClose={()=>setActivityId(null)} refresh={refresh}/>}
- {editContact&&<ReviewDialog c={editContact} onClose={()=>setEditContact(null)} refresh={refresh}/>}
- </div>;
+const when = (v: string | null | undefined) =>
+  v && !Number.isNaN(Date.parse(v))
+    ? new Date(v).toLocaleString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    : '';
+const names: Record<string, string> = {
+  Applications: 'Your applications',
+  'Outreach queue': 'Contacts to review',
+  'Outreach tracker': 'Your outreach, in one place',
+  Experience: 'Experience collection',
+  Settings: 'Workspace settings',
+};
+const subtitles: Record<string, string> = {
+  Applications: 'Find an application and prepare your next introduction.',
+  'Outreach queue': 'Review the person, check the evidence, then make it personal.',
+  'Outreach tracker': 'Keep track of conversations and the next action.',
+  Experience: 'Factual evidence you approve for personalization.',
+  Settings: 'Sources, models and drafting preferences.',
+};
+const label = (kind: string) => (eventLabels as Record<string, string>)[kind] || statusLabel(kind);
+const savedFilters = () => {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('outreach-filters-v2') || '{}');
+    return {
+      query: String(saved.query || ''),
+      submission: String(saved.submission || initialFilters.submission),
+      sort:
+        !saved.sort || saved.sort === 'submitted-desc'
+          ? 'source-desc'
+          : saved.sort === 'submitted-asc'
+            ? 'source-asc'
+            : String(saved.sort),
+    };
+  } catch {
+    return { ...initialFilters };
+  }
+};
+const savedCollapsedCompanies = () => {
+  try {
+    return new Set<string>(
+      JSON.parse(sessionStorage.getItem('outreach-collapsed-companies-v1') || '[]'),
+    );
+  } catch {
+    return new Set<string>();
+  }
+};
+export function Badge({
+  children,
+  tone = 'neutral',
+}: {
+  children: React.ReactNode;
+  tone?: string;
+}) {
+  return children ? <span className={'status-badge ' + tone}>{children}</span> : null;
 }
-function ApplicationFilters({apps,filters:f,setFilters,count,missingOnly,onMissing}:{apps:Application[];filters:Filters;setFilters:React.Dispatch<React.SetStateAction<Filters>>;count:number;missingOnly:boolean;onMissing:(v:boolean)=>void}){
- const change=(key:string,value:string)=>setFilters((old:Filters)=>({...old,[key]:value}));
- const select=(key:string,title:string,values:string[]) => <label>{title}<select value={f[key as keyof Filters]} onChange={e=>change(key,e.target.value)}>{values.map(v=><option key={v} value={v}>{v==='all'?'All '+title.toLowerCase():statusLabel(v)}</option>)}</select></label>;
- const submission=['all',...new Set<string>(apps.map(submissionGroup))];
- return <section className="panel filter-panel"><div className="toolbar"><label className="search-field">Search<input type="search" value={f.query} onChange={e=>change('query',e.target.value)} placeholder="Search"/></label>{select('submission','Submission status',submission)}{select('sort','Sort by',['source-desc','source-asc','observed-desc','observed-asc'])}<label className="check-field"><input type="checkbox" checked={missingOnly} onChange={e=>onMissing(e.target.checked)}/>Missing role</label></div><div className="filter-bottom"><span className="application-counts"><strong>{count} matching {count===1?'application':'applications'}</strong><span aria-hidden="true"> · </span><span>{apps.filter((a:Application)=>a.source_status==='COMPLETED').length} submitted in Tsenta</span></span>{(f.query||f.submission!==initialFilters.submission||f.sort!==initialFilters.sort)&&<button className="text-button" onClick={()=>setFilters({...initialFilters})}>Reset filters</button>}</div></section>;
+export function Workspace() {
+  const [data, setData] = useState<Snapshot | null>(null),
+    [config, setConfig] = useState<Configuration | null>(null),
+    [view, setView] = useState('Applications');
+  const [filters, setFilters] = useState(savedFilters),
+    [focus, setFocus] = useState<string | null>(null),
+    [draftId, setDraftId] = useState<number | null>(null),
+    [activityId, setActivityId] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false),
+    [remote, setRemote] = useState(false),
+    [refreshNotice, setRefreshNotice] = useState('');
+  const [error, setError] = useState(''),
+    [notice, setNotice] = useState(''),
+    [pending, setPending] = useState<string[]>([]),
+    [page, setPage] = useState(1);
+  const [query, setQuery] = useState(''),
+    [showDismissed, setShowDismissed] = useState(false),
+    [relevanceFilter, setRelevanceFilter] = useState('recommended'),
+    [missingOnly, setMissingOnly] = useState(false),
+    [trackerFilter, setTrackerFilter] = useState('all'),
+    [collapsedCompanies, setCollapsedCompanies] = useState(savedCollapsedCompanies);
+  const [olderOpen, setOlderOpen] = useState(false),
+    [prepareDetails, setPrepareDetails] = useState<Application | null>(null),
+    [roleCandidate, setRoleCandidate] = useState<RoleCandidate | null>(null);
+  const [editContact, setEditContact] = useState<Contact | null>(null),
+    [undoDismiss, setUndoDismiss] = useState<Contact | null>(null);
+  const lastJobs = useRef<Record<string, string>>({}),
+    busy = useRef(new Set<string>()),
+    fetching = useRef(false),
+    selected = useRef<string | null>(null);
+  selected.current = focus;
+  async function refresh() {
+    if (fetching.current) return;
+    fetching.current = true;
+    setRefreshing(true);
+    try {
+      const next = await api<Snapshot>('/state');
+      for (const r of completedWhileViewing(
+        lastJobs.current,
+        next.applications,
+        selected.current,
+      )) {
+        const a = findApplication(next.applications, r.id);
+        setNotice(
+          `${displayValue(a?.company) || 'Application'}: ${r.ready ? 'drafts are ready.' : 'research finished; no candidates found.'}`,
+        );
+      }
+      lastJobs.current = Object.fromEntries(
+        next.applications.map((a: Application) => [a.source_application_id, a.job?.state || '']),
+      );
+      setData(next);
+    } finally {
+      fetching.current = false;
+      setRefreshing(false);
+    }
+  }
+  async function refreshPage() {
+    if (fetching.current) return;
+    setError('');
+    setRefreshNotice('');
+    try {
+      await refresh();
+      setRefreshNotice('Latest outreach data loaded.');
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+  const settings = async () => setConfig(await api<Configuration>('/settings'));
+  useEffect(() => {
+    let alive = true;
+    api('/bootstrap')
+      .then(async boot => {
+        if (alive) {
+          setRemote(!!boot.remote);
+          await refresh();
+          await settings();
+          if (alive) {
+            const setup = await api('/bootstrap');
+            if (setup.onboarding_required) setView('Settings');
+          }
+        }
+      })
+      .catch(e => setError(e.message));
+    const timer = setInterval(() => {
+      if (alive && !document.hidden) refresh().catch(e => setError(e.message));
+    }, 5000);
+    return () => {
+      alive = false;
+      clearInterval(timer);
+    };
+  }, []);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('outreach-filters-v2', JSON.stringify(filters));
+    } catch {}
+    setPage(1);
+  }, [filters]);
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        'outreach-collapsed-companies-v1',
+        JSON.stringify([...collapsedCompanies]),
+      );
+    } catch {}
+  }, [collapsedCompanies]);
+  async function action(key: string, fn: () => Promise<unknown>, message = '') {
+    if (busy.current.has(key)) return;
+    busy.current.add(key);
+    setPending([...busy.current]);
+    setError('');
+    try {
+      await fn();
+      await refresh();
+      if (message) setNotice(message);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      busy.current.delete(key);
+      setPending([...busy.current]);
+    }
+  }
+  const apps = data?.applications || [],
+    contacts = data?.contacts || [],
+    shown = filterApplications(apps, filters).filter(
+      (a: Application) => !missingOnly || !displayValue(a.role),
+    ),
+    detail = findApplication(apps, focus);
+  const pages = Math.max(1, Math.ceil(shown.length / 25)),
+    currentPage = Math.min(page, pages),
+    rows = shown.slice((currentPage - 1) * 25, currentPage * 25);
+  const draft = contacts.find((c: Contact) => c.id === draftId),
+    activity = contacts.find((c: Contact) => c.id === activityId);
+  const queueBase: Contact[] = filterQueue(contacts, { relevance: 'all' });
+  const queueQuality: Quality = {
+    ...(data?.quality || ({} as Quality)),
+    recommended_contacts: queueBase.filter(c =>
+      ['high', 'medium'].includes(c.relevance_assessment?.level),
+    ).length,
+    needs_review: queueBase.filter(c => c.review_status !== 'supported').length,
+    notes_over_limit: queueBase.filter(
+      c => Array.from(c.note || '').length > (config?.note_limit || 200),
+    ).length,
+  };
+  const queue = filterQueue(contacts, { query, showDismissed, relevance: relevanceFilter });
+  const queueCompanies = groupQueueCompanies(queue, apps, filters.sort);
+  const tracker = filterTracker(contacts, trackerFilter, query);
+  function navigate(v: string) {
+    setView(v);
+    setNotice('');
+    setRefreshNotice('');
+    setError('');
+    setQuery('');
+    if (v === 'Settings') settings().catch(e => setError(e.message));
+    window.scrollTo(0, 0);
+  }
+  function openApplication(id: string) {
+    setView('Applications');
+    setFocus(id);
+    window.scrollTo(0, 0);
+  }
+  function prepare(a: Application) {
+    if (!displayValue(a.company) || !displayValue(a.role)) {
+      setPrepareDetails(a);
+      return;
+    }
+    return action(
+      'prepare-' + a.source_application_id,
+      () => api(`/applications/${encodeURIComponent(a.source_application_id)}/research`, 'POST'),
+      'Preparation queued. You can continue browsing.',
+    );
+  }
+  function extractRole(a: Application) {
+    if (a.role_candidate) {
+      setRoleCandidate({ ...a.role_candidate, company: a.company });
+      return;
+    }
+    return action('extract-role-' + a.source_application_id, async () => {
+      const result = await api(
+        `/applications/${encodeURIComponent(a.source_application_id)}/extract-role`,
+        'POST',
+      );
+      setRoleCandidate({ ...result, application_id: a.source_application_id, company: a.company });
+    });
+  }
+  const extractRoleButton = (a: Application) =>
+    !displayValue(a.role) && safeLink(a.job_url) ? (
+      <button
+        className="text-button extract-role"
+        disabled={pending.includes('extract-role-' + a.source_application_id)}
+        onClick={() => extractRole(a)}
+      >
+        {pending.includes('extract-role-' + a.source_application_id)
+          ? 'Reading posting…'
+          : a.role_candidate
+            ? 'Review extracted role'
+            : 'Extract role from posting'}
+      </button>
+    ) : null;
+  function canPrepare(a: Application) {
+    return (
+      data?.baseline_valid &&
+      a.source_status === 'COMPLETED' &&
+      !['rejected', 'job_closed'].includes(a.hiring_outcome) &&
+      !activeJob(a)
+    );
+  }
+  function dismissPreparation(a: Application) {
+    return action(
+      'dismiss-preparation-' + a.source_application_id,
+      () =>
+        api(
+          `/applications/${encodeURIComponent(a.source_application_id)}/research/dismiss`,
+          'POST',
+        ),
+      'Preparation dismissed. You can prepare it again from Applications.',
+    );
+  }
+  function hasOutreach(a: Application) {
+    return (
+      a.research_state === 'ready' &&
+      contacts.some((c: Contact) => c.application_id === a.source_application_id)
+    );
+  }
+  function toggleCompany(key: string) {
+    setCollapsedCompanies(previous => {
+      const next = new Set(previous);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  }
+  async function dismiss(c: Contact, dismissed: boolean) {
+    await api(`/contacts/${c.id}`, 'PUT', {
+      name: c.name,
+      title: c.title || '',
+      company: c.company || '',
+      linkedin_url: c.linkedin_url,
+      review_status: c.review_status,
+      review_note: c.review_note || '',
+      review_source: c.review_source || '',
+      dismissed,
+    });
+    setUndoDismiss(dismissed ? c : null);
+  }
+  const renderCompany = (company: CompanyGroup) => {
+    const collapsed = !query.trim() && collapsedCompanies.has(company.key),
+      contentId = 'company-' + company.key.replace(/[^a-z0-9_-]/gi, '-');
+    return (
+      <section className="panel company-group" key={company.key}>
+        <button
+          className="company-toggle"
+          type="button"
+          aria-expanded={!collapsed}
+          aria-controls={contentId}
+          onClick={() => toggleCompany(company.key)}
+        >
+          <svg viewBox="0 0 20 20" aria-hidden="true" className={collapsed ? '' : 'expanded'}>
+            <path d="m7 5 5 5-5 5" />
+          </svg>
+          <span>
+            <strong>{displayValue(company.company) || 'Company not supplied'}</strong>
+            <small>
+              {company.contact_count} {company.contact_count === 1 ? 'contact' : 'contacts'}
+            </small>
+          </span>
+        </button>
+        {!collapsed && (
+          <div id={contentId} className="company-applications">
+            {company.applications.map((group: QueueGroup) => (
+              <section className="queue-group" key={group.application_id}>
+                <div className="application-group-header">
+                  <div>
+                    <p className="eyebrow">APPLICATION</p>
+                    <h3>{displayValue(group.role) || 'Role not supplied'}</h3>
+                  </div>
+                  {group.submitted_at && (
+                    <Badge tone="green">Submitted {when(group.submitted_at)}</Badge>
+                  )}
+                </div>
+                <div className="contact-grid">
+                  {group.contacts.map((c: Contact) => (
+                    <ContactCard
+                      key={c.id}
+                      c={c}
+                      demo={data?.demo || false}
+                      onDraft={() => setDraftId(c.id)}
+                      onEdit={() => setEditContact(c)}
+                      onDismiss={() =>
+                        action(
+                          'dismiss-' + c.id,
+                          () => dismiss(c, !c.dismissed),
+                          c.dismissed ? 'Contact restored.' : 'Contact dismissed.',
+                        )
+                      }
+                      onRecord={() => setActivityId(c.id)}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  };
+  return (
+    <div className="shell">
+      <aside>
+        <a className="brand" href="/">
+          <svg className="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+            <circle cx="9" cy="9" r="4" />
+            <circle cx="23" cy="23" r="4" />
+            <path d="M12 12c3 1.6 6.4 5 8 8" />
+            <path d="m16.5 19.5 4 .5-.5-4" />
+          </svg>
+          <span className="brand-name">
+            outreach<span>.</span>
+          </span>
+        </a>
+        <p className="eyebrow workspace">YOUR WORKSPACE</p>
+        <nav aria-label="Workspace">
+          {['Applications', 'Outreach queue', 'Outreach tracker', 'Experience', 'Settings'].map(
+            (v, i) => (
+              <button
+                key={v}
+                aria-current={view === v ? 'page' : undefined}
+                className={view === v ? 'nav-active' : ''}
+                onClick={() => navigate(v)}
+              >
+                <span aria-hidden="true">{['▦', '◎', '↗', '◇', '⚙'][i]}</span>
+                {v}
+              </button>
+            ),
+          )}
+        </nav>
+        <div className="sidebar-note">
+          <strong>A thoughtful introduction.</strong>
+          <p>
+            Your experience. Your words.
+            <br />
+            Every message approved by you.
+          </p>
+          <Badge tone="green">{remote ? 'Private remote workspace' : 'Local workspace'}</Badge>
+        </div>
+      </aside>
+      <main>
+        <header>
+          <span>
+            Workspace <span className="muted">/ {view}</span>
+          </span>
+          <span className="local-indicator">
+            ● {remote ? 'Private remote workspace' : 'Local workspace'}
+          </span>
+        </header>
+        <div className="content">
+          {data?.demo && (
+            <div className="notice warning">
+              FICTIONAL TEST WORKSPACE · Separate database. No real outreach.
+            </div>
+          )}
+          <div className="page-title">
+            <div>
+              <h1>{names[view]}</h1>
+              <p className="subtitle">{subtitles[view]}</p>
+            </div>
+            {view === 'Applications' && (
+              <div className="sync-actions">
+                <span className="sync-meta">
+                  {data?.last_successful_sync
+                    ? 'Last synced ' + when(data.last_successful_sync)
+                    : 'No sync completed yet'}
+                </span>
+                <button
+                  className="button"
+                  disabled={
+                    pending.includes('sync') ||
+                    ['queued', 'running', 'retry'].includes(data?.sync?.state || '')
+                  }
+                  onClick={() => action('sync', () => api('/sync', 'POST'), 'One sync requested.')}
+                >
+                  <span aria-hidden="true">↻</span>{' '}
+                  {['queued', 'running', 'retry'].includes(data?.sync?.state || '')
+                    ? 'Syncing…'
+                    : 'Sync applications'}
+                </button>
+              </div>
+            )}
+            {['Outreach queue', 'Outreach tracker'].includes(view) && (
+              <div className="outreach-refresh-actions">
+                <span className="hint" role="status">
+                  {refreshNotice}
+                </span>
+                <button
+                  className="button"
+                  disabled={refreshing || !data}
+                  aria-busy={refreshing}
+                  onClick={refreshPage}
+                >
+                  <span aria-hidden="true">↻</span> {refreshing ? 'Refreshing…' : 'Refresh'}
+                </button>
+              </div>
+            )}
+          </div>
+          {error && (
+            <div className="notice error" role="alert">
+              {error}
+              <button className="text-button" onClick={() => setError('')}>
+                Dismiss
+              </button>
+            </div>
+          )}
+          {notice && (
+            <div className="notice success" role="status">
+              {notice}
+              {undoDismiss && (
+                <button
+                  className="text-button"
+                  onClick={() =>
+                    action('restore', () => dismiss(undoDismiss, false), 'Contact restored.')
+                  }
+                >
+                  Undo dismissal
+                </button>
+              )}
+              <button className="text-button" onClick={() => setNotice('')}>
+                Dismiss
+              </button>
+            </div>
+          )}
+          {roleCandidate && (
+            <Dialog title="Review extracted role" onClose={() => setRoleCandidate(null)}>
+              <div className="dialog-body form-stack">
+                <p>
+                  Check that this is the role for{' '}
+                  {displayValue(roleCandidate.company) || 'this application'}.
+                </p>
+                <strong>{roleCandidate.role}</strong>
+                <p className="hint">Found in: {roleCandidate.method}</p>
+                <a
+                  href={safeLink(roleCandidate.source_url)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View source posting ↗
+                </a>
+                <p className="hint">
+                  Saving fills the missing role. Outreach preparation starts only when you request
+                  it.
+                </p>
+                {error && (
+                  <p className="notice error" role="alert">
+                    {error}
+                  </p>
+                )}
+                <button
+                  className="button primary"
+                  disabled={pending.includes('save-role')}
+                  onClick={() =>
+                    action(
+                      'save-role',
+                      async () => {
+                        await api(
+                          `/applications/${encodeURIComponent(roleCandidate!.application_id)}/extracted-role/save`,
+                          'POST',
+                        );
+                        setRoleCandidate(null);
+                      },
+                      'Role saved from the posting.',
+                    )
+                  }
+                >
+                  Save role
+                </button>
+              </div>
+            </Dialog>
+          )}
+          {prepareDetails && (
+            <PrepareDetails
+              app={prepareDetails}
+              onClose={() => setPrepareDetails(null)}
+              onSave={async (value: { company: string; role: string }) => {
+                await api(
+                  `/applications/${encodeURIComponent(prepareDetails!.source_application_id)}/research`,
+                  'POST',
+                  value,
+                );
+                setPrepareDetails(null);
+                await refresh();
+                setNotice('Preparation queued.');
+              }}
+            />
+          )}
+          {!data ? (
+            <section className="panel empty" role="status">
+              <h2>Loading your workspace…</h2>
+              <p>Reading your saved applications and drafts.</p>
+              {error && (
+                <button className="button" onClick={() => location.reload()}>
+                  Try again
+                </button>
+              )}
+            </section>
+          ) : (
+            <>
+              {!data?.baseline_valid && !data.onboarding_required && (
+                <div className="notice error">
+                  Original baseline needs attention. Research is disabled until it is restored.
+                </div>
+              )}
+              {view === 'Applications' && (
+                <>
+                  {detail ? (
+                    <>
+                      <button className="text-button back" onClick={() => setFocus(null)}>
+                        ← Back to results · {shown.length} matching
+                      </button>
+                      <section className="panel application-detail">
+                        <div className="section-heading">
+                          <div>
+                            <p className="eyebrow">APPLICATION</p>
+                            <h2>
+                              {safeLink(detail.job_url) ? (
+                                <a
+                                  href={safeLink(detail.job_url)!}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="Open job posting in a new tab"
+                                >
+                                  {displayValue(detail.company) ||
+                                    'Application ' + detail.source_application_id.slice(0, 8)}{' '}
+                                  ↗
+                                </a>
+                              ) : (
+                                displayValue(detail.company) ||
+                                'Application ' + detail.source_application_id.slice(0, 8)
+                              )}
+                            </h2>
+                            {displayValue(detail.role) && (
+                              <p className="role-title">{detail.role}</p>
+                            )}
+                            {extractRoleButton(detail)}
+                          </div>
+                          <Badge
+                            tone={submissionGroup(detail) === 'completed' ? 'green' : 'neutral'}
+                          >
+                            {statusLabel(submissionGroup(detail))}
+                          </Badge>
+                        </div>
+                        <div className="company-info">
+                          <div>
+                            <h3>Company information</h3>
+                            {displayValue(detail.company) ? (
+                              <p>{detail.company}</p>
+                            ) : (
+                              <p className="muted">The source did not provide a company name.</p>
+                            )}
+                            <div className="link-row">
+                              {safeLink(detail.company_website) ? (
+                                <a
+                                  href={safeLink(detail.company_website)!}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Company website ↗
+                                </a>
+                              ) : (
+                                <span className="hint">No company website supplied.</span>
+                              )}
+                              {safeLink(detail.job_url) && (
+                                <a
+                                  href={safeLink(detail.job_url)!}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Original job posting ↗
+                                </a>
+                              )}
+                            </div>
+                            {detail.locations?.length > 0 ? (
+                              <p>{detail.locations.join(' · ')}</p>
+                            ) : (
+                              <p className="hint">No location supplied by the source.</p>
+                            )}
+                          </div>
+                          <div>
+                            <h3>Application details</h3>
+                            <p>Added {when(detail.first_seen)}</p>
+                            {detail.submitted_at && <p>Submitted {when(detail.submitted_at)}</p>}
+                            <p className="hint">
+                              {detail.submitted_at
+                                ? ''
+                                : 'Tsenta did not supply a submission date. The added date is when this app first observed the record.'}
+                            </p>
+                            <Badge>
+                              {displayValue(detail.hiring_outcome) &&
+                                statusLabel(detail.hiring_outcome)}
+                            </Badge>
+                            <details className="secondary-details">
+                              <summary>Record hiring outcome</summary>
+                              <Outcome
+                                key={`${detail.source_application_id}:${detail.hiring_outcome}:${detail.outcome_note || ''}`}
+                                app={detail}
+                                action={action}
+                              />
+                            </details>
+                          </div>
+                        </div>
+                      </section>
+                      <DescriptionReview
+                        key={detail.source_application_id}
+                        application={detail}
+                        onSaved={refresh}
+                      />
+                      <section className="section-block">
+                        <div className="section-heading">
+                          <div>
+                            <h2>Contacts to review</h2>
+                            <p className="muted">
+                              People suggested for this application. Check their evidence before
+                              reaching out.
+                            </p>
+                          </div>
+                          {!hasOutreach(detail) && (
+                            <button
+                              className="button primary"
+                              disabled={!canPrepare(detail) || pending.includes('prepare-' + focus)}
+                              onClick={() => prepare(detail)}
+                            >
+                              {activeJob(detail) || pending.includes('prepare-' + focus)
+                                ? 'Preparing…'
+                                : ['failed', 'blocked', 'interrupted'].includes(
+                                      detail.research_state,
+                                    )
+                                  ? 'Retry preparation'
+                                  : 'Prepare outreach'}
+                            </button>
+                          )}
+                        </div>
+                        <Progress app={detail} />
+                        {contacts
+                          .filter((c: Contact) => c.application_id === focus && !c.dismissed)
+                          .sort(compareContactRelevance)
+                          .map((c: Contact) => (
+                            <ContactCard
+                              key={c.id}
+                              c={c}
+                              onDraft={() => setDraftId(c.id)}
+                              onEdit={() => setEditContact(c)}
+                              onDismiss={() =>
+                                action(
+                                  'dismiss-' + c.id,
+                                  () => dismiss(c, true),
+                                  'Contact dismissed.',
+                                )
+                              }
+                              demo={data?.demo || false}
+                            />
+                          ))}
+                        {!contacts.some(
+                          (c: Contact) => c.application_id === focus && !c.dismissed,
+                        ) &&
+                          !activeJob(detail) && (
+                            <div className="panel empty">
+                              <h3>
+                                {detail.research_state === 'no_contacts'
+                                  ? 'No suitable contacts found'
+                                  : 'No contacts prepared yet'}
+                              </h3>
+                              <p>
+                                {canPrepare(detail)
+                                  ? 'Prepare outreach to research candidates and create drafts from your approved experience.'
+                                  : 'Preparation requires a confirmed submission, a company, and a role.'}
+                              </p>
+                            </div>
+                          )}
+                      </section>
+                    </>
+                  ) : (
+                    <>
+                      <PreparationDashboard
+                        apps={apps}
+                        onView={openApplication}
+                        onRetry={prepare}
+                        onDismiss={dismissPreparation}
+                        pending={pending}
+                      />
+                      {data.sync?.error && (
+                        <div role="alert" className="notice error">
+                          {data.sync.error}
+                        </div>
+                      )}
+                      <ApplicationFilters
+                        apps={apps}
+                        filters={filters}
+                        setFilters={setFilters}
+                        count={shown.length}
+                        missingOnly={missingOnly}
+                        onMissing={(value: boolean) => {
+                          setMissingOnly(value);
+                          setPage(1);
+                        }}
+                      />
+                      <section className="panel application-list">
+                        <div className="table-scroll">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Company & role</th>
+                                <th>Submission</th>
+                                <th>Outreach</th>
+                                <th>Added</th>
+                                <th>
+                                  <span className="sr-only">Outreach action</span>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {rows.map((a: Application) => (
+                                <tr
+                                  key={a.source_application_id}
+                                  data-application-id={a.source_application_id}
+                                >
+                                  <td>
+                                    <div className="application-cell">
+                                      <strong>
+                                        {safeLink(a.job_url) ? (
+                                          <a
+                                            href={safeLink(a.job_url)!}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            title="Open job posting in a new tab"
+                                          >
+                                            {displayValue(a.company) ||
+                                              'Application ' +
+                                                a.source_application_id.slice(0, 8)}{' '}
+                                            ↗
+                                          </a>
+                                        ) : (
+                                          displayValue(a.company) ||
+                                          'Application ' + a.source_application_id.slice(0, 8)
+                                        )}
+                                      </strong>
+                                      <button
+                                        className="application-role-link"
+                                        onClick={() => openApplication(a.source_application_id)}
+                                        title="View application details"
+                                      >
+                                        {displayValue(a.role) || 'View application details'}
+                                      </button>
+                                    </div>
+                                    {extractRoleButton(a)}
+                                    {displayValue(a.hiring_outcome) && (
+                                      <Badge>
+                                        {statusLabel(a.hiring_outcome)} · recorded by you
+                                      </Badge>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <Badge
+                                      tone={
+                                        submissionGroup(a) === 'completed' ? 'green' : 'neutral'
+                                      }
+                                    >
+                                      {statusLabel(submissionGroup(a))}
+                                    </Badge>
+                                  </td>
+                                  <td>
+                                    <Badge
+                                      tone={
+                                        a.research_state === 'ready'
+                                          ? 'purple'
+                                          : ['blocked', 'failed', 'interrupted'].includes(
+                                                a.research_state,
+                                              )
+                                            ? 'amber'
+                                            : 'neutral'
+                                      }
+                                    >
+                                      {activeJob(a) ? 'Preparing…' : statusLabel(a.research_state)}
+                                    </Badge>
+                                  </td>
+                                  <td className="date-cell">{when(a.first_seen)}</td>
+                                  <td className="application-action">
+                                    {hasOutreach(a) ? (
+                                      <button
+                                        className="button small"
+                                        onClick={() => openApplication(a.source_application_id)}
+                                      >
+                                        View outreach
+                                      </button>
+                                    ) : (
+                                      <button
+                                        className="button small"
+                                        disabled={
+                                          !canPrepare(a) ||
+                                          pending.includes('prepare-' + a.source_application_id)
+                                        }
+                                        onClick={() => prepare(a)}
+                                      >
+                                        {activeJob(a) ||
+                                        pending.includes('prepare-' + a.source_application_id)
+                                          ? 'Preparing…'
+                                          : ['failed', 'blocked', 'interrupted'].includes(
+                                                a.research_state,
+                                              )
+                                            ? 'Retry preparation'
+                                            : 'Prepare outreach'}
+                                      </button>
+                                    )}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                        {!shown.length ? (
+                          <div className="empty">
+                            <h3>No applications match</h3>
+                            <p>Try a broader search or choose another submission status.</p>
+                            <button
+                              className="button"
+                              onClick={() => setFilters({ ...initialFilters })}
+                            >
+                              Reset filters
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="pagination">
+                            <span>
+                              {(currentPage - 1) * 25 + 1}–
+                              {Math.min(currentPage * 25, shown.length)} of {shown.length}
+                            </span>
+                            <div className="button-row">
+                              <button
+                                className="button small"
+                                disabled={currentPage === 1}
+                                onClick={() => setPage(currentPage - 1)}
+                              >
+                                Previous
+                              </button>
+                              <span>
+                                Page {currentPage} of {pages}
+                              </span>
+                              <button
+                                className="button small"
+                                disabled={currentPage === pages}
+                                onClick={() => setPage(currentPage + 1)}
+                              >
+                                Next
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </section>
+                    </>
+                  )}
+                  {data.demo && (
+                    <button
+                      className="button small"
+                      onClick={() =>
+                        action(
+                          'demo',
+                          () => api('/demo/transition', 'POST'),
+                          'Fictional application advanced.',
+                        )
+                      }
+                    >
+                      Simulate pending → submitted (fictional)
+                    </button>
+                  )}
+                </>
+              )}
+              {view === 'Outreach queue' && (
+                <>
+                  <QualitySummary
+                    quality={queueQuality}
+                    onRecommended={() => setRelevanceFilter('recommended')}
+                    onEvidence={() => setRelevanceFilter('needs_evidence')}
+                    onRepair={() => navigate('Settings')}
+                  />
+                  <PreparationDashboard
+                    apps={apps}
+                    onView={openApplication}
+                    onRetry={prepare}
+                    onDismiss={dismissPreparation}
+                    pending={pending}
+                    compact
+                  />
+                  <section className="panel toolbar">
+                    <label className="contact-search">
+                      Find a contact
+                      <input
+                        type="search"
+                        value={query}
+                        onChange={e => setQuery(e.target.value)}
+                        placeholder="Name, company or role"
+                      />
+                    </label>
+                    <label>
+                      Relevance / review
+                      <select
+                        value={relevanceFilter}
+                        onChange={e => setRelevanceFilter(e.target.value)}
+                      >
+                        <option value="recommended">High / medium relevance</option>
+                        <option value="needs_evidence">Needs stronger evidence</option>
+                        <option value="all">All candidates</option>
+                      </select>
+                    </label>
+                    <label className="check-field">
+                      <input
+                        type="checkbox"
+                        checked={showDismissed}
+                        onChange={e => setShowDismissed(e.target.checked)}
+                      />
+                      Show dismissed
+                    </label>
+                    <span className="result-count">{queue.length} contacts</span>
+                  </section>
+                  <div className="queue-companies">
+                    {queueCompanies.slice(0, 3).map(renderCompany)}
+                    {queueCompanies.length > 3 && (
+                      <details
+                        className="older-outreach"
+                        open={!!query.trim() || olderOpen}
+                        onToggle={e => {
+                          if (!query.trim()) setOlderOpen(e.currentTarget.open);
+                        }}
+                      >
+                        <summary>
+                          Older outreach <span>· {queueCompanies.length - 3} companies</span>
+                        </summary>
+                        <div className="queue-companies">
+                          {queueCompanies.slice(3).map(renderCompany)}
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                  {!queue.length && (
+                    <div className="panel empty">
+                      <h2>No contacts to review</h2>
+                      <p>
+                        {query
+                          ? 'Try a broader search.'
+                          : 'Try All candidates to inspect saved contacts, or prepare outreach from a submitted application.'}
+                      </p>
+                      <button className="button" onClick={() => setRelevanceFilter('all')}>
+                        Show all candidates
+                      </button>
+                      <button className="button" onClick={() => navigate('Applications')}>
+                        Browse applications
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+              {view === 'Outreach tracker' && (
+                <>
+                  <OutcomeSummary quality={data.quality} />
+                  <p className="hint">
+                    Manually tracked. Record actions after taking them on LinkedIn.
+                  </p>
+                  <section className="panel toolbar">
+                    <label className="contact-search">
+                      Find a contact
+                      <input
+                        type="search"
+                        value={query}
+                        onChange={e => setQuery(e.target.value)}
+                        placeholder="Name, company or role"
+                      />
+                    </label>
+                    <label>
+                      Activity
+                      <select
+                        value={trackerFilter}
+                        onChange={e => setTrackerFilter(e.target.value)}
+                      >
+                        {[
+                          ['all', 'All contacted'],
+                          ['pending', 'Pending invitations'],
+                          ['connected', 'Connected'],
+                          ['awaiting', 'Awaiting reply'],
+                          ['replied', 'Replied'],
+                          ['followup', 'Follow-up due'],
+                          ['closed', 'Closed'],
+                        ].map(([v, l]) => (
+                          <option value={v} key={v}>
+                            {l}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <span>
+                      {tracker.length} {tracker.length === 1 ? 'person' : 'people'}
+                    </span>
+                  </section>
+                  <div className="tracker-list">
+                    {tracker.map((c: Contact) => {
+                      const s = trackerStatus(c);
+                      return (
+                        <section className="panel tracker-card" key={c.id}>
+                          <div>
+                            <h2>{c.name}</h2>
+                            <p>
+                              <strong>{displayValue(c.application_company)}</strong>
+                              {displayValue(c.role) && <> · {c.role}</>}
+                            </p>
+                            <div className="badge-row">
+                              <Badge tone="purple">{s.invitation}</Badge>
+                              <Badge
+                                tone={
+                                  s.group === 'replied'
+                                    ? 'green'
+                                    : s.group === 'followup'
+                                      ? 'amber'
+                                      : 'neutral'
+                                }
+                              >
+                                {s.message}
+                              </Badge>
+                              {s.group === 'followup' && <Badge tone="amber">Follow-up due</Badge>}
+                            </div>
+                          </div>
+                          <div>
+                            <small>LAST ACTIVITY</small>
+                            <p>
+                              {label(s.last.kind)} · {when(s.last.created_at)}
+                            </p>
+                            <small>NEXT ACTION</small>
+                            <p>{c.conversation.next_action}</p>
+                          </div>
+                          <div className="button-row">
+                            <button className="button primary" onClick={() => setActivityId(c.id)}>
+                              Timeline & update
+                            </button>
+                            <button className="button" onClick={() => setDraftId(c.id)}>
+                              View drafts
+                            </button>
+                          </div>
+                        </section>
+                      );
+                    })}
+                  </div>
+                  {!tracker.length && (
+                    <div className="panel empty">
+                      <h2>
+                        {trackerFilter !== 'all' || query
+                          ? 'No matching activity'
+                          : 'Your outreach starts here'}
+                      </h2>
+                      <p>
+                        After sending an invitation or message on LinkedIn, choose “Record activity”
+                        on a contact. Drafts alone stay in the Outreach queue. Undone actions do not
+                        count as contact.
+                      </p>
+                      <button className="button" onClick={() => navigate('Outreach queue')}>
+                        Review prepared contacts
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+              {view === 'Experience' && <ExperienceManager />}
+              {view === 'Settings' &&
+                (config ? (
+                  <SettingsView
+                    config={config}
+                    action={action}
+                    refreshSettings={settings}
+                    openExperience={() => setView('Experience')}
+                  />
+                ) : (
+                  <p role="status">Checking your tools…</p>
+                ))}
+            </>
+          )}
+          <footer>Prepared locally. Reviewed by you.</footer>
+        </div>
+      </main>
+      {draft && (
+        <DraftDialog
+          key={draft.id}
+          c={draft}
+          config={config}
+          demo={data?.demo || false}
+          onSaved={refresh}
+          onClose={() => setDraftId(null)}
+        />
+      )}
+      {activity && (
+        <ActivityDialog c={activity} onClose={() => setActivityId(null)} refresh={refresh} />
+      )}
+      {editContact && (
+        <ReviewDialog c={editContact} onClose={() => setEditContact(null)} refresh={refresh} />
+      )}
+    </div>
+  );
 }
-function CompletedPreparations({completed,apps,onView}:{completed:Application[];apps:Application[];onView:(id:string)=>void}){
- const [showAll,setShowAll]=useState(false);
- const companyKey=(a:Application)=>displayValue(a.company).trim().toLocaleLowerCase();
- const counts=new Map<string,number>();
- for(const app of apps){const key=companyKey(app);if(key)counts.set(key,(counts.get(key)||0)+1)}
- const visible=showAll?completed:completed.slice(0,3);
- return <div className="completed-preparations"><ul className="completed-preparation-list" aria-label="Completed applications">{visible.map(a=><li key={a.source_application_id} className="completed-preparation-row"><div className="completed-preparation-company"><strong>{displayValue(a.company)||'Company not supplied'}</strong>{(counts.get(companyKey(a))||0)>1&&<span>{displayValue(a.role)||'Role not supplied'}</span>}</div><button className="text-button" aria-label={`View outreach for ${displayValue(a.company)||'application'}${(counts.get(companyKey(a))||0)>1?' · '+(displayValue(a.role)||'Role not supplied'):''}`} onClick={()=>onView(a.source_application_id)}>View outreach <span aria-hidden="true">→</span></button></li>)}</ul>{completed.length>3&&<button className="text-button completed-preparation-more" aria-expanded={showAll} onClick={()=>setShowAll(!showAll)}>{showAll?'Show latest three':`View all ${completed.length} completed`}</button>}</div>;
+function ApplicationFilters({
+  apps,
+  filters: f,
+  setFilters,
+  count,
+  missingOnly,
+  onMissing,
+}: {
+  apps: Application[];
+  filters: Filters;
+  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  count: number;
+  missingOnly: boolean;
+  onMissing: (v: boolean) => void;
+}) {
+  const change = (key: string, value: string) =>
+    setFilters((old: Filters) => ({ ...old, [key]: value }));
+  const select = (key: string, title: string, values: string[]) => (
+    <label>
+      {title}
+      <select value={f[key as keyof Filters]} onChange={e => change(key, e.target.value)}>
+        {values.map(v => (
+          <option key={v} value={v}>
+            {v === 'all' ? 'All ' + title.toLowerCase() : statusLabel(v)}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+  const submission = ['all', ...new Set<string>(apps.map(submissionGroup))];
+  return (
+    <section className="panel filter-panel">
+      <div className="toolbar">
+        <label className="search-field">
+          Search
+          <input
+            type="search"
+            value={f.query}
+            onChange={e => change('query', e.target.value)}
+            placeholder="Search"
+          />
+        </label>
+        {select('submission', 'Submission status', submission)}
+        {select('sort', 'Sort by', ['source-desc', 'source-asc', 'observed-desc', 'observed-asc'])}
+        <label className="check-field">
+          <input
+            type="checkbox"
+            checked={missingOnly}
+            onChange={e => onMissing(e.target.checked)}
+          />
+          Missing role
+        </label>
+      </div>
+      <div className="filter-bottom">
+        <span className="application-counts">
+          <strong>
+            {count} matching {count === 1 ? 'application' : 'applications'}
+          </strong>
+          <span aria-hidden="true"> · </span>
+          <span>
+            {apps.filter((a: Application) => a.source_status === 'COMPLETED').length} submitted in
+            Tsenta
+          </span>
+        </span>
+        {(f.query ||
+          f.submission !== initialFilters.submission ||
+          f.sort !== initialFilters.sort) && (
+          <button className="text-button" onClick={() => setFilters({ ...initialFilters })}>
+            Reset filters
+          </button>
+        )}
+      </div>
+    </section>
+  );
 }
-function PreparationDashboard({apps,onView,onRetry,onDismiss,pending,compact=false}:{apps:Application[];onView:(id:string)=>void;onRetry:(a:Application)=>unknown;onDismiss:(a:Application)=>unknown;pending:string[];compact?:boolean}){
- const groups=preparationGroups(apps),visible=groups.queued.length||groups.running.length||groups.failed.length||(!compact&&groups.completed.length);
- if(!visible)return <div className="preparation-idle" role="status">Preparation idle · Choose an application to get started.</div>;
- if(!groups.queued.length&&!groups.running.length&&!groups.failed.length)return <details className="preparation-idle"><summary>Preparation idle · {groups.completed.length} completed</summary><CompletedPreparations completed={groups.completed} apps={apps} onView={onView}/></details>;
- const row=(a:Application,kind:string)=><div className="preparation-row" key={a.source_application_id}><div><strong>{displayValue(a.company)||'Company not supplied'}</strong><span>{displayValue(a.role)||'Role not supplied'}</span></div><div><Badge tone={kind==='complete'?'green':kind==='failed'?'amber':'purple'}>{kind==='queued'?'Queued':kind==='complete'?'Complete':(stages as Record<string,string>)[a.job?.stage||'']||statusLabel(a.job?.state)}</Badge>{a.job?.error&&<p className="hint">{a.job.error}</p>}</div><div className="preparation-actions">{kind==='complete'?<button className="button small" onClick={()=>onView(a.source_application_id)}>View outreach</button>:kind==='failed'?<button className="button small" disabled={pending.includes('prepare-'+a.source_application_id)} onClick={()=>onRetry(a)}>{pending.includes('prepare-'+a.source_application_id)?'Preparing…':'Retry'}</button>:null}{['queued','retry','blocked','failed','interrupted'].includes(a.job?.state||'')&&<button className="button preparation-dismiss" title="Dismiss preparation" aria-label={`Dismiss preparation for ${displayValue(a.company)||'this application'}`} disabled={pending.includes('dismiss-preparation-'+a.source_application_id)} onClick={()=>onDismiss(a)}><Trash2 size={16} aria-hidden="true"/></button>}</div></div>;
- return <section className="panel preparation-dashboard" aria-label="Outreach preparation"><div className="section-heading"><div><p className="eyebrow">OUTREACH PREPARATION</p><h2>Preparation activity</h2></div><p className="hint">Live local job state · one model job runs at a time</p></div>{groups.running.length>0&&<div className="preparation-section"><h3>Actively running</h3>{groups.running.map((a:Application)=>row(a,'running'))}</div>}{groups.queued.length>0&&<details className="preparation-section"><summary>Queued ({groups.queued.length})</summary>{groups.queued.map((a:Application)=>row(a,'queued'))}</details>}{groups.failed.length>0&&<div className="preparation-section"><h3>Needs attention</h3>{groups.failed.map((a:Application)=>row(a,'failed'))}</div>}{!compact&&groups.completed.length>0&&<details><summary>Recently completed</summary><CompletedPreparations completed={groups.completed} apps={apps} onView={onView}/></details>}</section>;
+function CompletedPreparations({
+  completed,
+  apps,
+  onView,
+}: {
+  completed: Application[];
+  apps: Application[];
+  onView: (id: string) => void;
+}) {
+  const [showAll, setShowAll] = useState(false);
+  const companyKey = (a: Application) => displayValue(a.company).trim().toLocaleLowerCase();
+  const counts = new Map<string, number>();
+  for (const app of apps) {
+    const key = companyKey(app);
+    if (key) counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  const visible = showAll ? completed : completed.slice(0, 3);
+  return (
+    <div className="completed-preparations">
+      <ul className="completed-preparation-list" aria-label="Completed applications">
+        {visible.map(a => (
+          <li key={a.source_application_id} className="completed-preparation-row">
+            <div className="completed-preparation-company">
+              <strong>{displayValue(a.company) || 'Company not supplied'}</strong>
+              {(counts.get(companyKey(a)) || 0) > 1 && (
+                <span>{displayValue(a.role) || 'Role not supplied'}</span>
+              )}
+            </div>
+            <button
+              className="text-button"
+              aria-label={`View outreach for ${displayValue(a.company) || 'application'}${(counts.get(companyKey(a)) || 0) > 1 ? ' · ' + (displayValue(a.role) || 'Role not supplied') : ''}`}
+              onClick={() => onView(a.source_application_id)}
+            >
+              View outreach <span aria-hidden="true">→</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {completed.length > 3 && (
+        <button
+          className="text-button completed-preparation-more"
+          aria-expanded={showAll}
+          onClick={() => setShowAll(!showAll)}
+        >
+          {showAll ? 'Show latest three' : `View all ${completed.length} completed`}
+        </button>
+      )}
+    </div>
+  );
 }
-function Progress({app}:{app:Application}){if(!app.job)return null;const j=app.job;if(j.state==='done')return null;return <div className={'notice '+(j.error?'warning':'info')} role={j.error?'alert':'status'}><div><strong>{(stages as Record<string,string>)[j.stage]||statusLabel(j.state)}</strong>{activeJob(app)&&<p>Preparation runs locally. You can browse while it finishes.</p>}{j.error&&<p>{j.error}</p>}{j.state==='retry'&&<p>Next attempt {when(new Date(j.next_attempt*1000).toISOString())}</p>}</div></div>}
-function ContactCard({c,onDraft,onEdit,onDismiss,onRecord,demo}:{c:Contact;onDraft:()=>void;onEdit:()=>void;onDismiss:()=>void;onRecord?:()=>void;demo:boolean}){
- const linkHelpId=React.useId();
- let profile:string|null=null;
- try{profile=linkedinUrl(c.linkedin_url)}catch{}
- const linkIssue=demo?'Profile links are disabled in the fictional workspace.':!profile?'No valid LinkedIn profile is saved for this contact.':'';
- const externalIcon=<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true" focusable="false"><path d="M11 3h6v6M17 3l-9 9M8 4H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4"/></svg>;
- return <section className={'panel contact-card queue-contact-card '+(c.dismissed?'dismissed':'')}>
-  <div className="contact-row-heading">
-   <div className="contact-person">
-    <h3>{displayValue(c.name)||'Name unavailable'}</h3>
-    <span className={displayValue(c.title)?'contact-title':'hint'}>{displayValue(c.title)||'Title unavailable'}</span>
+function PreparationDashboard({
+  apps,
+  onView,
+  onRetry,
+  onDismiss,
+  pending,
+  compact = false,
+}: {
+  apps: Application[];
+  onView: (id: string) => void;
+  onRetry: (a: Application) => unknown;
+  onDismiss: (a: Application) => unknown;
+  pending: string[];
+  compact?: boolean;
+}) {
+  const groups = preparationGroups(apps),
+    visible =
+      groups.queued.length ||
+      groups.running.length ||
+      groups.failed.length ||
+      (!compact && groups.completed.length);
+  if (!visible)
+    return (
+      <div className="preparation-idle" role="status">
+        Preparation idle · Choose an application to get started.
+      </div>
+    );
+  if (!groups.queued.length && !groups.running.length && !groups.failed.length)
+    return (
+      <details className="preparation-idle">
+        <summary>Preparation idle · {groups.completed.length} completed</summary>
+        <CompletedPreparations completed={groups.completed} apps={apps} onView={onView} />
+      </details>
+    );
+  const row = (a: Application, kind: string) => (
+    <div className="preparation-row" key={a.source_application_id}>
+      <div>
+        <strong>{displayValue(a.company) || 'Company not supplied'}</strong>
+        <span>{displayValue(a.role) || 'Role not supplied'}</span>
+      </div>
+      <div>
+        <Badge tone={kind === 'complete' ? 'green' : kind === 'failed' ? 'amber' : 'purple'}>
+          {kind === 'queued'
+            ? 'Queued'
+            : kind === 'complete'
+              ? 'Complete'
+              : (stages as Record<string, string>)[a.job?.stage || ''] || statusLabel(a.job?.state)}
+        </Badge>
+        {a.job?.error && <p className="hint">{a.job.error}</p>}
+      </div>
+      <div className="preparation-actions">
+        {kind === 'complete' ? (
+          <button className="button small" onClick={() => onView(a.source_application_id)}>
+            View outreach
+          </button>
+        ) : kind === 'failed' ? (
+          <button
+            className="button small"
+            disabled={pending.includes('prepare-' + a.source_application_id)}
+            onClick={() => onRetry(a)}
+          >
+            {pending.includes('prepare-' + a.source_application_id) ? 'Preparing…' : 'Retry'}
+          </button>
+        ) : null}
+        {['queued', 'retry', 'blocked', 'failed', 'interrupted'].includes(a.job?.state || '') && (
+          <button
+            className="button preparation-dismiss"
+            title="Dismiss preparation"
+            aria-label={`Dismiss preparation for ${displayValue(a.company) || 'this application'}`}
+            disabled={pending.includes('dismiss-preparation-' + a.source_application_id)}
+            onClick={() => onDismiss(a)}
+          >
+            <Trash2 size={16} aria-hidden="true" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+  return (
+    <section className="panel preparation-dashboard" aria-label="Outreach preparation">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">OUTREACH PREPARATION</p>
+          <h2>Preparation activity</h2>
+        </div>
+        <p className="hint">Live local job state · one model job runs at a time</p>
+      </div>
+      {groups.running.length > 0 && (
+        <div className="preparation-section">
+          <h3>Actively running</h3>
+          {groups.running.map((a: Application) => row(a, 'running'))}
+        </div>
+      )}
+      {groups.queued.length > 0 && (
+        <details className="preparation-section">
+          <summary>Queued ({groups.queued.length})</summary>
+          {groups.queued.map((a: Application) => row(a, 'queued'))}
+        </details>
+      )}
+      {groups.failed.length > 0 && (
+        <div className="preparation-section">
+          <h3>Needs attention</h3>
+          {groups.failed.map((a: Application) => row(a, 'failed'))}
+        </div>
+      )}
+      {!compact && groups.completed.length > 0 && (
+        <details>
+          <summary>Recently completed</summary>
+          <CompletedPreparations completed={groups.completed} apps={apps} onView={onView} />
+        </details>
+      )}
+    </section>
+  );
+}
+function Progress({ app }: { app: Application }) {
+  if (!app.job) return null;
+  const j = app.job;
+  if (j.state === 'done') return null;
+  return (
+    <div className={'notice ' + (j.error ? 'warning' : 'info')} role={j.error ? 'alert' : 'status'}>
+      <div>
+        <strong>{(stages as Record<string, string>)[j.stage] || statusLabel(j.state)}</strong>
+        {activeJob(app) && <p>Preparation runs locally. You can browse while it finishes.</p>}
+        {j.error && <p>{j.error}</p>}
+        {j.state === 'retry' && (
+          <p>Next attempt {when(new Date(j.next_attempt * 1000).toISOString())}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+function ContactCard({
+  c,
+  onDraft,
+  onEdit,
+  onDismiss,
+  onRecord,
+  demo,
+}: {
+  c: Contact;
+  onDraft: () => void;
+  onEdit: () => void;
+  onDismiss: () => void;
+  onRecord?: () => void;
+  demo: boolean;
+}) {
+  const linkHelpId = React.useId();
+  let profile: string | null = null;
+  try {
+    profile = linkedinUrl(c.linkedin_url);
+  } catch {}
+  const linkIssue = demo
+    ? 'Profile links are disabled in the fictional workspace.'
+    : !profile
+      ? 'No valid LinkedIn profile is saved for this contact.'
+      : '';
+  const externalIcon = (
+    <svg
+      viewBox="0 0 20 20"
+      width="15"
+      height="15"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M11 3h6v6M17 3l-9 9M8 4H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4" />
+    </svg>
+  );
+  return (
+    <section
+      className={'panel contact-card queue-contact-card ' + (c.dismissed ? 'dismissed' : '')}
+    >
+      <div className="contact-row-heading">
+        <div className="contact-person">
+          <h3>{displayValue(c.name) || 'Name unavailable'}</h3>
+          <span className={displayValue(c.title) ? 'contact-title' : 'hint'}>
+            {displayValue(c.title) || 'Title unavailable'}
+          </span>
+        </div>
+        <div className="contact-level">
+          <Badge tone={c.review_status === 'supported' ? 'green' : 'amber'}>
+            {c.support.label}
+          </Badge>
+          <span
+            className={
+              'relevance-badge relevance-' + (c.relevance_assessment?.level || 'unassessed')
+            }
+          >
+            {relevanceLabel(c)}
+          </span>
+          {c.dismissed && <Badge>Dismissed</Badge>}
+        </div>
+        <details className="overflow">
+          <summary aria-label={'More actions for ' + c.name}>•••</summary>
+          <div>
+            <button onClick={onEdit}>Edit / review details</button>
+            <button onClick={onDismiss}>
+              {c.dismissed ? 'Restore candidate' : 'Dismiss candidate'}
+            </button>
+            {onRecord && !c.dismissed && <button onClick={onRecord}>Record activity</button>}
+          </div>
+        </details>
+      </div>
+      <div className="card-actions">
+        <button className="button primary" onClick={onDraft}>
+          View drafts <span aria-hidden="true">→</span>
+        </button>
+        {linkIssue ? (
+          <span
+            className="button disabled-profile"
+            role="link"
+            aria-disabled="true"
+            tabIndex={0}
+            aria-describedby={linkHelpId}
+          >
+            LinkedIn {externalIcon}
+          </span>
+        ) : (
+          <a
+            className="button profile-link"
+            href={profile!}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`LinkedIn profile for ${c.name} (opens in a new tab)`}
+          >
+            LinkedIn {externalIcon}
+          </a>
+        )}
+      </div>
+      {linkIssue && (
+        <p className="hint profile-help" id={linkHelpId}>
+          {linkIssue}
+        </p>
+      )}
+      <div className="contact-detail-sections">
+        <details className="evidence-details">
+          <summary>Evidence</summary>
+          <p className="hint">
+            {c.support.scope} Search snippets do not establish current employment or responsibility
+            for this opening.
+          </p>
+          <blockquote>{c.evidence.excerpt}</blockquote>
+          {!demo && safeLink(c.evidence.url) && (
+            <a href={safeLink(c.evidence.url)!} target="_blank" rel="noopener noreferrer">
+              {c.evidence.source_title || 'View source'} ↗
+            </a>
+          )}
+          <p className="hint">Captured {when(c.evidence.checked_at)}</p>
+        </details>
+        <details className="evidence-details">
+          <summary>Review notes</summary>
+          <p>{c.relevance_assessment?.explanation}</p>
+          <p className="hint">Relevance reflects application fit, not verification confidence.</p>
+          <p>{c.relevance}</p>
+          {c.review_note ? (
+            <p>{c.review_note}</p>
+          ) : (
+            <p className="hint">No manual review notes recorded.</p>
+          )}
+          {safeLink(c.review_source) && (
+            <a href={safeLink(c.review_source)!} target="_blank" rel="noopener noreferrer">
+              Reviewed source ↗
+            </a>
+          )}
+          {c.prior_outreach_count > 0 && (
+            <p className="notice warning">
+              {c.prior_outreach_count} sent actions already recorded for this company or profile.
+            </p>
+          )}
+          <details>
+            <summary>Technical details</summary>
+            <p>{c.linkedin_url}</p>
+            <p>{c.uncertainty}</p>
+          </details>
+        </details>
+      </div>
+    </section>
+  );
+}
+function Outcome({ app, action }: { app: Application; action: Action }) {
+  const [outcome, setOutcome] = useState(app.hiring_outcome),
+    [note, setNote] = useState(app.outcome_note || '');
+  return (
+    <div className="form-stack">
+      <p className="hint">
+        Record only an outcome you know. Tsenta submission status does not establish rejection or
+        job closure.
+      </p>
+      <label>
+        Hiring outcome
+        <select value={outcome} onChange={e => setOutcome(e.target.value)}>
+          {['unknown', 'rejected', 'job_closed', 'interviewing', 'offer'].map(v => (
+            <option value={v} key={v}>
+              {v === 'unknown' ? 'No outcome recorded' : statusLabel(v)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        Source or note
+        <input value={note} onChange={e => setNote(e.target.value)} />
+      </label>
+      <button
+        className="button"
+        onClick={() =>
+          action(
+            'outcome',
+            () =>
+              api(`/applications/${encodeURIComponent(app.source_application_id)}/outcome`, 'PUT', {
+                outcome,
+                note,
+              }),
+            'Hiring outcome saved.',
+          )
+        }
+      >
+        Save outcome
+      </button>
+    </div>
+  );
+}
+function ReviewDialog({
+  c,
+  onClose,
+  refresh,
+}: {
+  c: Contact;
+  onClose: () => void;
+  refresh: () => Promise<void>;
+}) {
+  const [fields, setFields] = useState({ ...c }),
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false);
+  async function save() {
+    setBusy(true);
+    try {
+      await api(`/contacts/${c.id}`, 'PUT', {
+        name: fields.name,
+        title: fields.title || '',
+        company: fields.company || '',
+        linkedin_url: fields.linkedin_url,
+        review_status: fields.review_status,
+        review_source: fields.review_source || '',
+        review_note: fields.review_note || '',
+        dismissed: !!c.dismissed,
+      });
+      await refresh();
+      onClose();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Dialog title="Review contact details" onClose={onClose}>
+      <div className="dialog-body form-stack">
+        {error && (
+          <p role="alert" className="notice error">
+            {error}
+          </p>
+        )}
+        {['name', 'title', 'company', 'linkedin_url'].map(k => (
+          <label key={k}>
+            {k === 'linkedin_url' ? 'LinkedIn profile URL' : k[0].toUpperCase() + k.slice(1)}
+            <input
+              value={fields[k as 'name' | 'title' | 'company' | 'linkedin_url'] || ''}
+              onChange={e => setFields({ ...fields, [k]: e.target.value })}
+            />
+          </label>
+        ))}
+        <label>
+          Verification status
+          <select
+            value={fields.review_status}
+            onChange={e => setFields({ ...fields, review_status: e.target.value })}
+          >
+            <option value="needs_review">Evidence not verified</option>
+            <option value="supported">Supported by source</option>
+            <option value="conflicting">Conflicting information</option>
+          </select>
+        </label>
+        <label>
+          Reviewed source URL
+          <input
+            value={fields.review_source || ''}
+            onChange={e => setFields({ ...fields, review_source: e.target.value })}
+          />
+        </label>
+        <label>
+          What does the source establish?
+          <textarea
+            value={fields.review_note || ''}
+            onChange={e => setFields({ ...fields, review_note: e.target.value })}
+          />
+        </label>
+        <p className="hint">
+          “Evidence not verified” means the public source has not been confirmed by you. Corrections
+          do not rewrite existing drafts.
+        </p>
+        <button className="button primary" disabled={busy} onClick={save}>
+          {busy ? 'Saving…' : 'Save review'}
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+function ActivityDialog({
+  c,
+  onClose,
+  refresh,
+}: {
+  c: Contact;
+  onClose: () => void;
+  refresh: () => Promise<void>;
+}) {
+  const options = allowedEvents(c),
+    [kind, setKind] = useState(options[0] || ''),
+    [stamp, setStamp] = useState(''),
+    [note, setNote] = useState(''),
+    [error, setError] = useState(''),
+    [message, setMessage] = useState(''),
+    [busy, setBusy] = useState(false);
+  const value = options.includes(kind) ? kind : options[0] || '';
+  async function record() {
+    setBusy(true);
+    setError('');
+    try {
+      await api(`/contacts/${c.id}/events`, 'POST', {
+        kind: value,
+        created_at: stamp ? new Date(stamp).toISOString() : null,
+        note,
+        request_id: crypto.randomUUID(),
+      });
+      setMessage('Activity recorded. The tracker is up to date.');
+      setNote('');
+      setStamp('');
+      await refresh();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function undo(e: OutreachEvent) {
+    setBusy(true);
+    setError('');
+    try {
+      await api(`/contacts/${c.id}/events/${e.id}/undo`, 'POST');
+      await refresh();
+      setMessage('Activity undone. Record the corrected action or date below.');
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Dialog title={`Activity · ${c.name}`} onClose={onClose} drawer>
+      <div className="dialog-body">
+        <p>
+          <strong>{c.application_company}</strong> · {c.role}
+        </p>
+        <p className="hint">
+          Record actions you took on LinkedIn. This app does not detect messages, acceptances, or
+          replies.
+        </p>
+        {error && (
+          <p className="notice error" role="alert">
+            {error}
+          </p>
+        )}
+        {message && (
+          <p className="notice success" role="status">
+            {message}
+          </p>
+        )}
+        <div className="badge-row">
+          <Badge>{trackerStatus(c).invitation}</Badge>
+          <Badge>{trackerStatus(c).message}</Badge>
+        </div>
+        <h3>Timeline</h3>
+        <ol className="timeline">
+          {[...c.events]
+            .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at) || a.id - b.id)
+            .map((e: OutreachEvent) => (
+              <li key={e.id} className={e.undone_at ? 'undone' : ''}>
+                <div>
+                  <strong>
+                    {label(e.kind)}
+                    {e.undone_at ? ' · undone' : ''}
+                  </strong>
+                  <time>{when(e.created_at)}</time>
+                  {e.note && <p>{e.note}</p>}
+                </div>
+                {!e.undone_at && (
+                  <button className="text-button" disabled={busy} onClick={() => undo(e)}>
+                    Undo / correct
+                  </button>
+                )}
+              </li>
+            ))}
+        </ol>
+        {!c.events.length && <p className="muted">No activity recorded yet.</p>}
+        {options.length > 0 ? (
+          <div className="form-stack activity-form">
+            <h3>Record an action</h3>
+            <label>
+              What happened?
+              <select value={value} onChange={e => setKind(e.target.value)}>
+                {options.map(k => (
+                  <option value={k} key={k}>
+                    {label(k)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              When? <span className="hint">Leave blank for now · your local time</span>
+              <input type="datetime-local" value={stamp} onChange={e => setStamp(e.target.value)} />
+            </label>
+            <label>
+              Note (optional)
+              <textarea value={note} onChange={e => setNote(e.target.value)} rows={2} />
+            </label>
+            <button className="button primary" disabled={busy} onClick={record}>
+              {busy ? 'Saving…' : 'Record activity'}
+            </button>
+          </div>
+        ) : (
+          <p className="notice info">
+            {c.conversation.next_action}. Undo an incorrect event above to correct the record.
+          </p>
+        )}
+      </div>
+    </Dialog>
+  );
+}
 
-   </div>
-   <div className="contact-level"><Badge tone={c.review_status==='supported'?'green':'amber'}>{c.support.label}</Badge><span className={'relevance-badge relevance-'+(c.relevance_assessment?.level||'unassessed')}>{relevanceLabel(c)}</span>{c.dismissed&&<Badge>Dismissed</Badge>}</div>
-   <details className="overflow"><summary aria-label={'More actions for '+c.name}>•••</summary><div><button onClick={onEdit}>Edit / review details</button><button onClick={onDismiss}>{c.dismissed?'Restore candidate':'Dismiss candidate'}</button>{onRecord&&!c.dismissed&&<button onClick={onRecord}>Record activity</button>}</div></details>
-  </div>
-  <div className="card-actions">
-   <button className="button primary" onClick={onDraft}>View drafts <span aria-hidden="true">→</span></button>
-   {linkIssue?<span className="button disabled-profile" role="link" aria-disabled="true" tabIndex={0} aria-describedby={linkHelpId}>LinkedIn {externalIcon}</span>:<a className="button profile-link" href={profile!} target="_blank" rel="noopener noreferrer" aria-label={`LinkedIn profile for ${c.name} (opens in a new tab)`}>LinkedIn {externalIcon}</a>}
-  </div>
-  {linkIssue&&<p className="hint profile-help" id={linkHelpId}>{linkIssue}</p>}
-  <div className="contact-detail-sections"><details className="evidence-details"><summary>Evidence</summary><p className="hint">{c.support.scope} Search snippets do not establish current employment or responsibility for this opening.</p><blockquote>{c.evidence.excerpt}</blockquote>{!demo&&safeLink(c.evidence.url)&&<a href={safeLink(c.evidence.url)!} target="_blank" rel="noopener noreferrer">{c.evidence.source_title||'View source'} ↗</a>}<p className="hint">Captured {when(c.evidence.checked_at)}</p></details><details className="evidence-details"><summary>Review notes</summary><p>{c.relevance_assessment?.explanation}</p><p className="hint">Relevance reflects application fit, not verification confidence.</p><p>{c.relevance}</p>{c.review_note?<p>{c.review_note}</p>:<p className="hint">No manual review notes recorded.</p>}{safeLink(c.review_source)&&<a href={safeLink(c.review_source)!} target="_blank" rel="noopener noreferrer">Reviewed source ↗</a>}{c.prior_outreach_count>0&&<p className="notice warning">{c.prior_outreach_count} sent actions already recorded for this company or profile.</p>}<details><summary>Technical details</summary><p>{c.linkedin_url}</p><p>{c.uncertainty}</p></details></details></div>
- </section>;
-}
-function Outcome({app,action}:{app:Application;action:Action}){const [outcome,setOutcome]=useState(app.hiring_outcome),[note,setNote]=useState(app.outcome_note||'');return <div className="form-stack"><p className="hint">Record only an outcome you know. Tsenta submission status does not establish rejection or job closure.</p><label>Hiring outcome<select value={outcome} onChange={e=>setOutcome(e.target.value)}>{['unknown','rejected','job_closed','interviewing','offer'].map(v=><option value={v} key={v}>{v==='unknown'?'No outcome recorded':statusLabel(v)}</option>)}</select></label><label>Source or note<input value={note} onChange={e=>setNote(e.target.value)}/></label><button className="button" onClick={()=>action('outcome',()=>api(`/applications/${encodeURIComponent(app.source_application_id)}/outcome`,'PUT',{outcome,note}),'Hiring outcome saved.')}>Save outcome</button></div>}
-function ReviewDialog({c,onClose,refresh}:{c:Contact;onClose:()=>void;refresh:()=>Promise<void>}){const [fields,setFields]=useState({...c}),[error,setError]=useState(''),[busy,setBusy]=useState(false);async function save(){setBusy(true);try{await api(`/contacts/${c.id}`,'PUT',{name:fields.name,title:fields.title||'',company:fields.company||'',linkedin_url:fields.linkedin_url,review_status:fields.review_status,review_source:fields.review_source||'',review_note:fields.review_note||'',dismissed:!!c.dismissed});await refresh();onClose()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}return <Dialog title="Review contact details" onClose={onClose}><div className="dialog-body form-stack">{error&&<p role="alert" className="notice error">{error}</p>}{['name','title','company','linkedin_url'].map(k=><label key={k}>{k==='linkedin_url'?'LinkedIn profile URL':k[0].toUpperCase()+k.slice(1)}<input value={fields[k as 'name'|'title'|'company'|'linkedin_url']||''} onChange={e=>setFields({...fields,[k]:e.target.value})}/></label>)}<label>Verification status<select value={fields.review_status} onChange={e=>setFields({...fields,review_status:e.target.value})}><option value="needs_review">Evidence not verified</option><option value="supported">Supported by source</option><option value="conflicting">Conflicting information</option></select></label><label>Reviewed source URL<input value={fields.review_source||''} onChange={e=>setFields({...fields,review_source:e.target.value})}/></label><label>What does the source establish?<textarea value={fields.review_note||''} onChange={e=>setFields({...fields,review_note:e.target.value})}/></label><p className="hint">“Evidence not verified” means the public source has not been confirmed by you. Corrections do not rewrite existing drafts.</p><button className="button primary" disabled={busy} onClick={save}>{busy?'Saving…':'Save review'}</button></div></Dialog>}
-function ActivityDialog({c,onClose,refresh}:{c:Contact;onClose:()=>void;refresh:()=>Promise<void>}){
- const options=allowedEvents(c),[kind,setKind]=useState(options[0]||''),[stamp,setStamp]=useState(''),[note,setNote]=useState(''),[error,setError]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);
- const value=options.includes(kind)?kind:options[0]||'';
- async function record(){setBusy(true);setError('');try{await api(`/contacts/${c.id}/events`,'POST',{kind:value,created_at:stamp?new Date(stamp).toISOString():null,note,request_id:crypto.randomUUID()});setMessage('Activity recorded. The tracker is up to date.');setNote('');setStamp('');await refresh()}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
- async function undo(e:OutreachEvent){setBusy(true);setError('');try{await api(`/contacts/${c.id}/events/${e.id}/undo`,'POST');await refresh();setMessage('Activity undone. Record the corrected action or date below.')}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
- return <Dialog title={`Activity · ${c.name}`} onClose={onClose} drawer><div className="dialog-body"><p><strong>{c.application_company}</strong> · {c.role}</p><p className="hint">Record actions you took on LinkedIn. This app does not detect messages, acceptances, or replies.</p>{error&&<p className="notice error" role="alert">{error}</p>}{message&&<p className="notice success" role="status">{message}</p>}<div className="badge-row"><Badge>{trackerStatus(c).invitation}</Badge><Badge>{trackerStatus(c).message}</Badge></div><h3>Timeline</h3><ol className="timeline">{[...c.events].sort((a,b)=>Date.parse(a.created_at)-Date.parse(b.created_at)||a.id-b.id).map((e:OutreachEvent)=><li key={e.id} className={e.undone_at?'undone':''}><div><strong>{label(e.kind)}{e.undone_at?' · undone':''}</strong><time>{when(e.created_at)}</time>{e.note&&<p>{e.note}</p>}</div>{!e.undone_at&&<button className="text-button" disabled={busy} onClick={()=>undo(e)}>Undo / correct</button>}</li>)}</ol>{!c.events.length&&<p className="muted">No activity recorded yet.</p>}{options.length>0?<div className="form-stack activity-form"><h3>Record an action</h3><label>What happened?<select value={value} onChange={e=>setKind(e.target.value)}>{options.map(k=><option value={k} key={k}>{label(k)}</option>)}</select></label><label>When? <span className="hint">Leave blank for now · your local time</span><input type="datetime-local" value={stamp} onChange={e=>setStamp(e.target.value)}/></label><label>Note (optional)<textarea value={note} onChange={e=>setNote(e.target.value)} rows={2}/></label><button className="button primary" disabled={busy} onClick={record}>{busy?'Saving…':'Record activity'}</button></div>:<p className="notice info">{c.conversation.next_action}. Undo an incorrect event above to correct the record.</p>}</div></Dialog>;
+function PrepareDetails({
+  app,
+  onClose,
+  onSave,
+}: {
+  app: Application;
+  onClose: () => void;
+  onSave: (value: { company: string; role: string }) => Promise<void>;
+}) {
+  const [company, setCompany] = useState(displayValue(app.company)),
+    [role, setRole] = useState(displayValue(app.role)),
+    [error, setError] = useState(''),
+    [saving, setSaving] = useState(false);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      await onSave({ company: company.trim(), role: role.trim() });
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
+  return (
+    <Dialog title="Prepare outreach" onClose={onClose}>
+      <form className="dialog-body form-stack" onSubmit={submit}>
+        <p>Add the missing application details so research can find relevant people.</p>
+        {error && (
+          <p className="notice error" role="alert">
+            {error}
+          </p>
+        )}
+        <label>
+          Company
+          <input
+            required
+            maxLength={300}
+            value={company}
+            onChange={e => setCompany(e.target.value)}
+          />
+        </label>
+        <label>
+          Role
+          <input required maxLength={300} value={role} onChange={e => setRole(e.target.value)} />
+        </label>
+        <button className="button primary" disabled={saving || !company.trim() || !role.trim()}>
+          {saving ? 'Queuing…' : 'Prepare outreach'}
+        </button>
+      </form>
+    </Dialog>
+  );
 }
 
-function PrepareDetails({app,onClose,onSave}:{app:Application;onClose:()=>void;onSave:(value:{company:string;role:string})=>Promise<void>}){
- const [company,setCompany]=useState(displayValue(app.company)),[role,setRole]=useState(displayValue(app.role)),[error,setError]=useState(''),[saving,setSaving]=useState(false);
- async function submit(e:React.FormEvent){e.preventDefault();setSaving(true);setError('');try{await onSave({company:company.trim(),role:role.trim()})}catch(e){setError((e as Error).message)}finally{setSaving(false)}}
- return <Dialog title="Prepare outreach" onClose={onClose}><form className="dialog-body form-stack" onSubmit={submit}><p>Add the missing application details so research can find relevant people.</p>{error&&<p className="notice error" role="alert">{error}</p>}<label>Company<input required maxLength={300} value={company} onChange={e=>setCompany(e.target.value)}/></label><label>Role<input required maxLength={300} value={role} onChange={e=>setRole(e.target.value)}/></label><button className="button primary" disabled={saving||!company.trim()||!role.trim()}>{saving?'Queuing…':'Prepare outreach'}</button></form></Dialog>;
+function QualitySummary({
+  quality: q,
+  onRecommended,
+  onEvidence,
+  onRepair,
+}: {
+  quality: Quality;
+  onRecommended: () => void;
+  onEvidence: () => void;
+  onRepair: () => void;
+}) {
+  if (!q) return null;
+  return (
+    <section className="queue-counts" aria-label="Outreach readiness">
+      <button className="button" onClick={onRecommended}>
+        {q.recommended_contacts || 0} high / medium relevance
+      </button>
+      <button className="button" onClick={onEvidence}>
+        {q.needs_review || 0} need evidence review
+      </button>
+      <button className="button" onClick={onRepair}>
+        {q.notes_over_limit || 0} notes over limit
+      </button>
+    </section>
+  );
 }
-
-function QualitySummary({quality:q,onRecommended,onEvidence,onRepair}:{quality:Quality;onRecommended:()=>void;onEvidence:()=>void;onRepair:()=>void}){
- if(!q)return null;
- return <section className="queue-counts" aria-label="Outreach readiness"><button className="button" onClick={onRecommended}>{q.recommended_contacts||0} high / medium relevance</button><button className="button" onClick={onEvidence}>{q.needs_review||0} need evidence review</button><button className="button" onClick={onRepair}>{q.notes_over_limit||0} notes over limit</button></section>;
-}
-function OutcomeSummary({quality:q}:{quality:Quality}){
- if(!q)return null;
- return <section className="metric-grid" aria-label="Recorded outreach results">{[['Contacted',q.contacted||0],['Replied',q.replied||0],['Accepted',q.accepted||0],['Follow-ups due',q.followups_due||0]].map(([name,value])=><div className="panel metric-card" key={name}><span>{name}</span><strong>{value}</strong></div>)}<p className="hint metric-rates">Reply rate: {q.reply_rate==null?'Not enough data':q.reply_rate+'%'} · Invitation acceptance: {q.acceptance_rate==null?'Not enough data':q.acceptance_rate+'%'}</p></section>;
+function OutcomeSummary({ quality: q }: { quality: Quality }) {
+  if (!q) return null;
+  return (
+    <section className="metric-grid" aria-label="Recorded outreach results">
+      {[
+        ['Contacted', q.contacted || 0],
+        ['Replied', q.replied || 0],
+        ['Accepted', q.accepted || 0],
+        ['Follow-ups due', q.followups_due || 0],
+      ].map(([name, value]) => (
+        <div className="panel metric-card" key={name}>
+          <span>{name}</span>
+          <strong>{value}</strong>
+        </div>
+      ))}
+      <p className="hint metric-rates">
+        Reply rate: {q.reply_rate == null ? 'Not enough data' : q.reply_rate + '%'} · Invitation
+        acceptance: {q.acceptance_rate == null ? 'Not enough data' : q.acceptance_rate + '%'}
+      </p>
+    </section>
+  );
 }

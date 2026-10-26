@@ -1,0 +1,9 @@
+# Formatting only. Run: .venv/bin/ruff format  (install with requirements-dev.txt)
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".local", "frontend", "migrations/versions/001_schema.json"]
+
+[tool.ruff.format]
+# Keep the existing quote style so formatting changes layout only.
+quote-style = "preserve"

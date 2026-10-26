@@ -1,4 +1,5 @@
 """Serper transport checks using fictional responses; no external requests."""
+
 import asyncio
 import json
 
@@ -23,27 +24,54 @@ def provider(monkeypatch, response):
         assert 'Fictional Company' in payload['q']
         return response
 
-    monkeypatch.setattr(httpx, 'AsyncClient', lambda **kwargs: original(
-        transport=httpx.MockTransport(handle), **kwargs))
+    monkeypatch.setattr(
+        httpx,
+        'AsyncClient',
+        lambda **kwargs: original(transport=httpx.MockTransport(handle), **kwargs),
+    )
     return Serper(vault)
 
 
 def test_profiles_filtered_deduplicated_and_bounded(monkeypatch):
-    search = provider(monkeypatch, httpx.Response(200, json={'organic': [
-        {'link': 'https://linkedin.com/in/fictional-person/', 'title': 'Fictional Person', 'snippet': 'Evidence'},
-        {'link': 'https://www.linkedin.com/in/fictional-person', 'snippet': 'Duplicate'},
-        {'link': 'https://www.linkedin.com/jobs/123', 'snippet': 'Not a profile'},
-        {'link': 'https://example.com/in/name', 'snippet': 'Wrong site'},
-        {'link': 'https://linkedin.com/in/no-evidence', 'snippet': None},
-        None,
-    ]}))
+    search = provider(
+        monkeypatch,
+        httpx.Response(
+            200,
+            json={
+                'organic': [
+                    {
+                        'link': 'https://linkedin.com/in/fictional-person/',
+                        'title': 'Fictional Person',
+                        'snippet': 'Evidence',
+                    },
+                    {
+                        'link': 'https://www.linkedin.com/in/fictional-person',
+                        'snippet': 'Duplicate',
+                    },
+                    {'link': 'https://www.linkedin.com/jobs/123', 'snippet': 'Not a profile'},
+                    {'link': 'https://example.com/in/name', 'snippet': 'Wrong site'},
+                    {'link': 'https://linkedin.com/in/no-evidence', 'snippet': None},
+                    None,
+                ]
+            },
+        ),
+    )
     results = asyncio.run(search.search('Fictional Company', 'Engineer'))
     assert len(results) == 1
     assert results[0].url == 'https://www.linkedin.com/in/fictional-person'
     assert results[0].excerpt == 'Evidence'
 
 
-@pytest.mark.parametrize('status,error', [(401, Unavailable), (402, Unavailable), (403, Unavailable), (429, Retryable), (503, Retryable)])
+@pytest.mark.parametrize(
+    'status,error',
+    [
+        (401, Unavailable),
+        (402, Unavailable),
+        (403, Unavailable),
+        (429, Retryable),
+        (503, Retryable),
+    ],
+)
 def test_provider_errors(monkeypatch, status, error):
     search = provider(monkeypatch, httpx.Response(status))
     with pytest.raises(error):

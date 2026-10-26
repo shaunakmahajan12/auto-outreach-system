@@ -9,7 +9,9 @@
     "test": "node --test tests/*.test.mjs",
     "typecheck": "tsc -b",
     "test:e2e": "playwright test",
-    "screenshots:update": "UPDATE_SCREENSHOTS=true playwright test e2e/visual.spec.ts e2e/preparation.spec.ts"
+    "screenshots:update": "UPDATE_SCREENSHOTS=true playwright test e2e/visual.spec.ts e2e/preparation.spec.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
@@ -22,6 +24,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.5.0",
+    "prettier": "3.3.3",
     "tailwindcss": "^4.1.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.0"

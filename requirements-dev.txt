@@ -1,0 +1,2 @@
+# Development-only tools; not installed in the application image.
+ruff==0.6.9

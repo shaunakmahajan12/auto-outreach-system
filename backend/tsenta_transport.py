@@ -1,4 +1,5 @@
 """Allowlisted read-only Tsenta MCP transport shared by the app and the inspection CLI."""
+
 import json
 import os
 import urllib.parse
@@ -16,7 +17,14 @@ def validate_read(name, args):
     if name == "list-applications":
         if set(args) - {"filter", "page", "limit", "includeCounts"}:
             raise ValueError("Unexpected list argument")
-        if args.get("filter", "all") not in {"all", "submitted", "in_flight", "needs", "failed", "skipped"}:
+        if args.get("filter", "all") not in {
+            "all",
+            "submitted",
+            "in_flight",
+            "needs",
+            "failed",
+            "skipped",
+        }:
             raise ValueError("Invalid filter")
         for field, maximum in (("page", 10000), ("limit", 100)):
             value = args.get(field, 1)
@@ -31,7 +39,9 @@ def validate_read(name, args):
         if not isinstance(value, str) or not 1 <= len(value) <= 256:
             raise ValueError("Invalid application id")
         include = args.get("include", [])
-        if not isinstance(include, list) or any(v not in ("optimizedProfile", "resumePdfUrl") for v in include):
+        if not isinstance(include, list) or any(
+            v not in ("optimizedProfile", "resumePdfUrl") for v in include
+        ):
             raise ValueError("Unsupported inclusion")
     else:
         raise ValueError("Tool is not in the read-only allowlist")

@@ -1,4 +1,5 @@
 """Check real Ollama ranking and drafting using fictional inputs, without database writes."""
+
 import asyncio
 from pathlib import Path
 import sys
@@ -23,12 +24,16 @@ async def main():
     facts = [{'id': 'fictional-python', 'text': 'I built a fictional Python project.'}]
     draft = await model.draft(
         {'company': 'Fictional Cedar Labs', 'role': 'Software Engineer'},
-        pick, facts, {'note_limit': 200, 'dm_limit': 1200},
+        pick,
+        facts,
+        {'note_limit': 200, 'dm_limit': 1200},
     )
     assert len(draft['note']) <= 200 and len(draft['dm']) <= 1200
     assert set(draft['grounding']['fact_ids']) <= {'fictional-python'}
     print(f"PASS: {model.model} ranked fictional evidence and generated a validated draft.")
-    print('No real contacts, approved facts, external search requests, or database writes were used.')
+    print(
+        'No real contacts, approved facts, external search requests, or database writes were used.'
+    )
 
 
 if __name__ == '__main__':

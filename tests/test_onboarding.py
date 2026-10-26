@@ -1,4 +1,5 @@
 """Fresh live-workspace onboarding with fictional providers and isolated storage."""
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -18,12 +19,17 @@ class InitialHistory:
 
 @pytest.fixture
 def fresh(tmp_path, monkeypatch):
-    path = tmp_path/'fresh.sqlite'
+    path = tmp_path / 'fresh.sqlite'
     monkeypatch.setenv('OUTREACH_DEMO', 'false')
     monkeypatch.setenv('OUTREACH_DB', str(path))
     provider = InitialHistory()
-    app = create_app(vault=MemorySecrets(), tsenta=provider, search=FixtureSearch(),
-                     ollama=FixtureOllama(), start_worker=False)
+    app = create_app(
+        vault=MemorySecrets(),
+        tsenta=provider,
+        search=FixtureSearch(),
+        ollama=FixtureOllama(),
+        start_worker=False,
+    )
     with TestClient(app) as client:
         client.headers['x-outreach-token'] = client.get('/api/bootstrap').json()['token']
         yield client, path, provider
@@ -59,7 +65,7 @@ def test_failed_provider_import_can_be_retried(fresh):
 
 def test_interrupted_import_preserved_for_operator_review(fresh):
     client, path, _ = fresh
-    staged = path.with_name(path.name+'.initializing')
+    staged = path.with_name(path.name + '.initializing')
     staged.write_bytes(b'fictional interrupted import')
     assert client.post('/api/onboarding/initialize').status_code == 409
     assert staged.read_bytes() == b'fictional interrupted import'

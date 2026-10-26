@@ -48,6 +48,15 @@ npm test
 npm run build
 ```
 
+Formatting uses Ruff (Python) and Prettier (frontend), configured in `pyproject.toml`
+and `frontend/.prettierrc.json`:
+
+```sh
+.venv/bin/pip install -r requirements-dev.txt
+.venv/bin/ruff format          # or: ruff format --check
+cd frontend && npm run format  # or: npm run format:check
+```
+
 ## Scope and privacy
 
 Localhost is the default. Private remote mode requires real authentication, session-bound CSRF, role checks and explicit HTTPS/host/origin configuration; see the deployment guide. This remains a single-workspace service. It has no LinkedIn sending API or inbox synchronization. Search snippets are evidence to review, not proof of employment or hiring responsibility.

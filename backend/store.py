@@ -21,7 +21,8 @@ def backup(store, suffix):
     try:
         source.backup(copy)
     finally:
-        source.close(); copy.close()
+        source.close()
+        copy.close()
     os.chmod(target, 0o600)
 
 
@@ -43,7 +44,9 @@ class Store:
 
     def initialize(self):
         if not self.path.exists():
-            raise RuntimeError('Original Tsenta baseline missing. Restore .local/outreach.sqlite; never create a replacement baseline.')
+            raise RuntimeError(
+                'Original Tsenta baseline missing. Restore .local/outreach.sqlite; never create a replacement baseline.'
+            )
         backup(self, '-before-engineering-v1.sqlite')
         backup(self, '-before-correctness-v2.sqlite')
         os.chmod(self.path, 0o600)
@@ -66,17 +69,23 @@ class Store:
                     detail_checked TEXT, last_error TEXT)''')
                 columns = [r[1] for r in db.execute('PRAGMA table_info(applications_original)')]
                 names = ','.join(columns)
-                db.execute(f'INSERT INTO applications ({names}) SELECT {names} FROM applications_original')
+                db.execute(
+                    f'INSERT INTO applications ({names}) SELECT {names} FROM applications_original'
+                )
                 db.execute('UPDATE applications SET first_seen=?', (baseline['imported_at'],))
                 db.execute('CREATE TABLE baseline_members (application_id TEXT PRIMARY KEY)')
-                db.execute('INSERT INTO baseline_members SELECT source_application_id FROM applications_original')
+                db.execute(
+                    'INSERT INTO baseline_members SELECT source_application_id FROM applications_original'
+                )
                 db.execute('DROP TABLE applications_original')
                 db.execute('PRAGMA user_version=1')
         with self.db() as db:
             # SQL-level protection prevents a restart or later sync from moving the cutoff or baseline membership.
             for table in ('baseline', 'baseline_members'):
                 for operation in ('UPDATE', 'DELETE'):
-                    db.execute(f"CREATE TRIGGER IF NOT EXISTS freeze_{table}_{operation} BEFORE {operation} ON {table} BEGIN SELECT RAISE(ABORT,'Original baseline is immutable'); END")
+                    db.execute(
+                        f"CREATE TRIGGER IF NOT EXISTS freeze_{table}_{operation} BEFORE {operation} ON {table} BEGIN SELECT RAISE(ABORT,'Original baseline is immutable'); END"
+                    )
             db.executescript('''
                 CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS sync_runs (id INTEGER PRIMARY KEY, state TEXT NOT NULL, started_at TEXT,
@@ -99,31 +108,52 @@ class Store:
                 CREATE TABLE IF NOT EXISTS posting_role_checks (application_id TEXT PRIMARY KEY REFERENCES applications(source_application_id),
                     posting_url TEXT NOT NULL,status TEXT NOT NULL,error TEXT,checked_at TEXT NOT NULL);
             ''')
-            db.execute('INSERT OR IGNORE INTO settings VALUES(1,?)', (json.dumps({'facts': [], 'note_limit': 200, 'dm_limit': 1200}),))
-            db.execute("UPDATE sync_runs SET state='retry', error='Interrupted; will resume' WHERE state='running'")
+            db.execute(
+                'INSERT OR IGNORE INTO settings VALUES(1,?)',
+                (json.dumps({'facts': [], 'note_limit': 200, 'dm_limit': 1200}),),
+            )
+            db.execute(
+                "UPDATE sync_runs SET state='retry', error='Interrupted; will resume' WHERE state='running'"
+            )
         from backend.details import migrate
+
         migrate(self)
         from backend.details import migrate_company_metadata
+
         migrate_company_metadata(self)
         with self.db() as db:
-            db.execute("UPDATE jobs SET stage=state WHERE state!='running' AND stage='queued' AND state!='queued'")
-            db.execute("UPDATE jobs SET state='interrupted',stage='interrupted',error='Preparation was interrupted. Retry to resume using saved results.',updated_at=? WHERE state='running'",(now(),))
-            db.execute("UPDATE applications SET research_state='interrupted',last_error='Preparation was interrupted. Retry to resume.' WHERE source_application_id IN (SELECT application_id FROM jobs WHERE state='interrupted')")
+            db.execute(
+                "UPDATE jobs SET stage=state WHERE state!='running' AND stage='queued' AND state!='queued'"
+            )
+            db.execute(
+                "UPDATE jobs SET state='interrupted',stage='interrupted',error='Preparation was interrupted. Retry to resume using saved results.',updated_at=? WHERE state='running'",
+                (now(),),
+            )
+            db.execute(
+                "UPDATE applications SET research_state='interrupted',last_error='Preparation was interrupted. Retry to resume.' WHERE source_application_id IN (SELECT application_id FROM jobs WHERE state='interrupted')"
+            )
         self.reconcile_preparation_states()
         from backend.upgrades import migrate as upgrade
+
         upgrade(self)
 
     def reconcile_preparation_states(self):
         with self.db() as db:
-            db.execute("UPDATE applications SET research_state='not_started' WHERE source_status='COMPLETED' AND research_state='awaiting_submission'")
-            db.execute("UPDATE applications SET research_state='awaiting_submission' WHERE source_status!='COMPLETED' AND research_state='not_started'")
+            db.execute(
+                "UPDATE applications SET research_state='not_started' WHERE source_status='COMPLETED' AND research_state='awaiting_submission'"
+            )
+            db.execute(
+                "UPDATE applications SET research_state='awaiting_submission' WHERE source_status!='COMPLETED' AND research_state='not_started'"
+            )
 
     def settings(self):
-        if not self.path.exists():return {'facts':[],'note_limit':200,'dm_limit':1200}
+        if not self.path.exists():
+            return {'facts': [], 'note_limit': 200, 'dm_limit': 1200}
         with self.db() as db:
-            value=json.loads(db.execute('SELECT data FROM settings WHERE id=1').fetchone()[0])
-            value.setdefault('exact_note_200',True)
-            if value['exact_note_200']:value['note_limit']=200
+            value = json.loads(db.execute('SELECT data FROM settings WHERE id=1').fetchone()[0])
+            value.setdefault('exact_note_200', True)
+            if value['exact_note_200']:
+                value['note_limit'] = 200
             return value
 
     def settings_save(self, value):
@@ -132,52 +162,108 @@ class Store:
 
     def enqueue_sync(self):
         with self.db() as db:
-            active = db.execute("SELECT id FROM sync_runs WHERE state IN ('queued','running','retry')").fetchone()
+            active = db.execute(
+                "SELECT id FROM sync_runs WHERE state IN ('queued','running','retry')"
+            ).fetchone()
             if active:
                 return active['id']
-            return db.execute("INSERT INTO sync_runs(state,started_at) VALUES('queued',?)", (now(),)).lastrowid
+            return db.execute(
+                "INSERT INTO sync_runs(state,started_at) VALUES('queued',?)", (now(),)
+            ).lastrowid
 
     def select_application(self, app_id, company=None, role=None):
         from backend.details import baseline_valid
-        if not baseline_valid(self):raise ValueError('Original baseline is missing or inconsistent. Restore it before preparing outreach.')
+
+        if not baseline_valid(self):
+            raise ValueError(
+                'Original baseline is missing or inconsistent. Restore it before preparing outreach.'
+            )
         with self.db() as db:
-            app = db.execute('SELECT * FROM applications WHERE source_application_id=?', (app_id,)).fetchone()
+            app = db.execute(
+                'SELECT * FROM applications WHERE source_application_id=?', (app_id,)
+            ).fetchone()
             if not app:
                 raise ValueError('Application not found')
             if app['source_status'] != 'COMPLETED':
                 raise ValueError('Only a confirmed COMPLETED submission can be researched')
-            if app['hiring_outcome'] in ('rejected','job_closed'):raise ValueError('This application is marked rejected or closed. Correct its hiring outcome before preparing new outreach.')
-            for field,value in (('company',company),('role',role)):
+            if app['hiring_outcome'] in ('rejected', 'job_closed'):
+                raise ValueError(
+                    'This application is marked rejected or closed. Correct its hiring outcome before preparing new outreach.'
+                )
+            for field, value in (('company', company), ('role', role)):
                 if value is not None:
-                    if not value.strip():raise ValueError('Company and role cannot be blank')
-                    db.execute(f'UPDATE applications SET {field}=? WHERE source_application_id=?',(value.strip(),app_id))
+                    if not value.strip():
+                        raise ValueError('Company and role cannot be blank')
+                    db.execute(
+                        f'UPDATE applications SET {field}=? WHERE source_application_id=?',
+                        (value.strip(), app_id),
+                    )
             from backend.posting_role import missing_details
-            current = db.execute('SELECT company,role FROM applications WHERE source_application_id=?', (app_id,)).fetchone()
-            if missing_details(current['company'],current['role']):
+
+            current = db.execute(
+                'SELECT company,role FROM applications WHERE source_application_id=?', (app_id,)
+            ).fetchone()
+            if missing_details(current['company'], current['role']):
                 raise ValueError('Add the company and role before preparing outreach.')
-            if app['research_state']=='no_contacts':
-                db.execute('INSERT INTO preparation_epochs VALUES(?,1) ON CONFLICT(application_id) DO UPDATE SET epoch=preparation_epochs.epoch+1',(app_id,))
-                db.execute('DELETE FROM research_cache WHERE application_id=?',(app_id,))
-                db.execute("UPDATE jobs SET state='interrupted' WHERE application_id=? AND state='done'",(app_id,))
-            db.execute('UPDATE applications SET selected=1 WHERE source_application_id=?', (app_id,))
-            db.execute("INSERT OR IGNORE INTO jobs(application_id,state) VALUES(?,'queued')", (app_id,))
-            db.execute("UPDATE jobs SET state='queued',stage='queued',updated_at=?, attempts=0,next_attempt=0,error=NULL WHERE application_id=? AND state IN ('blocked','failed','interrupted','dismissed')", (now(),app_id))
-            db.execute("UPDATE applications SET research_state=COALESCE((SELECT state FROM jobs WHERE application_id=?),'queued'),last_error=NULL WHERE source_application_id=?", (app_id,app_id))
+            if app['research_state'] == 'no_contacts':
+                db.execute(
+                    'INSERT INTO preparation_epochs VALUES(?,1) ON CONFLICT(application_id) DO UPDATE SET epoch=preparation_epochs.epoch+1',
+                    (app_id,),
+                )
+                db.execute('DELETE FROM research_cache WHERE application_id=?', (app_id,))
+                db.execute(
+                    "UPDATE jobs SET state='interrupted' WHERE application_id=? AND state='done'",
+                    (app_id,),
+                )
+            db.execute(
+                'UPDATE applications SET selected=1 WHERE source_application_id=?', (app_id,)
+            )
+            db.execute(
+                "INSERT OR IGNORE INTO jobs(application_id,state) VALUES(?,'queued')", (app_id,)
+            )
+            db.execute(
+                "UPDATE jobs SET state='queued',stage='queued',updated_at=?, attempts=0,next_attempt=0,error=NULL WHERE application_id=? AND state IN ('blocked','failed','interrupted','dismissed')",
+                (now(), app_id),
+            )
+            db.execute(
+                "UPDATE applications SET research_state=COALESCE((SELECT state FROM jobs WHERE application_id=?),'queued'),last_error=NULL WHERE source_application_id=?",
+                (app_id, app_id),
+            )
 
     def dismiss_preparation(self, app_id):
         with self.db() as db:
-            job=db.execute('SELECT state FROM jobs WHERE application_id=?',(app_id,)).fetchone()
-            if not job:raise ValueError('No preparation to dismiss')
-            if job['state'] not in ('queued','retry','blocked','failed','interrupted','dismissed'):
-                raise ValueError('Preparation has already started or finished. Refresh to see its status.')
-            db.execute("UPDATE jobs SET state='dismissed',stage='dismissed',error=NULL,updated_at=? WHERE application_id=?",(now(),app_id))
-            db.execute("UPDATE applications SET research_state='dismissed',selected=0,last_error=NULL WHERE source_application_id=?",(app_id,))
+            job = db.execute('SELECT state FROM jobs WHERE application_id=?', (app_id,)).fetchone()
+            if not job:
+                raise ValueError('No preparation to dismiss')
+            if job['state'] not in (
+                'queued',
+                'retry',
+                'blocked',
+                'failed',
+                'interrupted',
+                'dismissed',
+            ):
+                raise ValueError(
+                    'Preparation has already started or finished. Refresh to see its status.'
+                )
+            db.execute(
+                "UPDATE jobs SET state='dismissed',stage='dismissed',error=NULL,updated_at=? WHERE application_id=?",
+                (now(), app_id),
+            )
+            db.execute(
+                "UPDATE applications SET research_state='dismissed',selected=0,last_error=NULL WHERE source_application_id=?",
+                (app_id,),
+            )
 
     def apply_snapshot(self, rows):
         from backend.baseline import normalize_status
         from backend.details import baseline_valid, sync_metadata
         from backend.posting_role import missing_details
-        if not baseline_valid(self):raise ValueError('Original baseline is missing or inconsistent; synchronization stopped safely.')
+
+        if not baseline_valid(self):
+            raise ValueError(
+                'Original baseline is missing or inconsistent; synchronization stopped safely.'
+            )
         added = eligible = 0
         with self.db() as db:
             if not db.execute('SELECT 1 FROM baseline WHERE singleton=1').fetchone():
@@ -185,45 +271,120 @@ class Store:
             for row in rows:
                 aid = row['applicationId']
                 status = row['status']
-                old = db.execute('SELECT * FROM applications WHERE source_application_id=?', (aid,)).fetchone()
-                historical = bool(db.execute('SELECT 1 FROM baseline_members WHERE application_id=?', (aid,)).fetchone())
-                missing = [k for k,v in {'company':row.get('companyName'),'role':row.get('jobTitle'),'job_url':row.get('url'),
-                                       'job_description':None,'submitted_at':None,'submitted_resume_reference':None}.items() if not v]
+                old = db.execute(
+                    'SELECT * FROM applications WHERE source_application_id=?', (aid,)
+                ).fetchone()
+                historical = bool(
+                    db.execute(
+                        'SELECT 1 FROM baseline_members WHERE application_id=?', (aid,)
+                    ).fetchone()
+                )
+                missing = [
+                    k
+                    for k, v in {
+                        'company': row.get('companyName'),
+                        'role': row.get('jobTitle'),
+                        'job_url': row.get('url'),
+                        'job_description': None,
+                        'submitted_at': None,
+                        'submitted_resume_reference': None,
+                    }.items()
+                    if not v
+                ]
                 if not old:
                     added += 1
-                    db.execute('''INSERT INTO applications(source_application_id,company,role,job_url,source_resume_profile_id,
+                    db.execute(
+                        '''INSERT INTO applications(source_application_id,company,role,job_url,source_resume_profile_id,
                         source_status,normalized_status,source_created_at,source_updated_at,historical,confirmed_at_baseline,
                         missing_fields,research_state,first_seen,job_id) VALUES(?,?,?,?,?,?,?,?,?,?,0,?,?,?,?)''',
-                        (aid,row.get('companyName'),row.get('jobTitle'),row.get('url'),row.get('resumeProfileId'),status,
-                         normalize_status(status),row.get('createdAt'),row.get('updatedAt'),int(historical),json.dumps(missing),
-                         'historical_no_outreach' if historical else ('not_started' if status=='COMPLETED' else 'awaiting_submission'),now(),row.get('jobId')))
+                        (
+                            aid,
+                            row.get('companyName'),
+                            row.get('jobTitle'),
+                            row.get('url'),
+                            row.get('resumeProfileId'),
+                            status,
+                            normalize_status(status),
+                            row.get('createdAt'),
+                            row.get('updatedAt'),
+                            int(historical),
+                            json.dumps(missing),
+                            'historical_no_outreach'
+                            if historical
+                            else (
+                                'not_started' if status == 'COMPLETED' else 'awaiting_submission'
+                            ),
+                            now(),
+                            row.get('jobId'),
+                        ),
+                    )
                 else:
-                    db.execute('''UPDATE applications SET company=COALESCE(NULLIF(?,''),company),role=COALESCE(NULLIF(?,''),role),job_url=COALESCE(NULLIF(?,''),job_url),source_status=?,normalized_status=?,
+                    db.execute(
+                        '''UPDATE applications SET company=COALESCE(NULLIF(?,''),company),role=COALESCE(NULLIF(?,''),role),job_url=COALESCE(NULLIF(?,''),job_url),source_status=?,normalized_status=?,
                         source_updated_at=?,job_id=COALESCE(?,job_id),source_resume_profile_id=COALESCE(?,source_resume_profile_id)
-                        WHERE source_application_id=?''',(row.get('companyName'),row.get('jobTitle'),row.get('url'),status,
-                        normalize_status(status),row.get('updatedAt'),row.get('jobId'),row.get('resumeProfileId'),aid))
+                        WHERE source_application_id=?''',
+                        (
+                            row.get('companyName'),
+                            row.get('jobTitle'),
+                            row.get('url'),
+                            status,
+                            normalize_status(status),
+                            row.get('updatedAt'),
+                            row.get('jobId'),
+                            row.get('resumeProfileId'),
+                            aid,
+                        ),
+                    )
                 # Membership, not a movable timestamp/high-water mark, excludes the original 281.
                 # Newly observed COMPLETED IDs qualify even after offline/development gaps.
-                sync_metadata(db,aid,row)
-                db.execute("UPDATE applications SET research_state='not_started' WHERE source_application_id=? AND source_status='COMPLETED' AND research_state='awaiting_submission'",(aid,))
-                db.execute("UPDATE applications SET research_state='awaiting_submission' WHERE source_application_id=? AND source_status!='COMPLETED' AND research_state='not_started'",(aid,))
-                if status == 'COMPLETED' and (not old or old['hiring_outcome'] not in ('rejected','job_closed')) and (not historical or (old and (old['selected'] or not old['confirmed_at_baseline']))):
-                    db.execute('UPDATE applications SET first_confirmed=COALESCE(first_confirmed,?) WHERE source_application_id=?',(now(),aid))
-                    if os.getenv('OUTREACH_AUTO_RESEARCH','true').lower() != 'true':
+                sync_metadata(db, aid, row)
+                db.execute(
+                    "UPDATE applications SET research_state='not_started' WHERE source_application_id=? AND source_status='COMPLETED' AND research_state='awaiting_submission'",
+                    (aid,),
+                )
+                db.execute(
+                    "UPDATE applications SET research_state='awaiting_submission' WHERE source_application_id=? AND source_status!='COMPLETED' AND research_state='not_started'",
+                    (aid,),
+                )
+                if (
+                    status == 'COMPLETED'
+                    and (not old or old['hiring_outcome'] not in ('rejected', 'job_closed'))
+                    and (
+                        not historical
+                        or (old and (old['selected'] or not old['confirmed_at_baseline']))
+                    )
+                ):
+                    db.execute(
+                        'UPDATE applications SET first_confirmed=COALESCE(first_confirmed,?) WHERE source_application_id=?',
+                        (now(), aid),
+                    )
+                    if os.getenv('OUTREACH_AUTO_RESEARCH', 'true').lower() != 'true':
                         continue
-                    current = db.execute('SELECT company,role FROM applications WHERE source_application_id=?', (aid,)).fetchone()
+                    current = db.execute(
+                        'SELECT company,role FROM applications WHERE source_application_id=?',
+                        (aid,),
+                    ).fetchone()
                     # Research needs both; a missing role is filled from the posting or by the user first.
-                    if missing_details(current['company'],current['role']):
+                    if missing_details(current['company'], current['role']):
                         continue
-                    cur = db.execute("INSERT OR IGNORE INTO jobs(application_id,state) VALUES(?,'queued')", (aid,))
+                    cur = db.execute(
+                        "INSERT OR IGNORE INTO jobs(application_id,state) VALUES(?,'queued')",
+                        (aid,),
+                    )
                     if cur.rowcount:
                         eligible += 1
-                        db.execute("UPDATE applications SET research_state='queued' WHERE source_application_id=?",(aid,))
+                        db.execute(
+                            "UPDATE applications SET research_state='queued' WHERE source_application_id=?",
+                            (aid,),
+                        )
                 elif status != 'COMPLETED':
                     # Keep blocked work recoverable if Tsenta later confirms completion again.
-                    db.execute("UPDATE jobs SET state='blocked',error='Submission is no longer confirmed' WHERE application_id=? AND state!='done'",(aid,))
-            return {'observed':len(rows),'added':added,'eligible':eligible}
+                    db.execute(
+                        "UPDATE jobs SET state='blocked',error='Submission is no longer confirmed' WHERE application_id=? AND state!='done'",
+                        (aid,),
+                    )
+            return {'observed': len(rows), 'added': added, 'eligible': eligible}
 
     def rows(self, sql, args=()):
         with self.db() as db:
-            return [dict(r) for r in db.execute(sql,args)]
+            return [dict(r) for r in db.execute(sql, args)]
