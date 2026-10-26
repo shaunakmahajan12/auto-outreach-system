@@ -47,6 +47,8 @@ private load balancer or explicit trusted networks in addition to app authentica
    host/origin headers. Set OUTREACH_REMOTE=true, BIND_HOST=0.0.0.0,
    EXTERNAL_BASE_URL=https://your-private-host, ALLOWED_HOSTS=your-private-host and
    ALLOWED_ORIGINS=https://your-private-host. Remote startup refuses incomplete auth.
+   Set FORWARDED_ALLOW_IPS to the proxy's address (only that proxy) so sign-in
+   rate limits see each client's address instead of the proxy's.
 7. OUTREACH_USERS is a secret JSON mapping of usernames to password_hash and role
    (`operator` or read-only `reader`). Generate a hash interactively without echo:
 

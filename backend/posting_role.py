@@ -6,6 +6,7 @@ import json
 import re
 import socket
 import ssl
+import time
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit
 
@@ -16,6 +17,15 @@ MAX_BYTES = 2_000_000
 
 def missing_role(value):
     return not value or bool(re.fullmatch(r'\s*(?:unknown(?: role| title)?|unavailable|n/a|not (?:provided|supplied|recorded|established)|(?:role|title) not (?:provided|supplied|established))\s*', value, re.I))
+
+
+def missing_company(value):
+    return not value or bool(re.fullmatch(r'\s*(?:unknown(?: company)?|unavailable|n/a|not (?:provided|supplied|recorded|established)|company not (?:provided|supplied|established))\s*', value, re.I))
+
+
+def missing_details(company, role):
+    # Matches the dashboard's placeholder handling; research needs both values.
+    return missing_company(company) or missing_role(role)
 
 
 class PostingParser(HTMLParser):
@@ -85,11 +95,19 @@ class PublicConnection(http.client.HTTPSConnection):
             raw.close();raise
 
 
-def fetch_posting(url):
+def remaining(deadline):
+    left=deadline-time.monotonic()
+    if left<=0:raise Unavailable('The posting took too long to load. Open the link or enter the role manually.')
+    return min(8,left)
+
+
+def fetch_posting(url,limit=25):
+    # One overall deadline, so a slow site cannot keep this worker thread reading after the caller gives up.
+    deadline=time.monotonic()+limit
     for _ in range(5):
         public_url(url)
         parsed=urlsplit(url)
-        connection=PublicConnection(parsed.hostname,timeout=8,context=ssl.create_default_context())
+        connection=PublicConnection(parsed.hostname,timeout=remaining(deadline),context=ssl.create_default_context())
         try:
             path=parsed.path or '/'
             if parsed.query:path+='?'+parsed.query
@@ -101,7 +119,13 @@ def fetch_posting(url):
                 url=urljoin(url,location);continue
             if response.status!=200:raise Unavailable(f'The posting returned HTTP {response.status}. Open the link or enter the role manually.')
             if 'html' not in response.getheader('Content-Type','').lower():raise Unavailable('The posting did not return an HTML page.')
-            body=response.read(MAX_BYTES+1)
+            chunks=[];size=0
+            while size<=MAX_BYTES:
+                connection.sock.settimeout(remaining(deadline))
+                chunk=response.read1(65536)
+                if not chunk:break
+                chunks.append(chunk);size+=len(chunk)
+            body=b''.join(chunks)
             if len(body)>MAX_BYTES:raise Unavailable('The posting page is too large to read. Enter the role manually.')
             return body.decode('utf-8',errors='replace'),url
         finally:connection.close()

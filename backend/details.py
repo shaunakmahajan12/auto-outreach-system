@@ -1,20 +1,15 @@
 """Source provenance, conservative mappings, and additive v2 migration."""
 import json
-import os
-import sqlite3
 from datetime import datetime
 from pathlib import Path
-from backend.store import now
+from backend.store import backup, now
 
 
 def migrate(store):
     with store.db() as db:
         version = db.execute('PRAGMA user_version').fetchone()[0]
     if version >= 2:return
-    backup = store.path.with_name(store.path.stem + '-before-v2.sqlite')
-    if not backup.exists():
-        with sqlite3.connect(store.path) as source, sqlite3.connect(backup) as target:source.backup(target)
-        os.chmod(backup, 0o600)
+    backup(store, '-before-v2.sqlite')
     with store.db() as db:
         # Explicit transaction: ALTER TABLE and version stamp must commit together.
         db.execute('BEGIN IMMEDIATE')
@@ -98,10 +93,7 @@ def contact_support(contact):
 def migrate_company_metadata(store):
     with store.db() as db:
         if db.execute('PRAGMA user_version').fetchone()[0] >= 3:return
-    backup=store.path.with_name(store.path.stem+'-before-v3.sqlite')
-    if not backup.exists():
-        with sqlite3.connect(store.path) as source, sqlite3.connect(backup) as target:source.backup(target)
-        os.chmod(backup,0o600)
+    backup(store, '-before-v3.sqlite')
     with store.db() as db:
         db.execute('BEGIN IMMEDIATE')
         columns={r[1] for r in db.execute('PRAGMA table_info(applications)')}

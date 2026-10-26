@@ -7,6 +7,7 @@ rule private_encrypted_bucket when %buckets !empty {
     RestrictPublicBuckets == true
   }
   %buckets.Properties.BucketEncryption.ServerSideEncryptionConfiguration[*].ServerSideEncryptionByDefault.SSEAlgorithm == 'AES256'
+  %buckets.Properties.LifecycleConfiguration.Rules[*].NoncurrentVersionExpiration.NoncurrentDays <= 7
 }
 let hosts = Resources.*[ Type == 'AWS::EC2::Instance' ]
 rule protected_host when %hosts !empty {

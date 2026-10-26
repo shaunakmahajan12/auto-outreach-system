@@ -10,9 +10,25 @@ def now():
     return datetime.now(timezone.utc).isoformat()
 
 
+def backup(store, suffix):
+    """One private copy before a migration step; staged imports opt out."""
+    if not store.backups:
+        return
+    target = store.path.with_name(store.path.stem + suffix)
+    if target.exists():
+        return
+    source, copy = sqlite3.connect(store.path), sqlite3.connect(target)
+    try:
+        source.backup(copy)
+    finally:
+        source.close(); copy.close()
+    os.chmod(target, 0o600)
+
+
 class Store:
-    def __init__(self, path):
+    def __init__(self, path, backups=True):
         self.path = Path(path).resolve()
+        self.backups = backups
 
     @contextmanager
     def db(self):
@@ -28,14 +44,8 @@ class Store:
     def initialize(self):
         if not self.path.exists():
             raise RuntimeError('Original Tsenta baseline missing. Restore .local/outreach.sqlite; never create a replacement baseline.')
-        backup=self.path.with_name(self.path.stem+'-before-engineering-v1.sqlite')
-        if not backup.exists():
-            with sqlite3.connect(self.path) as source,sqlite3.connect(backup) as target:source.backup(target)
-            os.chmod(backup,0o600)
-        backup2=self.path.with_name(self.path.stem+'-before-correctness-v2.sqlite')
-        if not backup2.exists():
-            with sqlite3.connect(self.path) as source,sqlite3.connect(backup2) as target:source.backup(target)
-            os.chmod(backup2,0o600)
+        backup(self, '-before-engineering-v1.sqlite')
+        backup(self, '-before-correctness-v2.sqlite')
         os.chmod(self.path, 0o600)
         with self.db() as db:
             baseline = db.execute('SELECT * FROM baseline WHERE singleton=1').fetchone()
@@ -43,11 +53,7 @@ class Store:
                 raise RuntimeError('Original baseline is required.')
             version = db.execute('PRAGMA user_version').fetchone()[0]
         if version < 1:
-            backup = self.path.with_name(self.path.stem + '-before-v1.sqlite')
-            if not backup.exists():
-                with sqlite3.connect(self.path) as source, sqlite3.connect(backup) as target:
-                    source.backup(target)
-                os.chmod(backup, 0o600)
+            backup(self, '-before-v1.sqlite')
             with self.db() as db:
                 db.execute('ALTER TABLE applications RENAME TO applications_original')
                 db.execute('''CREATE TABLE applications (
@@ -145,6 +151,10 @@ class Store:
                 if value is not None:
                     if not value.strip():raise ValueError('Company and role cannot be blank')
                     db.execute(f'UPDATE applications SET {field}=? WHERE source_application_id=?',(value.strip(),app_id))
+            from backend.posting_role import missing_details
+            current = db.execute('SELECT company,role FROM applications WHERE source_application_id=?', (app_id,)).fetchone()
+            if missing_details(current['company'],current['role']):
+                raise ValueError('Add the company and role before preparing outreach.')
             if app['research_state']=='no_contacts':
                 db.execute('INSERT INTO preparation_epochs VALUES(?,1) ON CONFLICT(application_id) DO UPDATE SET epoch=preparation_epochs.epoch+1',(app_id,))
                 db.execute('DELETE FROM research_cache WHERE application_id=?',(app_id,))
@@ -164,8 +174,9 @@ class Store:
             db.execute("UPDATE applications SET research_state='dismissed',selected=0,last_error=NULL WHERE source_application_id=?",(app_id,))
 
     def apply_snapshot(self, rows):
-        from scripts.tsenta_baseline import normalize_status
+        from backend.baseline import normalize_status
         from backend.details import baseline_valid, sync_metadata
+        from backend.posting_role import missing_details
         if not baseline_valid(self):raise ValueError('Original baseline is missing or inconsistent; synchronization stopped safely.')
         added = eligible = 0
         with self.db() as db:
@@ -187,7 +198,7 @@ class Store:
                          normalize_status(status),row.get('createdAt'),row.get('updatedAt'),int(historical),json.dumps(missing),
                          'historical_no_outreach' if historical else ('not_started' if status=='COMPLETED' else 'awaiting_submission'),now(),row.get('jobId')))
                 else:
-                    db.execute('''UPDATE applications SET company=COALESCE(NULLIF(?,''),company),role=COALESCE(NULLIF(?,''),role),job_url=?,source_status=?,normalized_status=?,
+                    db.execute('''UPDATE applications SET company=COALESCE(NULLIF(?,''),company),role=COALESCE(NULLIF(?,''),role),job_url=COALESCE(NULLIF(?,''),job_url),source_status=?,normalized_status=?,
                         source_updated_at=?,job_id=COALESCE(?,job_id),source_resume_profile_id=COALESCE(?,source_resume_profile_id)
                         WHERE source_application_id=?''',(row.get('companyName'),row.get('jobTitle'),row.get('url'),status,
                         normalize_status(status),row.get('updatedAt'),row.get('jobId'),row.get('resumeProfileId'),aid))
@@ -199,6 +210,10 @@ class Store:
                 if status == 'COMPLETED' and (not old or old['hiring_outcome'] not in ('rejected','job_closed')) and (not historical or (old and (old['selected'] or not old['confirmed_at_baseline']))):
                     db.execute('UPDATE applications SET first_confirmed=COALESCE(first_confirmed,?) WHERE source_application_id=?',(now(),aid))
                     if os.getenv('OUTREACH_AUTO_RESEARCH','true').lower() != 'true':
+                        continue
+                    current = db.execute('SELECT company,role FROM applications WHERE source_application_id=?', (aid,)).fetchone()
+                    # Research needs both; a missing role is filled from the posting or by the user first.
+                    if missing_details(current['company'],current['role']):
                         continue
                     cur = db.execute("INSERT OR IGNORE INTO jobs(application_id,state) VALUES(?,'queued')", (aid,))
                     if cur.rowcount:

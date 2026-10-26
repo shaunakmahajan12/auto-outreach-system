@@ -51,6 +51,13 @@ region and usage budget; CPU-only model latency must be measured on the target h
 9. Rehearse restoring both ledger and checkpoints from encrypted backups on a
    separate path before enabling a backup schedule. Document stop/start and rollback.
 
+`deploy_private.py` reads the Region from the `outreach` CLI profile and passes it to
+the host install script; confirm it matches the project's Region in AWS Settings
+before provisioning. The Ollama image is pinned by version and digest in
+`OLLAMA_IMAGE`; update it deliberately. After `install-status` reports success, the
+uploaded `workspace.tar.gz` (a private ledger copy) is deleted from the release
+bucket, and non-current object versions expire after one day.
+
 If public HTTPS is chosen instead, add a domain, TLS termination and the app's signed
 session authentication, CSRF and explicit host/origin configuration. The remote
 Tsenta callback needs verification for that exact hostname. See

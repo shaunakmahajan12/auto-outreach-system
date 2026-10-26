@@ -23,6 +23,9 @@ class Source(BaseModel):
 class Serper:
     def __init__(self,secrets_store):self.secrets=secrets_store
     async def search(self,company,role):
+        if not company or not role:raise Unavailable('Research needs the application company and role.')
+        # Quotes in source values would end the exact-company phrase early.
+        company=' '.join(company.replace('"',' ').split());role=' '.join(role.replace('"',' ').split())
         query=f'"{company[:120]}" (recruiter OR "talent acquisition" OR "hiring manager" OR "technical founder") {role[:100]} site:linkedin.com/in/'
         results=await self.results(query)
         sources=[]
@@ -175,8 +178,9 @@ class Ollama:
              'requirements':[{k:r[k] for k in ('text','category','priority')} for r in app.get('requirements',[])],'selected_fact_ids':[f['id'] for f in selected]}
         # Keep complete excerpts in grounding, but never repeat them in drafting input.
         from backend.input_budget import fits_draft
+        omitted=[]
         while not fits_draft(self.model,DraftPlan,instruction,data) and len(selected)>1:
-            selected.pop()
+            omitted.append(selected.pop())
             data['facts']=[{'id':f['id'],'text':f['text']} for f in selected]
             data['selected_fact_ids']=[f['id'] for f in selected]
         if not fits_draft(self.model,DraftPlan,instruction,data):
@@ -204,13 +208,15 @@ class Ollama:
         dm='\n\n'.join(part for part in (opening,body,question+' Thank you!') if part)
         # Whole approved facts are removed rather than chopped into misleading fragments.
         while len(dm)>limits['dm_limit'] and chosen:
-            chosen.pop()
+            omitted.append({'id':chosen.pop()})
             body=' '.join(lookup[fid] for fid in chosen)
             dm='\n\n'.join(part for part in (opening,body,question+' Thank you!') if part)
         if len(dm)>limits['dm_limit']:raise Unavailable('Draft exceeds your DM limit. Increase it in Settings.')
         return {'note':note,'dm':dm,'grounding':{'fact_ids':chosen,'facts':[lookup[fid] for fid in dict.fromkeys(chosen+note_facts)],
             'note_fact_ids':note_facts,
             'note_explanation':note_explanation,
+            # Whole facts are dropped rather than cut; say so instead of omitting them silently.
+            'omitted_explanation':(f'{len(omitted)} approved fact(s) did not fit the model input or your DM limit in full and were left out. Split long facts into concise ones.' if omitted else None),
             'method':'Standard framing with whole model-selected approved facts',
             'fallback_used':False,'validation_issues':[],'generated_note':note,
             'matching':app.get('matching'), 'source_references':{f['id']:f.get('source_reference','') for f in selected},

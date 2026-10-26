@@ -1,18 +1,10 @@
 """Additive, repeatable local migration. Never rewrites drafts or baseline rows."""
-import os
-import sqlite3
-from backend.store import now
+from backend.store import backup, now
 
 
 def migrate(store):
-    backup=store.path.with_name(store.path.stem+'-before-engineering-v1.sqlite')
-    if not backup.exists():
-        with sqlite3.connect(store.path) as source, sqlite3.connect(backup) as target: source.backup(target)
-        os.chmod(backup,0o600)
-    backup2=store.path.with_name(store.path.stem+'-before-correctness-v2.sqlite')
-    if not backup2.exists():
-        with sqlite3.connect(store.path) as source,sqlite3.connect(backup2) as target:source.backup(target)
-        os.chmod(backup2,0o600)
+    backup(store,'-before-engineering-v1.sqlite')
+    backup(store,'-before-correctness-v2.sqlite')
     with store.db() as db:
         db.execute('CREATE TABLE IF NOT EXISTS message_feedback(suggestion_id TEXT NOT NULL REFERENCES draft_suggestions(id), kind TEXT NOT NULL, accepted INTEGER NOT NULL, edited INTEGER NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(suggestion_id,kind))')
         db.execute('CREATE TABLE IF NOT EXISTS preparation_epochs(application_id TEXT PRIMARY KEY, epoch INTEGER NOT NULL DEFAULT 0)')

@@ -1,33 +1,34 @@
 """Validated all-table SQLite -> PostgreSQL import. Target must be empty.
 
-Never changes source or switches configuration. Prints counts only, never data/URLs.
+Backs up the source, then applies only its additive local migrations before reading.
+Never switches configuration. Prints counts only, never data/URLs.
 """
 import argparse
 import json
 import os
 from pathlib import Path
-import sqlite3
+import sys
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
 from sqlalchemy import create_engine, MetaData, select, text
 from alembic.config import Config
 from alembic import command
-from backend.store import Store
+from backend.store import Store, backup
 os.umask(0o077)
 from backend.details import baseline_valid
 
 def migrate(source_path,url):
-    source_path=Path(source_path).resolve();backup=source_path.with_name(source_path.stem+'-before-postgres.sqlite')
+    source_path=Path(source_path).resolve()
     if not source_path.exists():raise ValueError('Source does not exist')
-    if not backup.exists():
-        with sqlite3.connect(source_path) as source,sqlite3.connect(backup) as target:source.backup(target)
-        backup.chmod(0o600)
-    store=Store(source_path);store.initialize()
+    store=Store(source_path);backup(store,'-before-postgres.sqlite');store.initialize()
     from backend.experience import ExperienceRepository
     ExperienceRepository(store,url=f'sqlite:///{source_path}').initialize()
     if not baseline_valid(store):raise ValueError('Source baseline invariant failed')
     with store.db() as db:
         if db.execute('PRAGMA foreign_key_check').fetchone():raise ValueError('Source foreign keys invalid')
     os.environ['DATABASE_URL']=url
-    command.upgrade(Config('alembic.ini'),'head')
+    config=Config(str(ROOT/'alembic.ini'));config.set_main_option('script_location',str(ROOT/'migrations'))
+    command.upgrade(config,'head')
     source=create_engine(f'sqlite:///{source_path}');target=create_engine(url,hide_parameters=True)
     metadata=MetaData();metadata.reflect(source)
     counts={}

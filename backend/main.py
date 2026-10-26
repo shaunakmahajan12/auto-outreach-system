@@ -162,6 +162,8 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
         if not store.path.exists() and path=='/api/settings' and request.method!='GET':
             return JSONResponse({'detail':'Import your initial history before saving approved facts.'},status_code=409)
         if request.method in ('POST','PUT','PATCH'):
+            if 'content-length' not in request.headers and request.headers.get('transfer-encoding'):
+                return JSONResponse({'detail':'Content length required'},status_code=411)
             try:size=int(request.headers.get('content-length','0'))
             except ValueError:return JSONResponse({'detail':'Invalid content length'},status_code=400)
             if size>100000:return JSONResponse({'detail':'Request is too large'},status_code=413)
@@ -182,7 +184,7 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
     async def temporary(request,error):return JSONResponse({'detail':str(error)},status_code=503)
 
     @app.get('/api/bootstrap')
-    def bootstrap(request:Request):return {'token':request.session.get('csrf') if remote else csrf,'demo':demo,'onboarding_required':not store.path.exists()}
+    def bootstrap(request:Request):return {'token':request.session.get('csrf') if remote else csrf,'demo':demo,'remote':bool(remote),'onboarding_required':not store.path.exists()}
 
     @app.get('/api/state')
     def state(request:Request):
@@ -395,7 +397,7 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
             if store.path.exists():raise ValueError('A database already exists. Your original baseline cannot be replaced.')
             rows=await tsenta.snapshot()
             # snapshot() has already validated the complete, unfiltered source history.
-            from scripts.tsenta_baseline import save_baseline
+            from backend.baseline import save_baseline
             limit=100;total=len(rows);pages=max(1,(total+limit-1)//limit)
             captures=[{'tool':'list-applications','arguments':{'filter':'all','page':i+1,'limit':limit},
                 'response':{'result':{'structuredContent':{'tool':'list-applications','result':{
@@ -408,7 +410,7 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
             from backend.store import Store
             try:
                 save_baseline(captures,temporary)
-                staged=Store(temporary);staged.initialize()
+                staged=Store(temporary,backups=False);staged.initialize()
                 if not baseline_valid(staged):raise Unavailable('Initial history validation failed.')
                 # Hard link publishes atomically and refuses to overwrite an existing file.
                 os.link(temporary,store.path)
@@ -420,7 +422,7 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
     @app.post('/api/maintenance/repair-notes')
     async def repair_generated_notes():
         from backend.maintenance import repair_notes
-        return await asyncio.to_thread(repair_notes,store)
+        return await asyncio.to_thread(repair_notes,store,experience)
 
     @app.post('/api/sync')
     def sync():return {'run_id':store.enqueue_sync()}
@@ -525,9 +527,13 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
         with store.db() as db:
             original=db.execute('SELECT * FROM contacts WHERE id=?',(cid,)).fetchone()
             if not original:raise ValueError('Contact not found')
-            saved=json.dumps({k:original[k] for k in ('name','title','company','linkedin_url')})
-            db.execute('UPDATE contacts SET name=?,title=?,company=?,linkedin_url=?,review_status=?,review_note=?,review_source=?,reviewed_at=?,dismissed=?,original_fields=COALESCE(original_fields,?) WHERE id=?',
-                (value.name,value.title or None,value.company or None,url,value.review_status,value.review_note,source,now(),int(value.dismissed),saved,cid))
+            identity={'name':value.name,'title':value.title or None,'company':value.company or None,'linkedin_url':url}
+            review={'review_status':value.review_status,'review_note':value.review_note,'review_source':source}
+            # Dismissing or restoring alone is neither a field correction nor a review.
+            changed=lambda fields:any((fields[k] or None)!=(original[k] or None) for k in fields)
+            saved=json.dumps({k:original[k] for k in identity}) if changed(identity) else None
+            db.execute('UPDATE contacts SET name=?,title=?,company=?,linkedin_url=?,review_status=?,review_note=?,review_source=?,reviewed_at=CASE WHEN ?=1 THEN ? ELSE reviewed_at END,dismissed=?,original_fields=COALESCE(original_fields,?) WHERE id=?',
+                (value.name,identity['title'],identity['company'],url,value.review_status,value.review_note,source,int(changed(review)),now(),int(value.dismissed),saved,cid))
         return {'saved':True}
 
     @app.put('/api/contacts/{cid}/drafts')
@@ -594,6 +600,7 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
             event=db.execute('SELECT * FROM outreach_events WHERE id=? AND contact_id=?',(eid,cid)).fetchone()
             if not event:raise ValueError('Activity not found')
             if event['kind']=='dm_sent' and db.execute("SELECT 1 FROM outreach_events WHERE contact_id=? AND kind='followup_sent' AND undone_at IS NULL",(cid,)).fetchone():raise ValueError('Undo dependent follow-up entries before undoing the original message.')
+            if event['kind']=='invitation_sent' and db.execute("SELECT 1 FROM outreach_events WHERE contact_id=? AND kind='connection_accepted' AND undone_at IS NULL",(cid,)).fetchone():raise ValueError('Undo the recorded acceptance before undoing the invitation.')
             db.execute('UPDATE outreach_events SET undone_at=COALESCE(undone_at,?) WHERE id=?',(now(),eid))
         return {'undone':True}
 

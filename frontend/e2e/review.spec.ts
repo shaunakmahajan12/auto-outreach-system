@@ -112,3 +112,37 @@ test('failed description load keeps Save disabled until successful retry',async(
  await expect(page.getByRole('alert')).toContainText('Fictional load failure');await expect(page.getByRole('button',{name:'Save description',exact:true})).toBeDisabled();
  failed=false;await page.getByRole('button',{name:'Retry loading',exact:true}).click();await expect(page.getByRole('button',{name:'Save description',exact:true})).toBeEnabled();
 });
+test('typed comma-separated technologies are kept as separate entries',async({page})=>{
+ await page.getByRole('button',{name:'Experience',exact:true}).click();
+ await page.getByRole('button',{name:'Add experience',exact:true}).first().click();
+ await page.getByLabel('Factual text').fill('I built a fictional typed technologies record.');
+ // Type key by key: a filled value would hide commas being dropped while typing.
+ await page.getByLabel('Technologies (comma separated)').pressSequentially('React, TypeScript');
+ await expect(page.getByLabel('Technologies (comma separated)')).toHaveValue('React, TypeScript');
+ await page.getByRole('button',{name:'Save experience',exact:true}).click();
+ const record=page.locator('.experience-record',{hasText:'I built a fictional typed technologies record.'});
+ await expect(record.locator('.technology-chip')).toHaveText(['React','TypeScript']);
+});
+test('hiring outcome can be recorded from application details',async({page})=>{
+ await page.locator('tr[data-application-id="FICTIONAL-HISTORY"]').getByRole('button',{name:'Software Engineer (fictional)',exact:true}).click();
+ await page.getByText('Record hiring outcome',{exact:true}).click();
+ await page.getByLabel('Hiring outcome').selectOption('interviewing');
+ await page.getByRole('button',{name:'Save outcome',exact:true}).click();
+ await expect(page.getByText('Hiring outcome saved.',{exact:false})).toBeVisible();
+ await expect(page.locator('.application-detail .status-badge',{hasText:'Interviewing'})).toBeVisible();
+ await api(page,'/applications/FICTIONAL-HISTORY/outcome',{outcome:'unknown',note:''},'PUT');
+});
+test('unsaved edits yield to a newer saved draft',async({page})=>{
+ const state=await api(page,'/state',undefined,'GET');
+ const contact=state.contacts.find((c:any)=>c.application_id==='FICTIONAL-HISTORY');
+ await page.locator('tr[data-application-id="FICTIONAL-HISTORY"]').getByRole('button',{name:'Software Engineer (fictional)',exact:true}).click();
+ await page.getByRole('button',{name:'View drafts',exact:false}).first().click();
+ await page.getByRole('textbox',{name:'Connection note',exact:true}).fill('Unsaved fictional working edit');
+ await page.getByRole('button',{name:'Close dialog',exact:true}).click();
+ await api(page,`/contacts/${contact.id}/drafts`,{note:'Newer saved fictional note',dm:contact.dm},'PUT');
+ await page.reload();
+ await page.locator('tr[data-application-id="FICTIONAL-HISTORY"]').getByRole('button',{name:'Software Engineer (fictional)',exact:true}).click();
+ await page.getByRole('button',{name:'View drafts',exact:false}).first().click();
+ await expect(page.getByRole('textbox',{name:'Connection note',exact:true})).toHaveValue('Newer saved fictional note');
+ await expect(page.getByText('The saved draft changed after your unsaved edits',{exact:false})).toBeVisible();
+});

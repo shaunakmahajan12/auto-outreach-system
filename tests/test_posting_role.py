@@ -27,8 +27,10 @@ def test_redirect_revalidated_and_response_bounded(monkeypatch):
     class Response:
         status=302
         def getheader(self,name,default=None):return 'https://localhost/private' if name=='Location' else default
+    class Socket:
+        def settimeout(self,value):assert 0<value<=8
     class Connection:
-        def __init__(self,*a,**k):pass
+        def __init__(self,*a,**k):self.sock=Socket()
         def request(self,*a,**k):pass
         def getresponse(self):return Response()
         def close(self):pass
@@ -36,7 +38,7 @@ def test_redirect_revalidated_and_response_bounded(monkeypatch):
     with pytest.raises(ValueError):posting_role.fetch_posting('https://posting.example.com/job')
     Response.status=200
     Response.getheader=lambda self,*a:'text/html'
-    Response.read=lambda self,n:b'x'*n
+    Response.read1=lambda self,n:b'x'*n
     with pytest.raises(Unavailable,match='too large'):posting_role.fetch_posting('https://posting.example.com/job')
 
 
@@ -118,3 +120,19 @@ def test_background_preserves_role_entered_during_request(client,monkeypatch):
     monkeypatch.setattr(posting_role,'inspect_posting',inspect)
     asyncio.run(posting_role.fill_next_missing_role(store))
     assert store.rows('SELECT role FROM applications')[0]['role']=='Manual role'
+
+
+def test_posting_read_stops_at_overall_deadline(monkeypatch):
+    class Response:
+        status=200
+        def getheader(self,name,default=None):return 'text/html'
+        def read1(self,n):return b'<'
+    class Connection:
+        def __init__(self,*a,**k):self.sock=type('Socket',(),{'settimeout':lambda self,v:None})()
+        def request(self,*a,**k):pass
+        def getresponse(self):return Response()
+        def close(self):pass
+    clock=iter(range(0,10000,5))
+    monkeypatch.setattr(posting_role,'PublicConnection',Connection)
+    monkeypatch.setattr(posting_role.time,'monotonic',lambda:next(clock))
+    with pytest.raises(Unavailable,match='too long'):posting_role.fetch_posting('https://posting.example.com/job')

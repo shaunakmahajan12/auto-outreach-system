@@ -34,9 +34,15 @@ def configuration():
 
 def routes(app,config):
     attempts={}
+    # Failed sign-ins are limited per address+username, per address and per username,
+    # so neither rotating usernames nor rotating addresses avoids the limit.
+    limits=lambda host,username:((('pair',host,username),5),(('address',host),20),(('username',username),20))
     @app.get('/login',response_class=HTMLResponse)
     def login_page(request:Request):
-        request.session.clear();nonce=secrets.token_urlsafe(32);request.session['login_csrf']=nonce
+        # Visiting the sign-in page must not sign out an active session (a link could force that);
+        # only an expired or anonymous session is reset. A successful sign-in replaces it.
+        if not (config['users'].get(request.session.get('user','')) and request.session.get('expires',0)>time.time()):request.session.clear()
+        nonce=secrets.token_urlsafe(32);request.session['login_csrf']=nonce
         return HTMLResponse('<!doctype html><title>Outreach sign in</title><h1>Sign in</h1><form method="post" action="/login">'
             f'<input type="hidden" name="csrf" value="{nonce}"><label>Username<input name="username" autocomplete="username" required></label>'
             '<label>Password<input name="password" type="password" autocomplete="current-password" required></label><button>Sign in</button></form>')
@@ -47,13 +53,15 @@ def routes(app,config):
         value=lambda k:form.get(k,[''])[0]
         if not hmac.compare_digest(value('csrf'),request.session.get('login_csrf','')) or not value('csrf'):
             return JSONResponse({'detail':'Invalid login session'},403)
-        key=(request.client.host if request.client else 'unknown',value('username')[:100])
-        recent=[t for t in attempts.get(key,[]) if t>time.monotonic()-300]
-        if len(recent)>=5:return JSONResponse({'detail':'Too many attempts. Try again in five minutes.'},429)
+        # request.client is the real address only behind proxies listed in FORWARDED_ALLOW_IPS.
+        keys=limits(request.client.host if request.client else 'unknown',value('username')[:100])
+        cutoff=time.monotonic()-300
+        recent={key:[t for t in attempts.get(key,[]) if t>cutoff] for key,_ in keys}
+        if any(len(recent[key])>=limit for key,limit in keys):return JSONResponse({'detail':'Too many attempts. Try again in five minutes.'},429)
         user=config['users'].get(value('username'))
         if not user or not verify(value('password'),user['password_hash']):
-            if len(attempts)>1000:attempts.clear()
-            attempts[key]=recent+[time.monotonic()]
+            if len(attempts)>3000:attempts.clear()
+            for key,_ in keys:attempts[key]=recent[key]+[time.monotonic()]
             return JSONResponse({'detail':'Invalid credentials'},401)
         request.session.clear();request.session.update({'user':value('username'),'csrf':secrets.token_urlsafe(32),'expires':time.time()+28800})
         return RedirectResponse('/',status_code=303)
