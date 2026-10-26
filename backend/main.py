@@ -543,6 +543,10 @@ def create_app(store=None,tsenta=None,search=None,ollama=None,vault=None,start_w
         with store.db() as db:
             existing=db.execute('SELECT note FROM drafts WHERE contact_id=?',(cid,)).fetchone()
             if not existing:raise ValueError('Draft not found')
+            # Hard note limit (code points, as LinkedIn and the editor count). An unchanged
+            # legacy note is left alone so it cannot block saving the DM; copying still refuses it.
+            if value.note!=existing['note'] and len(value.note)>limits['note_limit']:
+                raise ValueError(f"Connection note exceeds your {limits['note_limit']}-character limit. Shorten it before saving.")
             grounding=json.loads(db.execute('SELECT grounding FROM drafts WHERE contact_id=?',(cid,)).fetchone()[0])
             accepted=grounding.get('accepted_suggestions',{})
             if value.suggestion_id:

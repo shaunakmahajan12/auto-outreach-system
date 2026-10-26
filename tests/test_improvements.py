@@ -176,8 +176,11 @@ def test_note_save_validation_preserves_legacy_and_copies_identical_text(client)
     c=prepared(client);cid=c['id'];store=client.app.state.store
     with store.db() as db:db.execute('UPDATE drafts SET note=? WHERE contact_id=?',('Legacy edited note',cid))
     assert client.put(f'/api/contacts/{cid}/drafts',json={'note':'Legacy edited note','dm':'Updated DM'}).status_code==200
-    for note in ('Short edit','x'*106,'x'*199,'x'*201,' '+'x'*199):
+    for note in ('Short edit','x'*106,'x'*199,' '+'x'*199):
         assert client.put(f'/api/contacts/{cid}/drafts',json={'note':note,'dm':'Updated DM'}).status_code==200
         assert store.rows('SELECT note FROM drafts')[0]['note']==note
         assert prepare(store,cid,'note')['text']==note
+    # The note limit is hard: an over-limit edit is rejected and the saved note is kept.
+    assert client.put(f'/api/contacts/{cid}/drafts',json={'note':'x'*201,'dm':'Updated DM'}).status_code==400
+    assert store.rows('SELECT note FROM drafts')[0]['note']==' '+'x'*199
     assert not store.rows('SELECT * FROM outreach_events')

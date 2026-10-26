@@ -28,13 +28,16 @@ export function DraftDialog({c,config,demo,onClose,onSaved}:{c:DraftContact;conf
  useEffect(()=>{try{if(acceptedSuggestion)sessionStorage.setItem(storageKey+'-acceptance',JSON.stringify(acceptedSuggestion));else sessionStorage.removeItem(storageKey+'-acceptance')}catch{setError('Save before closing; browser storage is unavailable.')}},[acceptedSuggestion,storageKey]);
  const dirty=draft.note!==baseline.note||draft.dm!==baseline.dm;
  const noteLimit=config?.note_limit||200,limit=tab==='note'?noteLimit:(config?.dm_limit||1200);
- const over=Array.from(draft.dm).length>(config?.dm_limit||1200);
- const copyInvalid=tab==='dm'&&over;
+ const dmOver=Array.from(draft.dm).length>(config?.dm_limit||1200);
  const noteOver=Array.from(draft.note).length>noteLimit;
+ // Both limits are hard. An unchanged legacy note over the limit does not block saving the DM.
+ const noteBlocked=noteOver&&draft.note!==baseline.note;
+ const over=dmOver||noteBlocked;
+ const copyInvalid=tab==='note'?noteOver:dmOver;
  const blocked=demo||c.dismissed||['rejected','job_closed'].includes(c.hiring_outcome)||c.source_status!=='COMPLETED'||!!c.conversation.closed_reason;
  function keep(next:Draft){sessionStorage.setItem(storageKey,JSON.stringify({...next,base:baseline}))}
  function update(next:Draft){setDraft(next);try{keep(next)}catch{setError('This browser cannot retain working edits. Save before closing.')}}
- async function persist(){if(over)throw new Error('Message exceeds the character limit.');await api(`/contacts/${c.id}/drafts`,'PUT',{...draft,suggestion_id:acceptedSuggestion?.id,suggestion_parts:acceptedSuggestion?.parts});setBaseline({...draft});setAcceptedSuggestion(null);sessionStorage.removeItem(storageKey);}
+ async function persist(){if(over)throw new Error(noteBlocked?`Shorten the connection note to ${noteLimit} characters before saving.`:'Message exceeds the character limit.');await api(`/contacts/${c.id}/drafts`,'PUT',{...draft,suggestion_id:acceptedSuggestion?.id,suggestion_parts:acceptedSuggestion?.parts});setBaseline({...draft});setAcceptedSuggestion(null);sessionStorage.removeItem(storageKey);}
  async function save(){setBusy('save');setError('');try{await persist();setMessage('Drafts saved.');await onSaved()}catch(e){setError((e as Error).message);if((e as {status?:number}).status===400)setAcceptedSuggestion(null)}finally{setBusy('')}}
  async function suggest(){setBusy('suggest');setError('');setGenerationFailed(false);try{setSuggestion(await api(`/contacts/${c.id}/draft-suggestion`,'POST'));setMessage('Suggestion ready. Your current drafts are unchanged.')}catch(e){setGenerationFailed(true);setError((e as Error).message)}finally{setBusy('')}}
  function useSuggestion(parts:('note'|'dm')[]){if(!suggestion)return;if(parts.some(k=>draft[k]!==baseline[k])&&!window.confirm('Replace the working message with this suggestion? Saved drafts stay unchanged until you save.'))return;setAcceptedSuggestion(previous=>({id:suggestion.suggestion_id,parts:[...new Set([...(previous?.id===suggestion.suggestion_id?previous.parts:[]),...parts])]}));update({...draft,...Object.fromEntries(parts.map(k=>[k,suggestion[k]]))});setTab(parts[0]);setMessage('Suggestion applied. Save to keep it.');}
@@ -60,7 +63,7 @@ export function DraftDialog({c,config,demo,onClose,onSaved}:{c:DraftContact;conf
  {error&&<div className="notice error" role="alert">{error}{generationFailed&&<button className="text-button" disabled={!!busy} onClick={suggest}>Retry generation</button>}</div>}{message&&<div className="notice success" role="status">{message}</div>}
  <div className="draft-layout"><section className="draft-main"><div className="draft-tabs" role="tablist" aria-label="Message type" onKeyDown={tabKey}>{[['note','Connection note'],['dm','Direct message']].map(([value,label])=><button id={'draft-tab-'+value} key={value} role="tab" aria-selected={tab===value} aria-controls="draft-panel" tabIndex={tab===value?0:-1} onClick={()=>setTab(value as 'note'|'dm')}>{label}</button>)}</div>
  <div id="draft-panel" role="tabpanel" aria-labelledby={'draft-tab-'+tab}><label className="sr-only" htmlFor="draft-text">{tab==='note'?'Connection note':'Direct message'}</label><textarea id="draft-text" className="draft-editor" disabled={!!busy} value={draft[tab]} onChange={e=>update({...draft,[tab]:e.target.value})} rows={9}/><div className="editor-meta"><span>{dirty?'Working edits retained in this browser tab':'Saved draft'}</span><span className={(tab==='note'?noteOver:copyInvalid)?'danger':''} aria-live="polite">{Array.from(draft[tab]).length} / {limit} characters</span></div></div>
- {tab==='note'&&noteOver&&<p className="hint" role="status">Above your configured LinkedIn limit. You can still save or copy this note; LinkedIn may require shortening it.</p>}
+ {tab==='note'&&noteOver&&<p className="hint danger" role="status">Over your {noteLimit}-character limit. Shorten this note to save or copy it.</p>}
  {dirty&&<p className="hint">Closing this dialog keeps your working edits. The copy action uses the text currently displayed.</p>}
  <div className="button-row"><button className="button primary" disabled={(!dirty&&!acceptedSuggestion)||over||!!busy} onClick={save}>{busy==='save'?'Saving…':'Save changes'}</button><button className="button" disabled={over||copyInvalid||!!busy||blocked||!draft[tab].trim()} onClick={copy}>{busy==='copy'?'Working…':'Open LinkedIn & copy message'}</button></div>
  {demo&&<p className="hint">Fictional workspace: external profiles are disabled.</p>}{blocked&&!demo&&<p className="hint">Copy/open is unavailable for a dismissed contact, a closed conversation, or an unconfirmed submission.</p>}

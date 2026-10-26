@@ -146,3 +146,15 @@ test('unsaved edits yield to a newer saved draft',async({page})=>{
  await expect(page.getByRole('textbox',{name:'Connection note',exact:true})).toHaveValue('Newer saved fictional note');
  await expect(page.getByText('The saved draft changed after your unsaved edits',{exact:false})).toBeVisible();
 });
+test('connection notes over the limit cannot be saved or copied',async({page})=>{
+ await page.locator('tr[data-application-id="FICTIONAL-HISTORY"]').getByRole('button',{name:'Software Engineer (fictional)',exact:true}).click();
+ await page.getByRole('button',{name:'View drafts',exact:false}).first().click();
+ const note=page.getByRole('textbox',{name:'Connection note',exact:true});
+ await note.fill('x'.repeat(201));
+ await expect(page.getByText('Over your 200-character limit',{exact:false})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Save changes',exact:true})).toBeDisabled();
+ await expect(page.getByRole('button',{name:'Open LinkedIn & copy message',exact:true})).toBeDisabled();
+ await note.fill('x'.repeat(200));
+ await expect(page.getByRole('button',{name:'Save changes',exact:true})).toBeEnabled();
+ await page.getByRole('button',{name:'Close dialog',exact:true}).click();
+});

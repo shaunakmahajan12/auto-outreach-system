@@ -64,6 +64,6 @@ def prepare(store,cid,kind):
     if kind not in ('note','dm'):raise ValueError('Unknown draft kind')
     value=row[kind]
     limit=store.settings()['note_limit' if kind=='note' else 'dm_limit']
-    if kind=='dm' and len(value)>limit:raise ValueError('Draft exceeds your configured character limit; edit and save first')
+    if len(value)>limit:raise ValueError('Draft exceeds your configured character limit; edit and save first')
     # Pure read: copying/opening must never create an outreach event.
     return {'url':public_url(row['linkedin_url'],True),'text':value}

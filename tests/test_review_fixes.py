@@ -1,5 +1,6 @@
 """Regressions from the repository review, using fictional records only."""
 import asyncio
+import pytest
 from backend.demo import row
 from backend.experience import ExperienceInput
 from backend.maintenance import repair_notes
@@ -161,3 +162,21 @@ def test_search_query_strips_quotes(monkeypatch):
     monkeypatch.setattr(Serper,'results',results)
     asyncio.run(Serper(None).search('Cedar "Labs"','Engineer'))
     assert seen['q'].startswith('"Cedar Labs" (')
+
+
+def test_note_limit_is_hard_for_changed_notes(client):
+    client.post(f'/api/applications/{AID}/research');advance(client)
+    c=client.get('/api/state').json()['contacts'][0];cid=c['id']
+    response=client.put(f'/api/contacts/{cid}/drafts',json={'note':'x'*201,'dm':c['dm']})
+    assert response.status_code==400 and '200-character limit' in response.json()['detail']
+    assert client.put(f'/api/contacts/{cid}/drafts',json={'note':'😀'*200,'dm':c['dm']}).status_code==200
+
+
+def test_legacy_long_note_does_not_block_dm_but_blocks_copy(client):
+    from backend.outreach import prepare
+    client.post(f'/api/applications/{AID}/research');advance(client)
+    store=client.app.state.store
+    cid=client.get('/api/state').json()['contacts'][0]['id']
+    with store.db() as db:db.execute('UPDATE drafts SET note=? WHERE contact_id=?',('y'*250,cid))
+    assert client.put(f'/api/contacts/{cid}/drafts',json={'note':'y'*250,'dm':'Edited fictional DM'}).status_code==200
+    with pytest.raises(ValueError,match='character limit'):prepare(store,cid,'note')

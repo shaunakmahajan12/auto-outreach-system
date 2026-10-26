@@ -54,7 +54,10 @@ Generated connection notes default to exactly 200 Unicode code points, matching
 frontend Array.from and Python len. Whole facts and finite framing variants are used;
 no whitespace padding, fact truncation or invented metrics. Impossible combinations
 produce an actionable failure and preserve saved text. Disable the setting for
-maximum-length rendering. Manual notes remain editable, saveable and copyable.
+maximum-length rendering. The configured note limit is also a hard limit for manual
+edits: a changed note over it cannot be saved, and an over-limit note cannot be
+copied or opened until shortened. Previously saved over-limit notes stay unchanged
+until edited or repaired; they do not block saving the DM.
 
 ## Backup and rollback
 
